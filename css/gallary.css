@@ -1,0 +1,594 @@
+a {
+	text-decoration: none;
+}
+
+.txt-rt {
+	text-align: right;
+}
+
+/* text align right */
+.txt-lt {
+	text-align: left;
+}
+
+/* text align left */
+.txt-center {
+	text-align: center;
+}
+
+/* text align center */
+.float-rt {
+	float: right;
+}
+
+/* float right */
+.float-lt {
+	float: left;
+}
+
+/* float left */
+.clear {
+	clear: both;
+}
+
+/* clear float */
+.pos-relative {
+	position: relative;
+}
+
+/* Position Relative */
+.pos-absolute {
+	position: absolute;
+}
+
+/* Position Absolute */
+.vertical-base {
+	vertical-align: baseline;
+}
+
+/* vertical align baseline */
+.vertical-top {
+	vertical-align: top;
+}
+
+/* vertical align top */
+.underline {
+	padding-bottom: 5px;
+	border-bottom: 1px solid #eee;
+	margin: 0 0 20px 0;
+}
+
+/* Add 5px bottom padding and a underline */
+nav.vertical ul li {
+	display: block;
+}
+
+/* vertical menu */
+nav.horizontal ul li {
+	display: inline-block;
+}
+
+/* horizontal menu */
+img {
+	max-width: 100%;
+}
+
+/*end reset*/
+
+.wrap {
+	width: 80%;
+	margin: 20px auto;
+}
+
+/*----content-----*/
+/*---search-bar----*/
+.left-content {
+	width: 70%;
+	float: left;
+}
+
+.search-left {
+	float: left;
+}
+
+.search-left p {
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding-top: 4px;
+	color: #fff;
+}
+
+.searchbar {
+	background: #222;
+	padding: 12px;
+}
+
+.lables p a {
+	color: rgb(30, 93, 173);
+}
+
+.lables a {
+	padding-left: 4px;
+}
+
+.lables p {
+	font-size: 0.89em;
+	font-family: 'Ropa Sans', sans-serif;
+	color: #BBBBBB;
+}
+
+.lables p a:hover {
+	color: #555;
+}
+
+/*-----right-content-----*/
+.right-content {
+	float: right;
+	width: 29%;
+}
+
+.popular h3 {
+	text-align: left;
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding-top: 4px;
+	color: #fff;
+	float: left;
+}
+
+.popular p {
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	color: #fff;
+	margin-top: -1px;
+	text-align: left !important;
+}
+
+.popular {
+	background: #222;
+}
+
+.grid1 {
+	border: 1px solid rgb(230, 230, 230);
+	border-top: none;
+	padding: 10px;
+}
+
+/*----video1----*/
+.video1 img {
+	float: left;
+	width: 30%;
+}
+
+.video1 p {
+	float: right;
+	width: 67%;
+}
+
+.video1 span {
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	float: right;
+	width: 67%;
+}
+
+.video1 p {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+	color: rgb(155, 155, 155);
+	line-height: 1.8em;
+}
+
+.video1 {
+	margin-top: 10px;
+	border: 1px solid rgb(230, 230, 230);
+	padding: 10px;
+}
+
+.video1 img {
+	cursor: pointer;
+}
+
+.Recent-Vodeos h3 {
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background: #2E9598;
+	color: #fff;
+	padding: 10px;
+	margin-top: 10px;
+}
+
+.grid1 {
+	position: relative;
+}
+
+/*---page-not-found----*/
+.error-page {
+	text-align: center;
+	padding-top: 116px;
+}
+
+.error-page h3,
+.error-page p {
+	font-size: 5em;
+	font-family: 'Ropa Sans', sans-serif;
+	color: rgb(30, 93, 173);
+}
+
+.error-page h3 {
+	font-size: 10em;
+}
+
+/*---single-page-----*/
+.inner-page {
+	width: 70%;
+	float: left;
+}
+
+.title ul li {
+	display: inline-block;
+}
+
+.title h3,
+.title h4 {
+	font-size: 1.2em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding: 10px 0px 6px 0px;
+	color: rgb(155, 155, 155);
+}
+
+.title h4 {
+	font-size: 1em;
+}
+
+.title ul {
+	padding-bottom: 10px;
+}
+
+.title ul li a {
+	color: rgb(155, 155, 155);
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 0.9em;
+	padding: 0px 3px;
+}
+
+.title ul li img {
+	vertical-align: middle;
+	margin: 0px 3px;
+}
+
+.title ul li a:hover {
+	color: rgb(30, 93, 173);
+}
+
+.view-links {
+	float: left;
+}
+
+.view-links ul li {
+	display: inline-block;
+}
+
+.views-count {
+	float: right;
+}
+
+.view-links h4,
+.views-count p {
+	color: rgb(155, 155, 155);
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 0.9em;
+}
+
+.views-count p span {
+	color: rgb(30, 93, 173);
+	font-size: 1.5em;
+	text-transform: uppercase;
+}
+
+.view-links ul li img {
+	vertical-align: middle;
+	padding: 0 5px;
+}
+
+.view-links h4 {
+	text-transform: uppercase;
+}
+
+.view-links ul {
+	float: left;
+}
+
+.comment1 li a {
+	color: #fff;
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 0.9em;
+}
+
+.comment1 li a:hover,
+.comment1 li a span {
+	color: rgb(155, 155, 155);
+}
+
+.comment1 {
+	margin-left: 15px;
+}
+
+.comment1 li:first-child {
+	background: #fff;
+	padding: 2px 5px;
+	background: rgb(30, 93, 173);
+	color: #fff;
+	border-radius: 0.3em;
+	margin-right: 10px;
+}
+
+.comment1 li a span:hover {
+	text-decoration: underline;
+}
+
+.video-details p,
+.video-details span {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+	color: rgb(155, 155, 155);
+	line-height: 1.8em;
+}
+
+.video-details p {
+	padding: 7px 0px;
+}
+
+.video-details ul {
+	padding: 10px 0px;
+}
+
+.video-details p a {
+	color: rgb(30, 93, 173);
+	font-family: 'Ropa Sans', sans-serif;
+}
+
+.other-links li a,
+.tags li a {
+	font-size: 0.9em;
+	color: rgb(30, 93, 173);
+	font-family: 'Ropa Sans', sans-serif;
+}
+
+.other-links li {
+	padding: 2px 0;
+}
+
+.other-links li a:hover,
+.tags li a:hover {
+	text-decoration: underline;
+}
+
+.tags ul li {
+	display: inline-block;
+}
+
+.tags h3 {
+	color: rgb(155, 155, 155);
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 0.9em;
+	text-transform: uppercase;
+}
+
+.other-links ul li {
+	line-height: 1.8em;
+}
+
+.related-videos h6 {
+	font-size: 1em;
+	font-family: 'Ropa Sans', sans-serif;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	color: rgb(155, 155, 155);
+	padding: 15px 0px 10px 0px;
+	border-bottom: 1px dashed rgb(201, 201, 201);
+}
+
+.video-inner span {
+	position: absolute;
+	right: -10px;
+	bottom: 15px;
+	background: rgba(58, 58, 58, 0.61);
+	padding: 7px 20px;
+	font-family: 'Ropa Sans', sans-serif;
+	color: #fff;
+}
+
+.viwes {
+	padding: 11px 0px;
+}
+
+.video-inner img {
+	background: #fff;
+	padding: 10px;
+	box-shadow: 0px 0px 10px rgb(228, 228, 228);
+}
+
+.video-inner {
+	position: relative;
+	width: 97.3%;
+}
+
+/*---categories----*/
+/*----sidebar----*/
+.content-sidebar {
+	float: left;
+	width: 21.6%;
+	font-family: 'Ropa Sans', sans-serif;
+}
+
+.content-sidebar h4,
+.recent-videos h5 {
+	background: rgb(30, 93, 173);
+	color: #fff;
+	padding: 10px;
+	text-transform: uppercase;
+	font-family: 'Ropa Sans', sans-serif;
+}
+
+.recent-videos h5 img {
+	margin-right: 3px;
+}
+
+.recent-videos h5 {
+	padding: 9.5px 10px;
+}
+
+.content-sidebar h4 img {
+	vertical-align: middle;
+	padding-right: 5px;
+}
+
+.content-sidebar li a {
+	font-family: 'Ropa Sans', sans-serif;
+	font-size: 0.89em;
+	color: rgb(116, 110, 110);
+	display: block;
+	padding: 12px 0px;
+	background: url(../images/sepHor.png) repeat-x left bottom;
+	padding-left: 5px;
+}
+
+.content-sidebar li a:hover {
+	background: url(../images/sepHor.png) repeat-x left bottom;
+	background-color: #eee;
+	color: rgb(30, 93, 173);
+}
+
+/*--recent-videos--*/
+.recent-videos {
+	float: right;
+	width: 77%;
+	margin: 0px 0px 13px 0px;
+}
+
+/***** Media Quries *****/
+@media only screen and (max-width: 1024px) {
+	.wrap {
+		width: 95%;
+	}
+}
+
+/*  GO FULL WIDTH AT LESS THAN 800 PIXELS */
+
+@media only screen and (max-width: 800px) {
+	.wrap {
+		width: 95%;
+	}
+}
+
+/*  GO FULL WIDTH AT LESS THAN 640 PIXELS */
+
+@media only screen and (max-width: 640px) and (min-width: 480px) {
+	.wrap {
+		width: 95%;
+	}
+}
+
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+
+@media only screen and (max-width: 480px) {
+	.wrap {
+		width: 95%;
+	}
+}
+
+/*----responsive-design----*/
+@media screen and (max-width:1366px) {
+	.wrap {
+		width: 90%;
+	}
+}
+
+@media screen and (max-width:1280px) {
+	.wrap {
+		width: 90%;
+	}
+}
+
+@media screen and (max-width:1024px) {
+	.wrap {
+		width: 90%;
+	}
+}
+
+@media screen and (max-width:768px) {
+	.wrap {
+		width: 90%;
+	}
+
+	.popular h3 {
+		font-size: 0.9em;
+	}
+}
+
+@media screen and (max-width:640px) {
+	.wrap {
+		width: 95%;
+	}
+
+	.popular p {
+		font-size: 0.7em;
+	}
+}
+
+@media screen and (max-width:768px) {
+	.left-content {
+		width: 100%;
+		float: none;
+	}
+
+	.right-content {
+		float: none;
+		width: 50%;
+		margin-top: 2em;
+	}
+}
+
+@media screen and (max-width:667px) {
+	.recent-videos .grid {
+		width: 43%;
+	}
+}
+
+@media screen and (max-width:568px) {
+	.recent-videos {
+		width: 100%;
+	}
+
+	.recent-videos .grid {
+		width: 44%;
+	}
+
+	.content-sidebar {
+		float: none;
+		width: 100%;
+	}
+}
+
+@media screen and (max-width:414px) {
+	.right-content {
+		float: none;
+		width: 90%;
+		margin: 2em auto 0;
+	}
+
+	.recent-videos .grid {
+		width: 90%;
+	}
+}
+
+@media screen and (max-width:320px) {
+	.search-right input[type="text"] {
+		width: 91%;
+	}
+}

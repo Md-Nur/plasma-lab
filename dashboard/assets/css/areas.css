@@ -1,0 +1,102 @@
+/* lab_activities */
+
+.lab_activities{
+    background: url(../images/lab_activities.jpg) no-repeat fixed center;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    -ms-background-size: cover;
+    text-align: center;
+    padding: 20px 0 50px 0px;
+    -webkit-box-shadow: 3px 3px 5px 3px rgba(10, 10, 10, 0.47);
+    -moz-box-shadow: 3px 3px 5px 3px rgba(10, 10, 10, 0.47);
+    box-shadow: 3px 3px 5px 3px rgba(10, 10, 10, 0.47);
+}
+.lab_activities h1{
+    color: #fff;
+}
+.service-box{
+    position: relative;
+    overflow: hidden;
+    margin-bottom:10px;
+    perspective:1000px;
+    -webkit-perspective:1000px;
+
+}
+.service-icon{
+    width: 100%;
+    height: 220px;
+    text-align: center;
+    transition: all .5s ease;
+    border: 3px solid #2E9598;
+}
+
+.service-content{
+    position: absolute;
+    border: 3px solid #2E9598;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    opacity: 0;
+    width: 100%;
+    height: 220px;
+    padding: 20px;
+    text-align: center;
+    transition: all .5s ease;
+    background-color: #474747;
+    backface-visibility:hidden;
+    transform-style: preserve-3d;
+    -webkit-transform: translateY(110px) rotateX(-90deg);
+    -moz-transform: translateY(110px) rotateX(-90deg);
+    -ms-transform: translateY(110px) rotateX(-90deg);
+    -o-transform: translateY(110px) rotateX(-90deg);
+    transform: translateY(110px) rotateX(-90deg);
+}
+.service-box .service-icon .front-content{
+    position: relative;
+    top:80px;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.service-box .service-icon .front-content img {
+
+}
+
+
+.service-box .service-content{
+    font-weight: 700;
+    color: #fff;
+    margin-bottom:10px;
+    text-transform: uppercase;
+}
+.service-box .service-content p {
+    font-size: 13px;
+    color: #b1b1b1;
+    margin:0;
+}
+.yellow{background-color: #ffc000;}
+.orange{background-color: #fc7f0c;}
+.red{background-color: #e84b3a;}
+.grey{background-color: #474747;}
+.service-box:hover .service-icon{
+    opacity: 0;
+    -webkit-transform: translateY(-110px) rotateX(90deg);
+    -moz-transform: translateY(-110px) rotateX(90deg);
+    -ms-transform: translateY(-110px) rotateX(90deg);
+    -o-transform: translateY(-110px) rotateX(90deg);
+    transform: translateY(-110px) rotateX(90deg);
+}
+.service-box:hover .service-content {
+    opacity: 1;
+    -webkit-transform: rotateX(0);
+    -moz-transform: rotateX(0);
+    -ms-transform: rotateX(0);
+    -o-transform: rotateX(0);
+    transform: rotateX(0);
+}
+
