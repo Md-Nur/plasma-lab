@@ -1,90 +1,77 @@
 <?php
 
-$notice_menu = '';
-
 $notice_num = mysqli_query($db, "SELECT * FROM notice");
 $num_rows = mysqli_num_rows($notice_num);
-
-if($num_rows == 0){
-    $notice_menu = 'display:none;';
-}else{
-    $notice_menu = '';
-}
-
-
-
+$notice_menu = ($num_rows == 0) ? 'display:none;' : '';
 
 ?>
-
 
 <div>
 	<nav class="social" style="<?php echo $notice_menu; ?>">
 		<ul>
-			<li><a href="" data-toggle="modal" data-target="#myModal">Notices <i class="fa fa-bell"></i></a></li>
+			<li><a href="#" onclick="document.getElementById('notice-dialog').showModal(); return false;">Notices <i class="fa fa-bell"></i></a></li>
 		</ul>
 	</nav>
 </div>
 
-<!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-	<div class="modal-dialog">
-
-		<!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-header" style="background-color: #F44336; color: #fff;">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title" style="font-size: 23px;">Recent Notices</h4>
+<!-- Dialog -->
+<dialog id="notice-dialog" closedby="any" class="modern-dialog">
+	<div class="dialog-header notice-header">
+		<h3 class="dialog-title">Recent Notices</h3>
+		<button class="dialog-close-btn" onclick="document.getElementById('notice-dialog').close();" aria-label="Close dialog">&times;</button>
+	</div>
+	<div class="dialog-body">
+		<?php 
+		$i = 1;
+		$result = mysqli_query($db, "SELECT * FROM notice ORDER BY id DESC LIMIT 5");
+		while($row = mysqli_fetch_array($result)){ 
+		?>
+		<div class="notice-card">
+			<div class="notice-card-header">
+				<strong><?php echo $i; ?>.</strong>
+				<span class="notice-card-title"><?php echo htmlspecialchars($row['title']); ?></span>
+				<button class="notice-toggle-btn readMore">Read</button>
 			</div>
-			<div class="modal-body">
-
-				<?php 
-
-    $i = 1;
-    $result = mysqli_query($db, "SELECT * FROM notice ORDER BY id DESC limit 5");
-    while($row = mysqli_fetch_array($result)){ 
-
-  ?>
-				<div class="notice notice-success">
-
-					<strong>
-						<?php echo $i; ?> . </strong>
-
-					<span style="padding-right: 100px;">
-						<?php echo $row['title']; ?></span>
-
-					<span class="pull-right text-success readMore">Read</span>
-
-
-					<div class="desc">
-						<p style="white-space: pre-line;border-top: 1px solid red;margin: 5px; font-size: 15px;">
-							<?php echo $row['description']; ?>
-						</p>
-					</div>
-				</div>
-				<?php $i++; } ?>
-
-			</div>
-			<div class="modal-footer" style="background-color: #F44336; color: #fff;">
-				<a href="all_notices.php" class="btn btn-success">View All</a>
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<div class="notice-card-body desc" style="display: none;">
+				<p><?php echo htmlspecialchars($row['description']); ?></p>
 			</div>
 		</div>
-
+		<?php $i++; } ?>
 	</div>
-</div>
+	<div class="dialog-footer notice-footer">
+		<a href="all_notices.php" class="btn btn-primary">View All</a>
+		<button class="btn btn-danger" onclick="document.getElementById('notice-dialog').close();">Close</button>
+	</div>
+</dialog>
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$(".readMore").click(function() {
-			var This = $(this);
-			$(this).next().toggle(function() {
-				if (This.text() == "Read") {
-					This.text("Hide")
-				} else {
-					This.text("Read")
-				}
-			})
-		});
-	})
+		// Fallback for browsers without closedby support
+		const dialog = document.getElementById('notice-dialog');
+		if (dialog && !('closedBy' in HTMLDialogElement.prototype)) {
+			dialog.addEventListener('click', (event) => {
+				if (event.target !== dialog) return;
+				const rect = dialog.getBoundingClientRect();
+				const isInside = (
+					rect.top <= event.clientY &&
+					event.clientY <= rect.top + rect.height &&
+					rect.left <= event.clientX &&
+					event.clientX <= rect.left + rect.width
+				);
+				if (!isInside) dialog.close();
+			});
+		}
 
+		$(".readMore").click(function() {
+			var $this = $(this);
+			var $body = $this.closest('.notice-card').find('.notice-card-body');
+			$body.slideToggle(200, function() {
+				if ($body.is(':visible')) {
+					$this.text("Hide");
+				} else {
+					$this.text("Read");
+				}
+			});
+		});
+	});
 </script>

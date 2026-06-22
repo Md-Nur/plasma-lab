@@ -27,6 +27,12 @@ include 'db_connect.php';
 
 
 </head>
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+
+    <script src="js/jquery-2.1.4.min.js"></script>
+
+
+</head>
 
 <body>
 
@@ -47,160 +53,119 @@ $result_students = mysqli_query($db, "SELECT * FROM students");
             </div>
             <div class="tittle-style" style="margin-bottom: 50px;"></div>
             <div class="clearfix"></div>
-            <div class="row">
-
-                <?php while ($row_members = mysqli_fetch_array($result_members)) {?>
-
-                <?php
-
-    $show_designation = '';
-
-    $show_phone = '';
-
-    $show_email = '';
-
-    $show_info = '';
-
-    $show_link = '';
-
-    if ($row_members['designation'] == "" || $row_members['designation'] == null) {
-        $show_designation = 'hidden';
-    }
-    if ($row_members['phone'] == "" || $row_members['phone'] == null) {
-        $show_phone = 'hidden';
-    }
-    if ($row_members['email'] == "" || $row_members['email'] == null) {
-        $show_email = 'hidden';
-    }
-    if ($row_members['info'] == "" || $row_members['info'] == null) {
-        $show_info = 'hidden';
-    }
-    if ($row_members['link'] == "" || $row_members['link'] == null) {
-        $show_link = 'hidden';
-    }
-
-    ?>
-      
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                    <div id="all">
-                        <div class="view view-first">
-                            <img src="images/member/members/<?php echo $row_members['image']; ?>" />
-                            <div class="mask">
-                                <h2><?php echo $row_members['name']; ?></h2>
-                                <p> <?php echo $row_members['designation']; ?></p>
-                                <a href="#" class="info" data-toggle="modal" data-target="#myModal_<?php echo $row_members['id']; ?>">Read More</a>
-                            </div>
+            
+            <div class="members-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px;">
+                <?php while ($row_members = mysqli_fetch_array($result_members)) {
+                    $show_designation = ($row_members['designation'] == "" || $row_members['designation'] == null) ? 'hidden' : '';
+                    $show_phone = ($row_members['phone'] == "" || $row_members['phone'] == null) ? 'hidden' : '';
+                    $show_email = ($row_members['email'] == "" || $row_members['email'] == null) ? 'hidden' : '';
+                    $show_info = ($row_members['info'] == "" || $row_members['info'] == null) ? 'hidden' : '';
+                    $show_link = ($row_members['link'] == "" || $row_members['link'] == null) ? 'hidden' : '';
+                ?>
+                <div class="member-card-wrapper">
+                    <div class="view view-first" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').showModal();">
+                        <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="<?php echo $row_members['name']; ?>" />
+                        <div class="mask">
+                            <h2><?php echo $row_members['name']; ?></h2>
+                            <p><?php echo $row_members['designation']; ?></p>
+                            <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_<?php echo $row_members['id']; ?>').showModal();">Read More</a>
                         </div>
                     </div>
                 </div>
 
-
-                <div class="modal fade member-modal" id="myModal_<?php echo $row_members['id']; ?>" tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <div class="modal-img">
-                                    <img class="img-responsive"
-                                        src="images/member/members/<?php echo $row_members['image']; ?>" alt="img"
-                                        style="width:80%;margin:0 auto;">
-                                </div>
-                            </div>
-                            <div class="modal-body">
-                                <div>
-                                    <h2>
-                                        <?php echo $row_members['name']; ?>
-                                    </h2>
-                                    <h4 class="<?php echo $show_designation; ?>">
-                                        <?php echo $row_members['designation']; ?>
-                                    </h4>
-                                    <h4 class="<?php echo $show_phone; ?>">Phone:
-                                        <?php echo $row_members['phone']; ?>
-                                    </h4>
-                                    <h4 class="<?php echo $show_email; ?>" style="color: blue;font-style: italic;">
-                                        E-mail:
-                                        <?php echo $row_members['email']; ?>
-                                    </h4>
-                                </div>
-                                <div class="members-description <?php echo $show_info; ?>" style="margin-top: 10px;">
-                                    <p style="white-space: pre-line;font-size: 16px;">
-                                        <?php echo $row_members['info']; ?>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <span><button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                    <a class="<?php echo $show_link; ?>" href="<?php echo $row_members['link']; ?>"
-                                        target="_blank"><button type="button" class="btn btn-info">More
-                                            Details</button></a></span>
+                <!-- Native HTML5 Dialog Modal -->
+                <dialog id="myModal_<?php echo $row_members['id']; ?>" closedby="any" class="modern-dialog">
+                    <div class="dialog-header">
+                        <h3 class="dialog-title"><?php echo htmlspecialchars($row_members['name']); ?></h3>
+                        <button class="dialog-close-btn" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').close();" aria-label="Close dialog">&times;</button>
+                    </div>
+                    <div class="dialog-body text-center">
+                        <div class="modal-img" style="margin-bottom: 20px;">
+                            <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="img"
+                                 style="max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin: 0 auto; display: block; object-fit: cover;">
+                        </div>
+                        <div class="member-meta" style="text-align: left; max-width: 480px; margin: 0 auto;">
+                            <h4 class="<?php echo $show_designation; ?>" style="font-weight: 700; color: var(--lab-plum); font-size: 16px; margin-bottom: 12px;">
+                                <?php echo htmlspecialchars($row_members['designation']); ?>
+                            </h4>
+                            <h4 class="<?php echo $show_phone; ?>" style="font-size: 14px; color: var(--lab-ink); margin: 6px 0;">
+                                <strong>Phone:</strong> <?php echo htmlspecialchars($row_members['phone']); ?>
+                            </h4>
+                            <h4 class="<?php echo $show_email; ?>" style="font-size: 14px; color: var(--lab-teal-dark); margin: 6px 0;">
+                                <strong>E-mail:</strong> <a href="mailto:<?php echo htmlspecialchars($row_members['email']); ?>" style="color: var(--lab-teal-dark); text-decoration: underline;"><?php echo htmlspecialchars($row_members['email']); ?></a>
+                            </h4>
+                            <div class="members-description <?php echo $show_info; ?>" style="margin-top: 15px; border-top: 1px dashed var(--lab-line); padding-top: 15px;">
+                                <p style="font-size: 14px; line-height: 1.6; color: var(--lab-muted); text-align: left;">
+                                    <?php echo nl2br(htmlspecialchars($row_members['info'])); ?>
+                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
-
-
-
-                <!-- ./Team member -->
-                <?php }?>
-                <!-- ./Team member -->
-
+                    <div class="dialog-footer">
+                        <button type="button" class="btn btn-danger" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').close();">Close</button>
+                        <a class="<?php echo $show_link; ?>" href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank">
+                            <button type="button" class="btn btn-primary">More Details</button>
+                        </a>
+                    </div>
+                </dialog>
+                <?php } ?>
             </div>
         </div>
     </section>
-
-
-
 
     <div class="clearfix"></div>
 
-
-    <section class="" style="background-color:#f5f5f5;">
+    <section class="students-section" style="background-color: var(--lab-soft); padding: 60px 0;">
         <div class="container">
             <div class="title-div text-center">
-                <h1>
-                    <span>L</span>ab
-                    <span>S</span>tudents
-                </h1>
+                <h1><span>L</span>ab <span>S</span>tudents</h1>
                 <div class="tittle-style"></div>
             </div>
             <div class="clearfix"></div>
-            <div class="team-row">
-
-                <?php while ($row_students = mysqli_fetch_array($result_students)) {?>
-                <div class=" students col-lg-2 col-md-3 col-sm-6 col-xxs-12">
-                    <div class="student-item">
-                        <img class="img-responsive" src="images/member/students/<?php echo $row_students['image']; ?>"
-                            alt="img">
-                        <div class="student-info">
-                            <h3>
-                                <?php echo $row_students['name']; ?>
-                            </h3>
-                            <h4 class="email">ferdousapee@gmail.com</h4>
-                            <h4>
-                                <?php echo $row_students['session']; ?>
-                            </h4>
+            
+            <div class="students-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; margin-top: 30px;">
+                <?php while ($row_students = mysqli_fetch_array($result_students)) { ?>
+                <div class="student-item-wrapper">
+                    <div class="student-item" style="height: 100%; display: flex; flex-direction: column;">
+                        <img class="img-responsive" src="images/member/students/<?php echo $row_students['image']; ?>" alt="<?php echo $row_students['name']; ?>" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+                        <div class="student-info" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <h3 style="margin-top: 10px; font-size: 17px; font-weight: 800;"><?php echo htmlspecialchars($row_students['name']); ?></h3>
+                                <h4 class="email" style="font-size: 13px; margin: 4px 0;"><a href="mailto:<?php echo htmlspecialchars($row_students['email']); ?>" style="color: var(--lab-teal-dark); word-break: break-all;"><?php echo htmlspecialchars($row_students['email']); ?></a></h4>
+                            </div>
+                            <h4 style="font-size: 13px; color: var(--lab-muted); margin-top: 8px;">Session: <?php echo htmlspecialchars($row_students['session']); ?></h4>
                         </div>
                     </div>
                 </div>
-                <?php }?>
-                <div class="clearfix"> </div>
+                <?php } ?>
             </div>
         </div>
     </section>
 
-
     <?php include 'notice.php';?>
-
     <?php include 'footer.php';?>
 
-
-
-    <script src="js/jquery-2.1.4.min.js"></script>
-    <script src="js/bootstrap.js"></script>
-
-    <script src="js/jquery.flexisel.js"></script>
-    <script src="js/easing.js"></script>
-
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Light-dismiss dialog polyfill / fallback
+            document.querySelectorAll('dialog[closedby="any"]').forEach(dialog => {
+                if (!('closedBy' in HTMLDialogElement.prototype)) {
+                    dialog.addEventListener('click', (event) => {
+                        if (event.target !== dialog) return;
+                        const rect = dialog.getBoundingClientRect();
+                        const isInside = (
+                            rect.top <= event.clientY &&
+                            event.clientY <= rect.top + rect.height &&
+                            rect.left <= event.clientX &&
+                            event.clientX <= rect.left + rect.width
+                        );
+                        if (!isInside) dialog.close();
+                    });
+                }
+            });
+        });
+    </script>
 </body>
-
 </html>

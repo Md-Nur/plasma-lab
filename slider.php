@@ -1,71 +1,44 @@
-<div class="clearfix"></div>
+<section class="sliderback">
+	<div class="container">
+		<div class="title-div text-center">
+			<h1><span>W</span>elcome</h1>
+			<div class="tittle-style"></div>
+		</div>
 
-<section class="sliderback" style="margin-top: 85px;">
+		<div class="welcome-container" style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 30px; align-items: stretch;">
+			<div id="slider" style="flex: 1 1 500px; min-width: 0;">
+				<ul class="slider-wrapper">
+					<?php 
+					$resultt = mysqli_query($db, "SELECT * FROM slider");
+					$i = 1;
+					while($row = mysqli_fetch_array($resultt)){ 
+						$active = ($i == 1) ? 'current-slide' : '';
+					?>
+					<li class="<?php echo $active; ?>">
+						<img src="images/slider/<?php echo $row['image']; ?>" alt="Slide Image" style="width: 100%; height: 100%; object-fit: cover;">
+						<div class="caption">
+							<h2 class="slider-title"><?php echo htmlspecialchars($row['title']); ?></h2>
+							<p><?php echo htmlspecialchars($row['sub_title']); ?></p>
+						</div>
+					</li>
+					<?php $i++; } ?>
+				</ul>
+				<ul id="control-buttons" class="control-buttons"></ul>
+			</div>
 
-	<div class="clearfix"></div>
-
-	<div class="title-div text-center">
-		<h1><span>W</span>elcome</h1>
-	</div>
-	<div class="tittle-style"></div>
-
-
-	<div id="slider" class="col-md-6" style="margin-top: 30px;">
-		<ul class="slider-wrapper">
-
-
-			<?php 
-      $resultt = mysqli_query($db, "SELECT * FROM slider");
-    ?>
-			<?php 
-      $i = 1;
-      while($row = mysqli_fetch_array($resultt)){ 
-        if ($i == 1) {
-          $active = 'current-slide';
-        }else {
-          $active = '';
-        }
-    ?>
-
-			<li class="<?php echo $active; ?>">
-				<img src="images/slider/<?php echo $row['image']; ?>" title="" alt="" style="width: 100%; height: 100%;">
-
-				<div class="caption">
-					<h2 class="slider-title">
-						<?php echo $row['title']; ?>
-					</h2>
-					<p>
-						<?php echo $row['sub_title']; ?>
+			<div class="welcome-info" style="flex: 1 1 400px; display: flex; flex-direction: column;">
+				<div class="info-content" style="background: var(--lab-card); border: 1px solid var(--lab-line); border-radius: 8px; box-shadow: var(--lab-shadow); padding: 30px; height: 100%; display: flex; align-items: center;">
+					<?php 
+					$result_about = mysqli_query($db, "SELECT * FROM about");
+					$row_about = mysqli_fetch_array($result_about);
+					?>
+					<p style="margin: 0; font-size: 16px; line-height: 1.8; color: var(--lab-muted); text-align: justify;">
+						<?php echo $row_about['about']; ?>
 					</p>
 				</div>
-			</li>
-
-			<?php $i++; } ?>
-
-		</ul>
-
-		<ul id="control-buttons" class="control-buttons pull-right"></ul>
-		<div class="clearfix"></div>
-	</div>
-
-
-
-	<div class="col-md-6" style="margin-top: 15px;">
-
-		<div class="info">
-			<div class="col-md-12">
-				<?php 
-            $result_about = mysqli_query($db, "SELECT * FROM about");
-            $row_about = mysqli_fetch_array($result_about)
-          ?>
-				<p>
-					<?php echo $row_about['about']; ?>
-				</p>
 			</div>
 		</div>
 	</div>
-
-	<div class="clearfix"></div>
 </section>
 <div class="clearfix"></div>
 <script type="text/javascript">
