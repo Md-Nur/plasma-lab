@@ -1,58 +1,41 @@
-<div id="contact" class="modal fade" role="dialog">
-	<div class="modal-dialog">
-		<div class="modal-content">
+<!-- Dialog -->
+<dialog id="contact-dialog" closedby="any" class="modern-dialog">
+	<div class="dialog-header">
+		<h3 class="dialog-title">Leave a Message</h3>
+		<button class="dialog-close-btn" onclick="document.getElementById('contact-dialog').close();" aria-label="Close dialog">&times;</button>
+	</div>
+	<div class="dialog-body">
+		<div class="contact">
+			<div class="contact_body">
+				<form id="myform" action="" method="post">
+					<fieldset class="form-group">
+						<input class="form-control" placeholder="Your name" type="text" name="name" value="" tabindex="1" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto;">
+					</fieldset>
 
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">×</button>
-				<h4 class="modal-title">Leave a Message Please.....</h4>
+					<fieldset class="form-group">
+						<input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" tabindex="2" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto;" />
+					</fieldset>
+
+					<fieldset class="form-group">
+						<input class="form-control" placeholder="Message subject..." type="text" name="subject" value="" tabindex="4" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto;">
+					</fieldset>
+
+					<fieldset class="form-group">
+						<textarea class="form-control" name="message" placeholder="Write a message..." id="contact-message-text" cols="150" rows="6" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto; resize: vertical;"></textarea>
+					</fieldset>
+
+					<fieldset class="form-group" style="margin-bottom: 0;">
+						<button onclick="return validateform()" name="submit" type="submit" id="contact-submit" class="submit_btn" style="width: 100%; background: var(--lab-teal-dark); color: #fff; border: 0; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 16px; box-shadow: 0 4px 12px rgba(8,125,130,0.2); transition: background 0.2s ease;">Send Message</button>
+					</fieldset>
+					<div id='result' style="margin-top: 14px; font-weight: 700; text-align: center;"></div>
+				</form>
 			</div>
-			<div class="modal-body">
-
-
-				<div id="" class="contact">
-					<div class="contact_body">
-						<div class="row">
-							<div class="contact_message">
-
-								<div class="clearfix"></div>
-								<form id="myform" action="" method="post">
-
-									<fieldset class="form-group">
-										<input class="form-control" placeholder="Your name" type="text" name="name" value="" tabindex="1" required>
-									</fieldset>
-
-									<fieldset class="form-group">
-										<input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" tabindex="2" required />
-									</fieldset>
-
-									<fieldset class="form-group">
-										<input class="form-control" placeholder="Message subject..." type="text" name="subject" value="" tabindex="4" required>
-									</fieldset>
-
-									<fieldset class="form-group">
-										<textarea class="form-control" type="text" name="message" placeholder="Write a message..." id="" cols="150" rows="8" value="" required></textarea>
-									</fieldset>
-
-									<fieldset class="form-group">
-										<button onclick="return validateform()" name="submit" type="submit" id="contact-submit" class="submit_btn">Send</button>
-									</fieldset>
-									<div id='result'></div>
-								</form>
-
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-
-			</div>
-
 		</div>
 	</div>
-</div>
+	<div class="dialog-footer">
+		<button class="btn btn-default" onclick="document.getElementById('contact-dialog').close();" style="border-radius: 8px;">Close</button>
+	</div>
+</dialog>
 
 <script type="text/javascript">
 	function validateform() {
@@ -66,7 +49,6 @@
 		var x = document.forms["myform"]["email"].value;
 		var atpos = x.indexOf("@");
 		var dotpos = x.lastIndexOf(".");
-
 
 		var b = document.forms["myform"]["email"].value;
 		if (b == null || b == "") {
@@ -84,7 +66,6 @@
 			return false;
 		}
 
-
 		var c = document.forms["myform"]["subject"].value;
 		if (c == null || c == "") {
 			document.getElementById("result").innerHTML = " Error : Subject field must be filled...";
@@ -99,26 +80,40 @@
 		elem.innerHTML = "Message is sending";
 		elem.style.color = "#00BEFD";
 
-
 		return (true);
 	}
-
 </script>
 
-
 <script>
-	$('#myform').submit(function(event) {
-		event.preventDefault();
-		$.ajax({
-			type: "POST",
-			url: "contact-form.php",
-			data: $(this).serialize(),
-			success: function(data) {
-				$('#result').html(data);
-			}
-		}).done(function() {
-			$("#myform").trigger("reset");
+	$(document).ready(function() {
+		// Fallback for browsers without closedby support
+		const dialog = document.getElementById('contact-dialog');
+		if (dialog && !('closedBy' in HTMLDialogElement.prototype)) {
+			dialog.addEventListener('click', (event) => {
+				if (event.target !== dialog) return;
+				const rect = dialog.getBoundingClientRect();
+				const isInside = (
+					rect.top <= event.clientY &&
+					event.clientY <= rect.top + rect.height &&
+					rect.left <= event.clientX &&
+					event.clientX <= rect.left + rect.width
+				);
+				if (!isInside) dialog.close();
+			});
+		}
+
+		$('#myform').submit(function(event) {
+			event.preventDefault();
+			$.ajax({
+				type: "POST",
+				url: "contact-form.php",
+				data: $(this).serialize(),
+				success: function(data) {
+					$('#result').html(data);
+				}
+			}).done(function() {
+				$("#myform").trigger("reset");
+			});
 		});
 	});
-
 </script>

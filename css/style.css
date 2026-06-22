@@ -546,12 +546,8 @@ div#all {
 	border-bottom: 1px solid #333333;
 }
 
-.publications .active a {
+.publications .nav-tabs > li.active > a {
 	background-color: transparent !important;
-}
-
-.publications .nav.nav-tabs a:hover {
-	color: #8E5083;
 }
 
 .table-hover tr:hover {
@@ -777,7 +773,7 @@ section {
 
 .navbar-default .navbar-nav > li > a {
 	border-radius: 999px;
-	color: var(--lab-ink);
+	color: var(--lab-ink) !important;
 	font-size: 15px;
 	font-weight: 700;
 	margin: 4px 3px;

@@ -38,74 +38,54 @@
 
 	<section class="lab_activities">
 		<div class="container">
-			<div class="title-div text-center">
+			<div class="title-div text-center" style="margin-bottom: 40px;">
 				<h1><span>R</span>esearch <span>A</span>ctivities</h1>
+				<div class="tittle-style"></div>
 			</div>
-			<div class="tittle-style"></div>
-			<div class="row" style="margin-top: 40px;">
-
-
+			
+			<div class="activities-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px;">
 				<?php 
-	$result_activities = mysqli_query($db, "SELECT * FROM activities"); 
-	
-?>
-				<?php while($row_activities = mysqli_fetch_array($result_activities)){ ?>
-
-				<div class="col-md-3 col-sm-6 ">
-					<div class="service-box">
-						<div class="service-icon">
-							<img src="images/activities/<?php echo $row_activities['image']; ?>" style="width: 100%;height: 100%;">
-						</div>
-						<div class="service-content" style="background-color:#fff;">
-							<h4 style="color: #8E5083; font-size:20px; font-weight:700;">
-								<?php echo $row_activities['title']; ?>
-							</h4>
-							<div class="seperator"></div>
-							<p style="color: #222; text-align: center;">
-								<?php echo $row_activities['info']; ?>
-							</p>
-						</div>
+				$result_activities = mysqli_query($db, "SELECT * FROM activities"); 
+				while($row_activities = mysqli_fetch_array($result_activities)){ 
+				?>
+				<div class="service-box" style="margin-bottom: 0;">
+					<div class="service-icon">
+						<img src="images/activities/<?php echo $row_activities['image']; ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>">
+					</div>
+					<div class="service-content">
+						<h4><?php echo htmlspecialchars($row_activities['title']); ?></h4>
+						<div class="seperator"></div>
+						<p><?php echo htmlspecialchars($row_activities['info']); ?></p>
 					</div>
 				</div>
-
 				<?php } ?>
-
-
-
 			</div>
 		</div>
 	</section>
 
 	<div class="clearfix"></div>
 
-	<section class="lab_vission">
-		<div class="top-bottom">
-			<div class="container">
-				<div class="title-div text-center">
-					<h1 class="tittle">
-						<span>V</span>ission
-					</h1>
-				</div>
+	<section class="lab_vission" style="background: linear-gradient(135deg, rgba(123, 61, 115, 0.05), rgba(28, 167, 168, 0.05)); padding: 80px 0;">
+		<div class="container">
+			<div class="title-div text-center" style="margin-bottom: 40px;">
+				<h1><span>V</span>ision</h1>
 				<div class="tittle-style"></div>
-				<div >
-					<div class="col-md-12">
-						<?php 
-						$result_vission = mysqli_query($db, "SELECT * FROM vission"); 
-						$row_vission = mysqli_fetch_array($result_vission);
-					?>
-						<div class="">
-							<h3>“
-								<?php echo $row_vission['title'] ?>”</h3>
-						</div>
-						<p style="white-space: pre-line;">
-							<?php echo $row_vission['description'] ?>
-						</p>
-					</div>
-				</div>
+			</div>
+			
+			<div style="max-width: 800px; margin: 0 auto; background: var(--lab-card); border: 1px solid var(--lab-line); border-radius: 16px; padding: 48px; box-shadow: var(--lab-shadow); backdrop-filter: blur(10px); text-align: center;">
+				<?php 
+				$result_vission = mysqli_query($db, "SELECT * FROM vission"); 
+				$row_vission = mysqli_fetch_array($result_vission);
+				?>
+				<h3 style="font-size: 24px; font-weight: 800; color: var(--lab-plum); line-height: 1.5; margin-bottom: 24px; font-style: italic;">
+					&ldquo;<?php echo htmlspecialchars($row_vission['title']); ?>&rdquo;
+				</h3>
+				<p style="font-size: 16px; color: var(--lab-muted); line-height: 1.8; text-align: justify; text-justify: inter-word; white-space: pre-line; margin: 0;">
+					<?php echo htmlspecialchars($row_vission['description']); ?>
+				</p>
 			</div>
 		</div>
 	</section>
-
 
 	<div class="clearfix"></div>
 

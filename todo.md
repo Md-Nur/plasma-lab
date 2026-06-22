@@ -1,4 +1,4 @@
-why /dashboard looks like that?
+
 
 dashboard/page_members.php?id=page_members in this page the cards are shrinking. make the cards responsive (flex wrap) and make sure they look good on all screen sizes. The popup modal which appears at pressing add member button is not properly shown. the modals is not responsive and it is not properly centered on the screen. make sure the modal is responsive and it is properly centered on the screen. also make sure the modal is properly styled and it looks good on all screen sizes. The modal can be close easily.
 
@@ -14,3 +14,7 @@ in /dashboard/page_photos.php?id=page_photos page when pressed the insert photo 
 use dry method as much as possible specially popup and image uploading section
 
 why the contact us button is not working in the navbar
+
+imporve the ux of the admin dashboard. make sure the admin dashboard is easy to use and it is easy to navigate. also make sure the admin dashboard is properly styled and it looks good on all screen sizes. use proper toast button.
+
+when I tries to add any journal from the dashboard it shows in there but not in the main website page like conference tab
