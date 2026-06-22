@@ -125,17 +125,7 @@ include('navigation.php');
 </div>
 
 
-<style type="text/css">
-.padding-tb {
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
 
-.hover:hover {
-    background-color: #F5F5F5;
-    font-weight: 600;
-}
-</style>
 
 <div class="well box-shadow col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 col-md-offset-1 col-lg-offset-1"
     style="margin-top:50px;">

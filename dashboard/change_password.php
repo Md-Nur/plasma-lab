@@ -10,9 +10,8 @@ $visibility = '';
 $msg = '';
 
 if(!isset($_SESSION["change_permitted_password"]) ){
-     
-    header('location: login.php');
-     
+     header('Location: /dashboard/login.php');
+     exit;
 }
 
 
@@ -64,7 +63,8 @@ if (isset($_POST['update_password'])) {
                     	//unset($_SESSION['retrive_id']);
                          
                          
-                         header('Location: login.php?change='.$id);
+                         header('Location: /dashboard/login.php?change='.$id);
+                         exit;
                          
                	} else {
                          $msg = 'Password update error. Please try again..';

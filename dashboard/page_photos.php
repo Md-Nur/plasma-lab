@@ -123,38 +123,7 @@ $result = mysqli_query($db, "SELECT * FROM photos");
 
 
 
-<style type="text/css">
-
-
-[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-}
-input,
-[type=file] + label {
- border: 1px solid #CCC;
- border-radius: 3px;
- text-align: left;
- position: relative;
-}
-[type=file] + label {
- text-align: center;
- /* Decorative */
- background: #333;
- color: #fff;
- border: none;
- cursor: pointer;
-}
-[type=file] + label:hover {
- background: #3399ff;
-}
-.photo_review{
-    display: absolute;
-
-}
-
-</style>	
+	
 
 
 <div id="insert_photos" class="modal fade" role="dialog">
@@ -178,12 +147,17 @@ input,
            	   </div>
            	   <div class="panel-body">
                      
-                       <div class="">
+                     <div class="alert alert-info" style="margin-bottom:15px;">
+                            <strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
+                            Uploaded photos will appear on the public <strong>Gallery &rarr; Photos</strong> page of the website.
+                     </div>
+
+                     <div class="">
                         <form id="upload_photo" method="post" action="page_photos.php" enctype="multipart/form-data">
                              <input type="hidden" name="id" value="<?php echo $id; ?>" required>
             
                              <div class="col-md-12">
-                               <img id="output" class="img-responsive" src="../images/member/students/<?php echo $image; ?>">
+                               <img id="output" class="img-responsive" src="../images/gallary/photos/<?php echo $image; ?>" style="height:200px; background:#f5f5f5;" onerror="this.style.display='none'">
                             </div>
             
                             <div class="clearfix"></div>

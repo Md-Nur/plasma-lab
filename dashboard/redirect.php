@@ -28,7 +28,8 @@ if(isset($_SESSION["sess_username"])){
     }
      
 }else {
-     header('location: login.php');
+     header('Location: /dashboard/login.php');
+     exit;
 }
 
 ?>

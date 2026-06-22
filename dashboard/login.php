@@ -2,9 +2,8 @@
 include('head.php');
 session_start();
 if(isset($_SESSION["sess_username"])){
-     
-  header('location: ../dashboard');
-     
+     header('Location: /dashboard/index.php');
+     exit;
 }
 
 $msg = '';
@@ -16,7 +15,8 @@ $password_tmp = "";
 
 
 if(isset($_SESSION["sess_username"])){
-     header('location: ../dashboard');
+     header('Location: /dashboard/index.php');
+     exit;
 }
 
 if(isset($_GET['change']) && isset($_SESSION["retrive_id"])) {
@@ -48,7 +48,8 @@ if(isset($_POST['login'])){
 		      $record = mysqli_fetch_array($rec);
           $_SESSION["sess_username"]= $record['username'];
           $_SESSION['id'] = $record['id'];
-          header("Location: ../dashboard/");
+          header('Location: /dashboard/index.php');
+          exit;
           
      }else {
           $alert_failed = '';

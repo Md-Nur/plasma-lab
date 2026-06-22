@@ -29,7 +29,7 @@ include('server.php');
 	<link rel="stylesheet" href="assets/css/ace-skins.min.css" />
 	<link rel="stylesheet" href="assets/css/ace-rtl.min.css" />
 	<link rel="stylesheet" href="assets/css/style.css" />
-
+	<link rel="stylesheet" href="assets/css/modern_dashboard.css" />
 	<script src="assets/js/ace-extra.min.js"></script>
 
 </head>

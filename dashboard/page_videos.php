@@ -217,51 +217,7 @@ if(isset($_GET['del'])){
 
 
 
-<style type="text/css">
-
-     .photo_post{
-         display: inline-block;
-     }
-
-     .photo_post span{
-     	margin-left: 20px;
-     }
-
-
-     /* Hide the file input using
-     opacity */
-     [type=file] {
-         position: absolute;
-         filter: alpha(opacity=0);
-         opacity: 0;
-     }
-
-     [type=file] + label {
-     	width: 100%;
-     	border: 1px solid #CCC;
-     	border-radius: 3px;
-     	text-align: left;
-     	padding: 10px;
-     	position: relative;
-     	text-align: center;
-     	background: #333;
-     	color: #fff;
-     	border: none;
-     	cursor: pointer;
-     }
-     [type=file] + label:hover {
-       background: #3399ff;
-     }
-     .photo_review{
-         display: absolute;
-
-     }
-     .progressBar{
-     	width: 200px;
-     	margin: 0 auto;
-     }
-
-</style>	
+	
 
 <div id="insert_videos" class="modal fade" role="dialog">
      <div class="modal-dialog"  style="width: 60%;">
@@ -273,6 +229,11 @@ if(isset($_GET['del'])){
                   <h4 class="modal-title">Insert Videos</h4>
                 </div>
                 <div class="modal-body">
+
+                	<div class="alert alert-info" style="margin-bottom:15px;">
+                		<strong><i class="fa fa-info-circle"></i> Where does this video appear?</strong><br>
+                		Uploaded videos will appear in the public <strong>Gallery &rarr; Videos</strong> section of the website.
+                	</div>
 
                 	<div id="status">
                          

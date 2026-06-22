@@ -89,54 +89,7 @@ if(isset($_POST['update'])){
 
 
 
-<style type="text/css">
-
-
-
-
-.photo_post{
-    display: inline-block;
-}
-
-.photo_post span{
-	margin-left: 20px;
-}
-
-
-/* Hide the file input using
-opacity */
-[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-}
-
-[type=file] + label {
-	width: 100%;
-	border: 1px solid #CCC;
-	border-radius: 3px;
-	text-align: left;
-	padding: 10px;
-	position: relative;
-	text-align: center;
-	background: #333;
-	color: #fff;
-	border: none;
-	cursor: pointer;
-}
-[type=file] + label:hover {
-  background: #3399ff;
-}
-.photo_review{
-    display: absolute;
-
-}
-.progressBar{
-	width: 200px;
-	margin: 0 auto;
-}
-
-</style>	
+	
 
 
 <div style="width: 60%;margin: 50px auto;">
@@ -151,8 +104,15 @@ opacity */
       <strong><?php echo $msg; ?></strong>
  </div>
 
+<div class="col-md-12">
+	<div class="alert alert-info" style="margin-bottom:15px;">
+		<strong><i class="fa fa-info-circle"></i> Where does this thumbnail appear?</strong><br>
+		Updated thumbnails will appear alongside the video on the public <strong>Gallery &rarr; Videos</strong> page of the website.
+	</div>
+</div>
+
 <div class="col-md-4">
-    <img id="output" class="img-responsive" src="../images/gallary/video/tmp/<?php echo $image; ?>" style="width:100%;height: 300px;" >
+    <img id="output" class="img-responsive" src="../images/gallary/video/tmp/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
     <button class="btn btn-success" style="width: 100%;" data-toggle="modal" data-target="#myVideo" >Show video</button>
 </div>
 

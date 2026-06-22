@@ -149,52 +149,7 @@ include('navigation.php');
 
 
 
-<style type="text/css">
-	.photo_post {
-		display: inline-block;
-	}
 
-	.photo_post span {
-		margin-left: 20px;
-	}
-
-
-	/* Hide the file input using
-opacity */
-	[type=file] {
-		position: absolute;
-		filter: alpha(opacity=0);
-		opacity: 0;
-	}
-
-	[type=file]+label {
-		border: 1px solid #CCC;
-		border-radius: 3px;
-		text-align: left;
-		padding: 10px;
-		width: 150px;
-		position: relative;
-	}
-
-	[type=file]+label {
-		text-align: center;
-		/* Decorative */
-		background: #333;
-		color: #fff;
-		border: none;
-		cursor: pointer;
-	}
-
-	[type=file]+label:hover {
-		background: #3399ff;
-	}
-
-	.photo_review {
-		display: absolute;
-
-	}
-
-</style>
 
 <div id="insert_teacher" class="modal fade" role="dialog">
 	<div class="modal-dialog" style="width: 60%;">
@@ -208,8 +163,12 @@ opacity */
 			</div>
 			<div class="modal-body">
 				<div class="clearfix"></div>
+				<div class="alert alert-info" style="margin-bottom:15px;">
+					<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
+					Uploaded photos will appear on the public <strong>Members</strong> page of the website.
+				</div>
 				<div class="col-md-4">
-					<img id="output" class="img-responsive" src="../images/member/members/<?php echo $image; ?>" style="width:100%;height: 300px;">
+					<img id="output" class="img-responsive" src="../images/member/members/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
 				</div>
 
 				<div class="col-md-8">

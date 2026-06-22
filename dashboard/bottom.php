@@ -1,5 +1,6 @@
-
-
+</main>
+	</div>
+</div>
 
 <script type="text/javascript">
 	//For Check All
@@ -151,6 +152,42 @@ function select_draft(source) {
 				
 				$('#id-push-content').removeAttr('checked').on('click', function() {
 					$('.sidebar').toggleClass('push_away');
+				});
+			});
+		</script>
+		
+		<script type="text/javascript">
+			document.addEventListener('DOMContentLoaded', function() {
+				var menuToggleBtn = document.getElementById('menuToggleBtn');
+				var modernSidebar = document.getElementById('modernSidebar');
+				var userMenuDropdownBtn = document.getElementById('userMenuDropdownBtn');
+				var userDropdownMenu = document.getElementById('userDropdownMenu');
+
+				if (menuToggleBtn && modernSidebar) {
+					menuToggleBtn.addEventListener('click', function(e) {
+						e.stopPropagation();
+						modernSidebar.classList.toggle('active');
+					});
+				}
+
+				if (userMenuDropdownBtn && userDropdownMenu) {
+					userMenuDropdownBtn.addEventListener('click', function(e) {
+						e.stopPropagation();
+						userDropdownMenu.classList.toggle('show');
+					});
+				}
+
+				document.addEventListener('click', function(e) {
+					if (userDropdownMenu && userDropdownMenu.classList.contains('show')) {
+						if (!userMenuDropdownBtn.contains(e.target)) {
+							userDropdownMenu.classList.remove('show');
+						}
+					}
+					if (modernSidebar && modernSidebar.classList.contains('active')) {
+						if (!modernSidebar.contains(e.target) && e.target !== menuToggleBtn && !menuToggleBtn.contains(e.target)) {
+							modernSidebar.classList.remove('active');
+						}
+					}
 				});
 			});
 		</script>

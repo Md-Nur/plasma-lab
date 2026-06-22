@@ -153,32 +153,32 @@ if(isset($_GET['edit'])) {
 	   <div class="panel-body">
              
              
-		  <div class="row">
-
-	<?php
-	$i = 1;
-	 while($row = mysqli_fetch_array($result)){ 
-	 ?>
-		
-	     		<div class="pull-left">
-	     			<h2><strong> <?php echo $i; ?>:  </strong> <?php echo $row['title']; ?></h2>
-	    			 <p><?php echo $row['description']; ?></p>
-	     		</div>
-		      <div class="pull-right"> 
-		           <a href = "page_notice.php?edit=<?php echo $row['id']; ?>" class="label label-default" title="Edit"> 
-		                <i class="fa fa-edit fa-lg"></i>
-		          </a>
-		          <a href = "page_notice.php?dell=<?php echo $row['id']; ?>" onclick="return deleletconfig()" class="label label-danger" title="Delete"> 
-		               <i class="fa fa-trash-o fa-lg"></i>
-		          </a>
-		     </div>    
-	           
-	     <div class="clearfix"></div>
-	     <hr>
-	<?php $i++; } ?>
-
-
-
+		  <div class="row" style="padding: 0 15px;">
+			<div class="list-group">
+				<?php
+				$i = 1;
+				while($row = mysqli_fetch_array($result)){ 
+				?>
+					<div class="list-group-item hover" style="margin-bottom: 15px; border-radius: 16px !important;">
+						<div class="pull-left" style="max-width: 85%;">
+							<h4 style="margin-top: 0; color: #fff; font-weight: 700; font-size: 17px;">
+								<span style="color: #818cf8; margin-right: 8px;">#<?php echo $i; ?></span> 
+								<?php echo $row['title']; ?>
+							</h4>
+							<p style="color: var(--text-secondary); font-size: 14px; margin: 8px 0 0 0; line-height: 1.6;"><?php echo $row['description']; ?></p>
+						</div>
+						<div class="pull-right" style="display: flex; gap: 8px; margin-top: 5px;"> 
+							 <a href="page_notice.php?edit=<?php echo $row['id']; ?>" class="btn btn-default" style="padding: 6px 12px !important; font-size: 12px !important; border-radius: 8px !important;" title="Edit"> 
+								  <i class="fa fa-edit fa-lg"></i>
+							</a>
+							<a href="page_notice.php?dell=<?php echo $row['id']; ?>" onclick="return deleletconfig()" class="btn btn-danger" style="padding: 6px 12px !important; font-size: 12px !important; border-radius: 8px !important;" title="Delete"> 
+								 <i class="fa fa-trash-o fa-lg"></i>
+							</a>
+					   </div>    
+					   <div class="clearfix"></div>
+					</div>
+				<?php $i++; } ?>
+			</div>
 		  </div>
 	   </div>
 

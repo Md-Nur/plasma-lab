@@ -20,12 +20,6 @@
 
 	</div>
 
-<style type="text/css">
-	.overlay a:hover{
-		text-decoration: underline;
-		color: red;
-	}
-</style>
 
 
 
@@ -40,20 +34,12 @@
 		    </div>
 		</div>
 
-		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-		    <div class="hovereffect">
-		        <img class="img-responsive" src="assets/images/home/visit.png" alt="">
-		            <div class="overlay">
-		                <a href="http://dept.ru.ac.bd/apee/SoalrEnergyLab/" target="_blank"><h1>Solar Energy Lab</h1></a>
-		            </div>
-		    </div>
-		</div>
 
 		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 		    <div class="hovereffect">
 		        <img class="img-responsive" src="assets/images/home/apee.png" alt="">
 		            <div class="overlay">
-		                <a href="http://www.ru.ac.bd/eee/" target="_blank"><h1>APEE</h1></a>
+		                <a href="http://www.ru.ac.bd/eee/" target="_blank"><h1>EEE</h1></a>
 		            </div>
 		    </div>
 		</div>

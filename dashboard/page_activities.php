@@ -147,63 +147,7 @@ $msg = '';
 
 
 
-<style type="text/css">
-
-form input{
-	border :1px solid #6C6D69;
-}
-
-
-.photo_post{
-    width: 150px;
-    display: inline-block;
-}
-
-label, input {
-  color: #333;
-  font: 14px/20px Arial;
-}
-
-label {
-  display: inline-block;
-  width: 5em;
-  padding: 0 1em;
-  text-align: right;
-}
-
-/* Hide the file input using
-opacity */
-[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-}
-input,
-[type=file] + label {
-  border: 1px solid #CCC;
-  border-radius: 3px;
-  text-align: left;
-  padding: 10px;
-  width: 150px;
-  position: relative;
-}
-[type=file] + label {
-  text-align: center;
-  /* Decorative */
-  background: #333;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-[type=file] + label:hover {
-  background: #3399ff;
-}
-.photo_review{
-    display: absolute;
-
-}
-
-</style>	
+	
 
 
 
@@ -225,9 +169,15 @@ input,
              
 		  <div class="row">
 
+			<div class="col-md-12">
+				<div class="alert alert-info" style="margin-bottom:15px;">
+					<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
+					Uploaded photos will appear on the public <strong>Activities</strong> section of the website.
+				</div>
+			</div>
 
 <div class="col-md-4">
-    <img id="output" class="img-responsive" src="../images/activities/<?php echo $image; ?>" style="width:100%;height: 300px;" >
+    <img id="output" class="img-responsive" src="../images/activities/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
 </div>
 
 <div class="col-md-8">

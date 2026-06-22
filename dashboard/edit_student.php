@@ -97,53 +97,7 @@ if(isset($_GET['id'])){
 
 
 
-<style type="text/css">
-
-
-
-
-.photo_post{
-    display: inline-block;
-}
-
-.photo_post span{
-	margin-left: 20px;
-}
-
-
-/* Hide the file input using
-opacity */
-[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-}
-
-[type=file] + label {
-  border: 1px solid #CCC;
-  border-radius: 3px;
-  text-align: left;
-  padding: 10px;
-  width: 150px;
-  position: relative;
-}
-[type=file] + label {
-  text-align: center;
-  /* Decorative */
-  background: #333;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-[type=file] + label:hover {
-  background: #3399ff;
-}
-.photo_review{
-    display: absolute;
-
-}
-
-</style>	
+	
 
 
 <div class="well box-shadow col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xs-offset-0 col-sm-offset-0" style="margin-top:50px;">
@@ -164,6 +118,13 @@ opacity */
              </div>
              
 		  <div class="row">
+
+		<div class="col-md-12">
+			<div class="alert alert-info" style="margin-bottom:15px;">
+				<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
+				Updated photos will appear on the public <strong>Members &rarr; Students</strong> page of the website.
+			</div>
+		</div>
 
 		<div class="col-md-4">
 	        <img id="output" class="img-responsive" src="../images/member/students/<?php echo $image; ?>" style="width:100%;" >

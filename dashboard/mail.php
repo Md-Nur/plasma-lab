@@ -15,7 +15,7 @@ use PHPMailer\PHPMailer\Exception;
 //Load Composer's autoloader
 require 'vendor/autoload.php';
 
-$mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+$mail = new PHPMailer(false);                              // Passing `false` disables exceptions
 
 //Server settings
 
@@ -39,7 +39,5 @@ $mail->Subject = $subject;
 $mail->Body    = $body;
 $mail->AltBody = $altbody;
 
-$mail->send();
-    
 
 ?>

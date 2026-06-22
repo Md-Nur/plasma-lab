@@ -78,37 +78,7 @@ if (isset($_POST['update'])) {
 ?>
 
 
-<style type="text/css">
 
-[type=file] {
-   position: absolute;
-   filter: alpha(opacity=0);
-   opacity: 0;
-}
-input,
-[type=file] + label {
-border: 1px solid #CCC;
-border-radius: 3px;
-text-align: left;
-position: relative;
-}
-[type=file] + label {
-text-align: center;
-/* Decorative */
-background: #6D6E6A;
-color: #fff;
-border: none;
-cursor: pointer;
-}
-[type=file] + label:hover {
-background: #3399ff;
-}
-.photo_review{
-   display: absolute;
-
-}
-
-</style>
 
 
 
@@ -132,11 +102,17 @@ background: #3399ff;
              </div>
              
 		  <div class="row">
+			 <div class="col-md-12">
+				<div class="alert alert-info" style="margin-bottom:15px;">
+					<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
+					This profile picture will appear in the top navigation bar and sidebar of the <strong>Admin Dashboard</strong>.
+				</div>
+			 </div>
 			 <div class="col-md-3 col-lg-3 hidden-xs hidden-sm">
-				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture">
+				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture" onerror="this.style.display='none'">
 			 </div>
 			 <div class="col-xs-12 col-sm-2 hidden-md hidden-lg">
-				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture">
+				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture" onerror="this.style.display='none'">
 			 </div>
 
 			 <div class=" col-md-9 col-lg-9">

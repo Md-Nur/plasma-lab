@@ -30,10 +30,14 @@ if ($imageFileType == 'mp4' || $imageFileType == 'ogv' || $imageFileType == 'web
 				$image = "demo_image.png";
 
 				echo '<div class="col-md-4">
-				        <img id="output" class="img-responsive" src="../images/gallary/video/tmp/'.$image.'" style="width:100%;height: 300px;" >
+				        <img id="output" class="img-responsive" src="../images/gallary/video/tmp/'.$image.'" style="width:100%;height: 300px;" onerror="this.style.display=\'none\'">
 				    </div>
 
 					<div class="col-md-8">
+						<div class="alert alert-info" style="margin-bottom:15px;">
+							<strong><i class="fa fa-info-circle"></i> Where does this thumbnail appear?</strong><br>
+							The chosen thumbnail will appear alongside the video in the public <strong>Gallery &rarr; Videos</strong> page.
+						</div>
 						<form id="upload_video" method="post" action="page_videos.php" enctype="multipart/form-data">
 
 							<input type="hidden" name="video_id" value="'.$video_id.'">
