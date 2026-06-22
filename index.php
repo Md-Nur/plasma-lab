@@ -17,7 +17,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="css/style.css?v=1.1">
+	<link rel="stylesheet" href="css/style.css?v=1.2">
 
 	<script src="js/jquery-2.1.4.min.js"></script>
 
@@ -43,14 +43,14 @@
 				<div class="tittle-style"></div>
 			</div>
 			
-			<div class="activities-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px;">
+			<div class="activities-grid">
 				<?php 
 				$result_activities = mysqli_query($db, "SELECT * FROM activities"); 
 				while($row_activities = mysqli_fetch_array($result_activities)){ 
 				?>
-				<div class="service-box" style="margin-bottom: 0;">
+				<div class="service-box activity-card">
 					<div class="service-icon">
-						<img src="images/activities/<?php echo $row_activities['image']; ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>">
+						<img src="images/activities/<?php echo htmlspecialchars($row_activities['image']); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>">
 					</div>
 					<div class="service-content">
 						<h4><?php echo htmlspecialchars($row_activities['title']); ?></h4>

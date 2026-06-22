@@ -13,17 +13,75 @@ include('navigation.php');
 $alert_success = 'display : none';
 $msg = '';
 	//connect to database
+
+	function uploadActivityImage($fileInputName, &$errorMessage) {
+		if (!isset($_FILES[$fileInputName]) || $_FILES[$fileInputName]['error'] === UPLOAD_ERR_NO_FILE) {
+			$errorMessage = 'Please choose an activity photo.';
+			return false;
+		}
+
+		if ($_FILES[$fileInputName]['error'] !== UPLOAD_ERR_OK) {
+			$errorMessage = 'Photo upload failed. Please try again.';
+			return false;
+		}
+
+		$tmp_name = $_FILES[$fileInputName]['tmp_name'];
+		$imageInfo = getimagesize($tmp_name);
+		if ($imageInfo === false) {
+			$errorMessage = 'Only image files are allowed.';
+			return false;
+		}
+
+		$allowedTypes = array(
+			IMAGETYPE_JPEG => 'jpg',
+			IMAGETYPE_PNG => 'png',
+			IMAGETYPE_GIF => 'gif'
+		);
+
+		if (defined('IMAGETYPE_WEBP')) {
+			$allowedTypes[IMAGETYPE_WEBP] = 'webp';
+		}
+
+		if (!isset($allowedTypes[$imageInfo[2]])) {
+			$errorMessage = 'Only JPG, PNG, GIF, and WEBP photos are supported.';
+			return false;
+		}
+
+		$uploadDir = __DIR__ . '/../images/activities/';
+		if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+			$errorMessage = 'Activity photo folder is missing and could not be created.';
+			return false;
+		}
+
+		$new_name = time() . '_' . mt_rand(1000, 9999) . '.' . $allowedTypes[$imageInfo[2]];
+		if (!move_uploaded_file($tmp_name, $uploadDir . $new_name)) {
+			$errorMessage = 'Could not save the uploaded photo.';
+			return false;
+		}
+
+		return $new_name;
+	}
+
+	function deleteActivityImage($imageName) {
+		if (empty($imageName) || $imageName === 'demo_image.png') {
+			return;
+		}
+
+		$imagePath = __DIR__ . '/../images/activities/' . basename($imageName);
+		if (is_file($imagePath)) {
+			unlink($imagePath);
+		}
+	}
 	
 	
 	//if save btn is clicked
 	if(isset($_POST['submit'])){
-		$title = addslashes($_POST['title']);
-		$info = addslashes($_POST['info']);
+		$title = mysqli_real_escape_string($db, $_POST['title']);
+		$info = mysqli_real_escape_string($db, $_POST['info']);
 
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$new_name = uploadActivityImage('image', $msg);
 		
-		if (move_uploaded_file($tmp_name, "../images/activities/".$new_name)) {
+		if ($new_name !== false) {
 			$query = "INSERT INTO activities (image, title, info) VALUES ('$new_name','$title', '$info')";
 
 			if ($db->query($query) === TRUE) {
@@ -32,19 +90,23 @@ $msg = '';
 				$alert_success = '';
 			} else {
 				$msg = 'Failed to add..';
+				deleteActivityImage($new_name);
 
 				$alert_failed = '';
 			}
 
+		}
+		else {
+			$alert_failed = '';
 		}
 	}
 	
 	//update data
 	if(isset($_POST['update'])){
 
-		$title = addslashes($_POST['title']);
-		$info = addslashes($_POST['info']);
-		$id = $_POST['id'];
+		$title = mysqli_real_escape_string($db, $_POST['title']);
+		$info = mysqli_real_escape_string($db, $_POST['info']);
+		$id = (int) $_POST['id'];
 
 		$fileName = basename($_FILES['image']['name']);
 
@@ -72,19 +134,18 @@ $msg = '';
 			}
 
 		}else {
-			$tmp_name = $_FILES['image']['tmp_name'];
-			$new_name = time().".jpg";
+			$new_name = uploadActivityImage('image', $msg);
 
 			$result = mysqli_query($db, "SELECT * FROM activities WHERE id=$id");
 			$row = mysqli_fetch_array($result);
 			$image = $row['image'];
-			unlink("../images/activities/".$image);
 
-			if (move_uploaded_file($tmp_name, "../images/activities/".$new_name)) {
+			if ($new_name !== false) {
 
 				$sql_update = mysqli_query($db, "UPDATE activities SET image='$new_name', title='$title', info = '$info' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
+					deleteActivityImage($image);
 
 					$msg = 'Updated..';
 					$edit_state = true;
@@ -93,14 +154,13 @@ $msg = '';
 				} else {
 
 					 $msg = 'Failed to update..';
+					deleteActivityImage($new_name);
 
 				$alert_failed = '';
 
 				}
 
 			}else {
-
-				$msg = 'Failed to update..';
 
 				$alert_failed = '';
 
@@ -116,11 +176,20 @@ $msg = '';
 	
 	//delete data
 	if(isset($_GET['del'])){
-		$id = $_GET['del'];
-		mysqli_query($db, "DELETE FROM activities WHERE id=$id");
-		$msg = 'Activity Deleted..';
+		$id = (int) $_GET['del'];
+		$rec = mysqli_query($db, "SELECT image FROM activities WHERE id=$id");
+		$record = mysqli_fetch_array($rec);
+		if (mysqli_query($db, "DELETE FROM activities WHERE id=$id")) {
+			if ($record) {
+				deleteActivityImage($record['image']);
+			}
+			$msg = 'Activity Deleted..';
 
-		$alert_success = '';
+			$alert_success = '';
+		} else {
+			$msg = 'Failed to delete..';
+			$alert_failed = '';
+		}
 	}
 	
 	
@@ -132,7 +201,7 @@ $msg = '';
 	
 		//fetch the record to be updated
 	if(isset($_GET['edit'])) {
-		$id = $_GET['edit'];
+		$id = (int) $_GET['edit'];
 		$edit_state = true;
 		
 		$rec = mysqli_query($db, "SELECT * FROM activities WHERE id=$id");
@@ -177,7 +246,7 @@ $msg = '';
 			</div>
 
 <div class="col-md-4">
-    <img id="output" class="img-responsive" src="../images/activities/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
+    <img id="output" class="img-responsive activity-preview-image" src="../images/activities/<?php echo htmlspecialchars($image); ?>" alt="Activity photo preview" onerror="this.style.display='none'">
 </div>
 
 <div class="col-md-8">
@@ -186,7 +255,7 @@ $msg = '';
 		<input type="hidden" name="id" value="<?php echo $id; ?>">
 
 		<div class="photo_post">
-			<input name="image" id="f02" type="file" placeholder="Add profile picture" onchange="loadFile(event)"/>
+			<input name="image" id="f02" type="file" accept="image/jpeg,image/png,image/gif,image/webp" placeholder="Add activity photo" onchange="loadFile(event)"/>
 			<label for="f02">Upload Photo</label>
 		</div>
 		<div class="clearfix"></div>
@@ -238,13 +307,13 @@ $msg = '';
 <?php while($row_activities = mysqli_fetch_array($result_activities)){ ?>
 
 	        <div class="col-md-4 col-lg-4 col-sm-6 ">
-	            <div class="service-box">
+	            <div class="service-box activity-admin-card">
 	                <div class="service-icon ">
-	                    <img src="../images/activities/<?php echo $row_activities['image']; ?>" style="width: 100%;height: 100%;">
+	                    <img src="../images/activities/<?php echo htmlspecialchars($row_activities['image']); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>" class="activity-admin-image">
 	                </div>
 	                <div class="service-content" style="background-image:url(../images/back4.jpg);">
-	                    <h3><?php echo $row_activities['title']; ?></h3>
-	                    <p><?php echo $row_activities['info']; ?></p>
+	                    <h3><?php echo htmlspecialchars($row_activities['title']); ?></h3>
+	                    <p><?php echo htmlspecialchars($row_activities['info']); ?></p>
 	                    <hr>
 	                    <a type="button" class="btn btn-info" href="page_activities.php?edit=<?php echo $row_activities['id']; ?>">Edit </a> 
 						<a type="button" class="btn btn-danger" href = "page_activities.php?del=<?php echo $row_activities['id']; ?>" onclick="return deleletconfig()"> Delete</a>
@@ -274,6 +343,7 @@ $msg = '';
     reader.onload = function(){
       var output = document.getElementById('output');
       output.src = reader.result;
+      output.style.display = 'block';
     };
     reader.readAsDataURL(event.target.files[0]);
   };
