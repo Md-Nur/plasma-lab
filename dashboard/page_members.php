@@ -1,4 +1,49 @@
 <?php
+
+// Check if this is an AJAX insert request first
+if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'){
+	include_once('server.php');
+
+	$upload_ok = false;
+	if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK || $_FILES['image']['size'] === 0) {
+		$msg = 'No file uploaded or upload error. Please try again.';
+	} else {
+		$name = mysqli_real_escape_string($db, $_POST['name']);
+		$designation = mysqli_real_escape_string($db, $_POST['designation']);
+		$phone = mysqli_real_escape_string($db, $_POST['phone']);
+		$email = mysqli_real_escape_string($db, $_POST['email']);
+		$link = mysqli_real_escape_string($db, $_POST['link']);
+		$info = mysqli_real_escape_string($db, $_POST['info']);
+
+		$tmp_name = $_FILES['image']['tmp_name'];
+		$new_name = time().".jpg";
+
+		if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
+			if ($link == '' || $link == null) {
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email')";
+			} else {
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link')";
+			}
+
+			if ($db->query($sql) === TRUE) {
+				$msg = 'Member added successfully.';
+				$upload_ok = true;
+			} else {
+				$msg = 'Failed to save member to database. Try again.';
+				if (is_file("../images/member/members/".$new_name)) {
+					unlink("../images/member/members/".$new_name);
+				}
+			}
+		} else {
+			$msg = 'Could not save the uploaded photo.';
+		}
+	}
+
+	header('Content-Type: application/json');
+	echo json_encode(['success' => $upload_ok, 'message' => $msg]);
+	exit;
+}
+
 include('head.php'); 
 include('redirect.php'); 
 include('navigation.php'); 
@@ -17,7 +62,7 @@ include('navigation.php');
 	//connect to database
 	
 	
-	//if save btn is clicked
+	//if save btn is clicked (fallback for non-AJAX POST)
 	if(isset($_POST['insert'])){
 		
 		$name = $_POST['name'];
@@ -165,120 +210,8 @@ include('navigation.php');
   text-align: center;
 }
 
-/* ── Add Member Dialog ──────────────────────────────────── */
-#add-member-dialog {
-  border: none;
-  border-radius: 20px;
-  padding: 0;
-  width: min(680px, 95vw);
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #111827;
-  color: #f3f4f6;
-  box-shadow: 0 30px 80px -10px rgba(0,0,0,0.85);
-  /* Centering via margin auto in top layer */
-  margin: auto;
-}
-
-#add-member-dialog::backdrop {
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.dlg-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  position: sticky;
-  top: 0;
-  background: #111827;
-  z-index: 5;
-}
-
-.dlg-title {
-  font-size: 20px;
-  font-weight: 700;
-  background: linear-gradient(135deg,#fff 0%,#cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
-}
-
-.dlg-close-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: color 0.2s, background 0.2s;
-}
-
-.dlg-close-btn:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.08);
-}
-
-.dlg-body {
-  padding: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.dlg-preview {
-  flex: 0 0 160px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.dlg-preview img {
-  width: 160px;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.1);
-  display: block;
-}
-
-.dlg-form-col {
-  flex: 1 1 280px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.dlg-footer {
-  padding: 16px 24px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-#dlg-result {
-  color: #f87171;
-  font-size: 14px;
-  flex: 1;
-}
-
-@media (max-width: 520px) {
-  .dlg-body { flex-direction: column; }
-  .dlg-preview { flex: none; width: 100%; }
-  .dlg-preview img { width: 100%; height: 200px; }
-  .members-grid { gap: 14px; }
-  .member-card { flex: 1 1 140px; min-width: 130px; }
-}
-</style>
+		/* Modal styles migrated globally to modern_dashboard.css */
+	</style>
 
 <div class="well box-shadow col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xs-offset-0 col-sm-offset-0" style="margin-top:50px;">
 	<div class="panel panel-primary">
@@ -322,30 +255,35 @@ include('navigation.php');
 
 
 <!-- Native dialog for Add Member -->
-<dialog id="add-member-dialog" aria-labelledby="dlg-title-id" closedby="any">
+<dialog id="add-member-dialog" class="dashboard-dialog" aria-labelledby="dlg-title-id" closedby="any">
 	<div class="dlg-header">
 		<h4 class="dlg-title" id="dlg-title-id">Add Member</h4>
 		<button type="button" class="dlg-close-btn" id="closeDlgBtn" aria-label="Close dialog">&times;</button>
 	</div>
 
-	<div class="dlg-body">
-		<div class="dlg-preview">
-			<img id="output" src="../images/member/members/<?php echo $image; ?>" alt="Member preview" onerror="this.style.display='none'">
-		</div>
-
-		<div class="dlg-form-col">
-			<div class="alert alert-info" style="margin-bottom:0;">
-				<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
-				Uploaded photos will appear on the public <strong>Members</strong> page.
+	<form id="member_t" method="post" action="page_members.php" enctype="multipart/form-data">
+		<div class="dlg-body">
+			<div class="dlg-preview">
+				<img id="output" src="../images/member/members/<?php echo $image; ?>" alt="Member preview" onerror="this.style.display='none'">
+				<div class="preview-placeholder" id="previewPlaceholder" style="width:160px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.02); color:rgba(255,255,255,0.3); <?php if($image !== 'demo_image.png') echo 'display:none;'; ?>">
+					<i class="fa fa-user fa-2x" style="margin-bottom:8px;"></i>
+					<span style="font-size:12px; text-align:center; padding: 0 10px;">Preview</span>
+				</div>
 			</div>
 
-			<form id="member_t" method="post" action="page_members.php" enctype="multipart/form-data">
+			<div class="dlg-form-col">
+				<div class="info-banner">
+					<i class="fa fa-info-circle"></i>
+					<span>Uploaded photos will appear on the public <strong>Members</strong> page.</span>
+				</div>
+
 				<input type="hidden" name="id" value="<?php echo $id; ?>">
 
-				<div class="photo_post form-group">
-					<input class="form-control" name="image" id="f02" type="file" placeholder="Add profile picture" onchange="loadFile(event)" />
-					<label for="f02">Upload Photo</label>
-					<span>Image must be Square Sized (eg. 300×300)</span>
+				<div class="photo_post form-group" style="margin-bottom:14px;">
+					<input type="file" name="image" id="f02" accept="image/*">
+					<label for="f02"><i class="fa fa-upload" style="margin-right:5px;"></i>Choose Photo</label>
+					<span id="fileNameDisplay" style="display:inline-block; margin-left:10px; color:#cbd5e1; font-size:13px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">No file selected</span>
+					<span style="display:block;color:var(--text-muted);font-size:11px;margin-top:4px;">Image must be Square Sized (e.g. 300×300)</span>
 				</div>
 
 				<fieldset class="form-group">
@@ -377,131 +315,66 @@ include('navigation.php');
 					<label for="member-info">Member Info:</label>
 					<textarea class="form-control" id="member-info" placeholder="Short bio..." name="info" rows="4" tabindex="6"></textarea>
 				</fieldset>
-			</form>
+			</div>
 		</div>
-	</div>
 
-	<div class="dlg-footer">
-		<span id="result" id="dlg-result"></span>
-		<div style="display:flex;gap:10px;margin-left:auto;">
-			<button type="button" class="btn btn-default" id="closeDlgFooterBtn">Close</button>
-			<button type="submit" form="member_t" onclick="return validateform()" name="insert" class="btn btn-info">Add Member</button>
+		<div class="dlg-footer">
+			<span class="dlg-result" id="result"></span>
+			<div style="display:flex; gap:10px; margin-left:auto;">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="submit" class="btn btn-info" id="insertMemberBtn">Add Member</button>
+			</div>
 		</div>
-	</div>
+	</form>
 </dialog>
 
-
+<script src="assets/js/dashboard-dialogs.js"></script>
 <script>
-	// ── File preview ──────────────────────────────────────
-	var loadFile = function(event) {
-		var reader = new FileReader();
-		reader.onload = function() {
-			var output = document.getElementById('output');
-			output.src = reader.result;
-			output.style.display = 'block';
-		};
-		reader.readAsDataURL(event.target.files[0]);
-	};
+  // Initialize native dialog
+  Dashboard.initDashboardDialog({
+    dialogId: 'add-member-dialog',
+    openBtnId: 'openAddMemberBtn'
+  });
 
-	// ── Dialog open / close ───────────────────────────────
-	var dialog = document.getElementById('add-member-dialog');
+  // Initialize image preview
+  Dashboard.initImagePreview('f02', 'output', 'previewPlaceholder', 'fileNameDisplay');
 
-	document.getElementById('openAddMemberBtn').addEventListener('click', function() {
-		dialog.showModal();
-	});
-
-	document.getElementById('closeDlgBtn').addEventListener('click', function() {
-		dialog.close();
-	});
-
-	document.getElementById('closeDlgFooterBtn').addEventListener('click', function() {
-		dialog.close();
-	});
-
-	// Light-dismiss fallback for browsers without closedby support (e.g. Safari)
-	if (!('closedBy' in HTMLDialogElement.prototype)) {
-		dialog.addEventListener('click', function(event) {
-			if (event.target !== dialog) return;
-			var rect = dialog.getBoundingClientRect();
-			var isContent = (
-				rect.top    <= event.clientY && event.clientY <= rect.top    + rect.height &&
-				rect.left   <= event.clientX && event.clientX <= rect.left   + rect.width
-			);
-			if (!isContent) dialog.close();
-		});
-	}
+  // Setup AJAX upload and form submission
+  Dashboard.setupAjaxForm({
+    formId: 'member_t',
+    dialogId: 'add-member-dialog',
+    submitParamName: 'insert',
+    validate: function(form) {
+      var file = form.querySelector('#f02').files[0];
+      if (!file) {
+        return 'Please select a photo before uploading.';
+      }
+      var name = form.querySelector('#member-name').value.trim();
+      if (!name) {
+        return 'Full Name is required.';
+      }
+      
+      var email = form.querySelector('#member-email').value.trim();
+      if (email) {
+        var atpos = email.indexOf("@");
+        var dotpos = email.lastIndexOf(".");
+        if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) {
+          return 'Please enter a valid Email Address.';
+        }
+      }
+      return null;
+    }
+  });
 </script>
-
-<script type="text/javascript">
-	function validateform() {
-
-		var image = document.forms["member_t"]["image"].value;
-		if (image == null || image == "") {
-			document.getElementById("result").innerHTML = " Error : Insert a Photo...";
-			return false;
-		}
-
-		var name = document.forms["member_t"]["name"].value;
-		if (name == null || name == "") {
-			document.getElementById("result").innerHTML = " Error : Name field must not Empty...";
-			return false;
-		}
-
-		// var designation = document.forms["member_t"]["designation"].value;
-		// if (designation == null || designation == "") {
-		// document.getElementById("result").innerHTML = " Error : Designation field must not Empty...";
-		// return false;
-		// }
-		//
-		// var phone = document.forms["member_t"]["phone"].value;
-		// if (phone == null || phone == "") {
-		// document.getElementById("result").innerHTML = " Error : phone field must not Empty...";
-		// return false;
-		// }
-
-		var x = document.forms["member_t"]["email"].value;
-		var atpos = x.indexOf("@");
-		var dotpos = x.lastIndexOf(".");
-
-
-		var b = document.forms["member_t"]["email"].value;
-		if (b == null || b == "") {
-			//			document.getElementById("result").innerHTML = " Error : Email field must be filled...";
-			//			return false;
-		} else {
-			if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= x.length) {
-				document.getElementById("result").innerHTML = " Error : Please Enter a valid Email Address .........";
-				return false;
-			}
-		}
-
-
-
-		// var info = document.forms["member_t"]["info"].value;
-		// if (info == null || info == "") {
-		// document.getElementById("result").innerHTML = " Error : Write some info about the member...";
-		// return false;
-		// }
-
-		return (true);
-	}
-
-</script>
-
 
 <script>
 	function deleletconfig() {
-
 		var del = confirm("Are you sure you want to delete this record?");
 		if (del == true) {
 			alert("record deleted")
 		}
 		return del;
 	}
-
 </script>
-
-
-
 
 <?php include('bottom.php'); ?>

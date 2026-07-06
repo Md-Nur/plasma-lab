@@ -1,5 +1,41 @@
-
 <?php
+
+// Check if this is an AJAX insert request first
+if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'){
+	include_once('server.php');
+
+	$upload_ok = false;
+	if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK || $_FILES['image']['size'] === 0) {
+		$msg = 'No file uploaded or upload error. Please try again.';
+	} else {
+		$name = mysqli_real_escape_string($db, $_POST['name']);
+		$session = mysqli_real_escape_string($db, $_POST['session']);
+		$email = mysqli_real_escape_string($db, $_POST['email']);
+
+		$tmp_name = $_FILES['image']['tmp_name'];
+		$new_name = time().".jpg";
+
+		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
+			$sql = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+			if ($db->query($sql) === TRUE) {
+				$msg = 'Student added successfully.';
+				$upload_ok = true;
+			} else {
+				$msg = 'Failed to save to database. Try again.';
+				if (is_file("../images/member/students/".$new_name)) {
+					unlink("../images/member/students/".$new_name);
+				}
+			}
+		} else {
+			$msg = 'Could not save the uploaded photo.';
+		}
+	}
+
+	header('Content-Type: application/json');
+	echo json_encode(['success' => $upload_ok, 'message' => $msg]);
+	exit;
+}
+
 include('head.php'); 
 include('redirect.php'); 
 include('navigation.php'); 
@@ -15,7 +51,7 @@ include('navigation.php');
 	//connect to database
 	include('server.php'); 
 	
-	//if save btn is clicked
+	//if save btn is clicked (fallback for non-AJAX POST)
 	if(isset($_POST['insert'])){
 
 		$name = $_POST['name'];
@@ -75,23 +111,63 @@ include('navigation.php');
 	$result = mysqli_query($db, "SELECT * FROM students");
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<style>
+	/* ── Student Cards Grid ── */
+	.students-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		padding: 10px 0;
+	}
 
-	<!-- bootstrap & fontawesome -->
-	<link rel="stylesheet" href="assets/css/style.css" />
-	<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
-	<link rel="stylesheet" href="assets/font-awesome/4.5.0/css/font-awesome.min.css" />
+	.student-card {
+		flex: 1 1 180px;
+		max-width: 220px;
+		min-width: 150px;
+		background: rgba(30, 41, 59, 0.55);
+		border: 1px solid rgba(255,255,255,0.09);
+		border-radius: 14px;
+		padding: 14px;
+		transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+	}
 
-	<script src="assets/js/jquery.js"></script>
+	.student-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 14px 32px rgba(0,0,0,0.35);
+		border-color: rgba(99,102,241,0.4);
+	}
 
-</head>
+	.student-card img {
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+		border-radius: 10px;
+		display: block;
+	}
 
-<body>
+	.student-card .card-name {
+		color: #a5b4fc;
+		font-weight: 700;
+		font-size: 15px;
+		margin: 10px 0 12px;
+		text-align: center;
+		word-break: break-word;
+	}
+
+	.student-card .card-actions {
+		display: flex;
+		gap: 8px;
+	}
+
+	.student-card .card-actions a {
+		flex: 1;
+		text-align: center;
+		padding: 6px 4px;
+		font-size: 13px;
+	}
+</style>
 
 
 
@@ -99,7 +175,7 @@ include('navigation.php');
     <div class="panel panel-primary">
 	   <div class="panel-heading">
 		  <h3 class="panel-title pull-left">Members: Students</h3>
-		  <button type="button" class="btn btn-info pull-right" data-toggle="modal" data-target="#insert_student">Insert Student</button>
+		  <button type="button" class="btn btn-info pull-right" id="openStudentModal"><i class="fa fa-plus" style="margin-right:5px;"></i>Insert Student</button>
 		  <div class="clearfix"></div>
 	   </div>
 	   <div class="panel-body">
@@ -112,23 +188,16 @@ include('navigation.php');
                   <strong><?php echo $msg; ?></strong>
              </div>
              
-		  <div class="row">
+		  <div class="students-grid">
 			 
 	<?php while($row = mysqli_fetch_array($result)){ ?>
-	<div class="col-md-2 well action" style="padding:10px;">
-		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" style="width:100%;height: 300px;" alt="">
-		<hr >
-		<div class="slider_caption">
-			<h4 style="color:green;font-weight:700;font-size:20px;"><?php echo $row['name']; ?></h4>
+	<div class="student-card">
+		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>">
+		<div class="card-name"><?php echo htmlspecialchars($row['name']); ?></div>
+		<div class="card-actions">
+			<a href="edit_student.php?id=<?php echo $row['id']; ?>" class="btn btn-success">Edit</a>
+			<a class="btn btn-danger" href="page_students.php?del=<?php echo $row['id']; ?>" onclick="return deleletconfig()">Delete</a>
 		</div>
-		<div class="col-md-6">
-			<a href="edit_student.php?id=<?php echo $row['id']; ?>"  class="btn btn-success" style="width: 100%;">Edit</a>
-		</div>
-
-		<div class="col-md-6">
-			<a type="button" class="btn btn-danger" href="page_students.php?del=<?php echo $row['id']; ?>" onclick="return deleletconfig()"> Delete</a>
-		</div>
-		
 	</div>
 	<?php } ?>
                
@@ -143,138 +212,117 @@ include('navigation.php');
 	
 
 
-<div id="insert_student" class="modal fade" role="dialog">
-  <div class="modal-dialog"  style="width: 60%;">
+<!-- Native dialog for Insert Student -->
+<dialog id="insert_student_overlay" class="dashboard-dialog" aria-labelledby="studentModalTitle" closedby="any">
+  <div class="dlg-header">
+    <h4 class="dlg-title" id="studentModalTitle">
+      <i class="fa fa-user-plus" style="margin-right:8px;"></i> Insert Student
+    </h4>
+    <button type="button" class="dlg-close-btn" data-dismiss="modal" aria-label="Close">&times;</button>
+  </div>
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Insert Student</h4>
+  <form id="member_s" method="post" action="page_students.php" enctype="multipart/form-data">
+    <div class="dlg-body">
+      <!-- Preview column -->
+      <div class="dlg-preview">
+        <img id="output" alt="Preview" style="display:none;">
+        <div class="preview-placeholder" id="previewPlaceholder" style="width:160px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.02); color:rgba(255,255,255,0.3);">
+          <i class="fa fa-image fa-2x" style="margin-bottom:8px;"></i>
+          <span style="font-size:12px; text-align:center; padding: 0 10px;">Preview area</span>
+        </div>
       </div>
-      <div class="modal-body">
 
-      	<div class="alert alert-info" style="margin-bottom:15px;">
-			<strong><i class="fa fa-info-circle"></i> Where does this image appear?</strong><br>
-			Uploaded photos will appear on the public <strong>Members &rarr; Students</strong> page of the website.
-		</div>
+      <!-- Form column -->
+      <div class="dlg-form-col">
+        <div class="info-banner">
+          <i class="fa fa-info-circle"></i>
+          <span>Uploaded photos will appear on the public <strong>Members &rarr; Students</strong> page of the website.</span>
+        </div>
 
-      	<div class="col-md-4">
-	        <img id="output" class="img-responsive" src="../images/member/students/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
-	    </div>
+        <input type="hidden" name="id" value="<?php echo $id; ?>">
 
-		<div class="col-md-8">
-			<form id="member_s" method="post" action="page_students.php" enctype="multipart/form-data">
-				<input type="hidden" name="id" value="<?php echo $id; ?>" required>
+        <div class="photo_post form-group" style="margin-bottom:14px;">
+          <input type="file" name="image" id="f02" accept="image/*">
+          <label for="f02"><i class="fa fa-upload" style="margin-right:5px;"></i>Choose Photo</label>
+          <span id="fileNameDisplay" style="display:inline-block; margin-left:10px; color:#cbd5e1; font-size:13px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">No file selected</span>
+          <span style="display:block;color:var(--text-muted);font-size:11px;margin-top:4px;">Image must be Square Sized (e.g. 300×300)</span>
+        </div>
 
-				<div class="photo_post form-group">
-					<input class="form-control" name="image" id="f02" type="file" placeholder="Add profile picture" onchange="loadFile(event)"/>
-					<label for="f02">Upload Photo</label><span>Image must be Square Sized (eg. 300*300)</span>
-				</div>
+        <fieldset class="form-group" style="margin-bottom:14px;">
+          <label for="student_name">Full Name</label>
+          <input class="form-control" id="student_name" placeholder="Full Name..." type="text" name="name" tabindex="1" required>
+        </fieldset>
 
-				<fieldset class="form-group">
-					<label for="name">Full Name:</label>
-					<input class="form-control" placeholder="Full Name ...." type="text" name="name" tabindex="1" required>
-				</fieldset>
+        <fieldset class="form-group" style="margin-bottom:14px;">
+          <label for="student_session">Session</label>
+          <input class="form-control" id="student_session" placeholder="e.g. 2021–2022" type="text" name="session" tabindex="2" required>
+        </fieldset>
 
-				<fieldset class="form-group">
-					<label for="session">Session:</label>
-					<input class="form-control" placeholder="Session...." type="text" name="session" tabindex="1" required>
-				</fieldset>
-
-				<fieldset class="form-group">
-					<label for="email">Email address:</label>
-					<input class="form-control" placeholder="example@domain.com" type="text" name="email" tabindex="1" required>
-				</fieldset>
-
-				<fieldset class="form-group">
-					<input onclick="return validateform()" type="submit" name="insert" id="insert" value="Insert" class="btn btn-info" />
-				</fieldset>
-			</form>
-
-		</div>
-
-		<div class="clearfix"></div>
-      </div>
-      <div class="modal-footer">
-      	<div class="clearfix"></div>
-      	<span id="result" class="pull-left" style="color: red"></span>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <fieldset class="form-group" style="margin-bottom:14px;">
+          <label for="student_email">Email Address</label>
+          <input class="form-control" id="student_email" placeholder="example@domain.com" type="email" name="email" tabindex="3" required>
+        </fieldset>
       </div>
     </div>
 
-  </div>
-</div>
+    <div class="dlg-footer">
+      <span class="dlg-result" id="result"></span>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-info" id="insertStudentBtn">
+          <i class="fa fa-plus" style="margin-right:5px;"></i>Insert Student
+        </button>
+      </div>
+    </div>
+  </form>
+</dialog>
 
-
-
+<script src="assets/js/dashboard-dialogs.js"></script>
 <script>
-  var loadFile = function(event) {
-    var reader = new FileReader();
-    reader.onload = function(){
-      var output = document.getElementById('output');
-      output.src = reader.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-  };
+  // Initialize native dialog
+  Dashboard.initDashboardDialog({
+    dialogId: 'insert_student_overlay',
+    openBtnId: 'openStudentModal'
+  });
+
+  // Initialize image preview
+  Dashboard.initImagePreview('f02', 'output', 'previewPlaceholder', 'fileNameDisplay');
+
+  // Setup AJAX upload and form submission
+  Dashboard.setupAjaxForm({
+    formId: 'member_s',
+    dialogId: 'insert_student_overlay',
+    submitParamName: 'insert',
+    validate: function(form) {
+      var file = form.querySelector('#f02').files[0];
+      if (!file) {
+        return 'Please select a photo before uploading.';
+      }
+      var name = form.querySelector('#student_name').value.trim();
+      if (!name) {
+        return 'Full Name is required.';
+      }
+      var session = form.querySelector('#student_session').value.trim();
+      if (!session) {
+        return 'Session is required.';
+      }
+      var email = form.querySelector('#student_email').value.trim();
+      if (!email) {
+        return 'Email Address is required.';
+      }
+      return null;
+    }
+  });
 </script>
 
-
-
 <script>
-	function deleletconfig(){
-
-	var del=confirm("Are you sure you want to delete this record?");
-	if (del==true){
-	   alert ("record deleted")
-	}
-	return del;
-	}
+  function deleletconfig(){
+    var del = confirm("Are you sure you want to delete this record?");
+    if (del == true) {
+      alert("Record deleted");
+    }
+    return del;
+  }
 </script>
-
-
-<script type="text/javascript">
-	function validateform() {
-
-	var image=document.forms["member_s"]["image"].value;
-	if (image==null || image==""){
-	  document.getElementById("result").innerHTML = " Error : Insert a Photo...";
-	  return false;
-	}
-
-	var name=document.forms["member_s"]["name"].value;
-	if (name==null || name==""){
-	  document.getElementById("result").innerHTML = " Error : Name field must not Empty...";
-	  return false;
-	}
-
-	var session=document.forms["member_s"]["session"].value;
-	if (session==null || session==""){
-	  document.getElementById("result").innerHTML = " Error : Session field must not Empty...";
-	  return false;
-	}
-	 
-	var x = document.forms["member_s"]["email"].value;
-    var atpos = x.indexOf("@");
-    var dotpos = x.lastIndexOf(".");
-	
-	
-	var b=document.forms["member_s"]["email"].value;
-	if (b==null || b=="")
-	 {
-	  document.getElementById("result").innerHTML = " Error : Email field must be filled...";
-	  return false;
-	 }else{
-		if (atpos<1 || dotpos<atpos+2 || dotpos+2>=x.length) {
-			document.getElementById("result").innerHTML = " Error : Please Enter a valid Email Address .........";
-			return false;
-		}
-	 }
-
-	return( true );
-	}
-	
-</script>	
-	
 
 <?php include('bottom.php'); ?>

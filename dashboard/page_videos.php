@@ -141,67 +141,46 @@ if(isset($_GET['del'])){
 
 
 
-<div class="">
-	<h1>
-		Gallary
-		<small>
-			<i class="ace-icon fa fa-angle-double-right"></i>
-			Videos
-		</small>
-		<small>
-			<i class="ace-icon fa fa-angle-double-right"></i>
-			<button type="button" class="btn btn-info" data-toggle="modal" data-target="#insert_videos">Insert Videos</button>
-		</small>
-	</h1>
-	<hr><br>
-</div><!-- /.page-header -->
-<div style="<?php echo $alert_success; ?>" id="update-alert" class="alert alert-success col-sm-12">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <strong><?php echo $msg; ?></strong>
- </div>
- <div style="<?php echo $alert_failed; ?>" id="update-alert" class="alert alert-danger col-sm-12">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <strong><?php echo $msg; ?></strong>
- </div>
+<div class="well box-shadow col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xs-offset-0 col-sm-offset-0" style="margin-top:50px;">
+    <div class="panel panel-primary">
+	   <div class="panel-heading">
+               <h3 class="panel-title pull-left">Gallery: Videos</h3>
+               <button type="button" class="pull-right btn btn-info" data-toggle="modal" data-target="#insert_videos"><i class="fa fa-plus" style="margin-right:5px;"></i>Insert Videos</button>
+               <div class="clearfix"></div>
+	   </div>
+	   <div class="panel-body">
+             <div style="<?php echo $alert_success; ?>" id="update-alert" class="alert alert-success col-sm-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <strong><?php echo $msg; ?></strong>
+             </div>
+             <div style="<?php echo $alert_failed; ?>" id="update-alert" class="alert alert-danger col-sm-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <strong><?php echo $msg; ?></strong>
+             </div>
 
-<section class="Recent-Vodeos col-md-12">
+<div class="videos-grid">
 	<?php $result_video = mysqli_query($db, "SELECT * FROM videos"); ?>
 	<?php while($row_video = mysqli_fetch_array($result_video)){ ?>
-	<div class="col-lg-2">
-		<div style="width: 100%;background: #EBEDEF;margin: 10px; border-radius: 10px;">
-			<img class="img-responsive" src="../images/gallary/video/tmp/<?php echo $row_video['image']; ?>" title="<?php echo $row_video['title']; ?>" data-toggle="modal" data-target="#myModal<?php echo $row_video['id']; ?>" />
-
-			<div style="color: black;width:100%;padding: 10px;">
-				<span style="color:#6FA2E2;"><?php echo $row_video['title']; ?></span>
-				<p><?php echo $row_video['info']; ?></p>
-				<br>
-				<div class="col-md-6">
-					<a class="btn btn-info" style="width: 100%;" href="edit_videos.php?id=<?php echo $row_video['id']; ?>" width="100%">Edit</a>
-				</div>
-
-				<div class="col-md-6">
-					<a class="btn btn-danger" style="width: 100%;" href="page_videos.php?del=<?php echo $row_video['id']; ?>" onclick="return deleletconfig()" width="100%">Delete</a>
-				</div>
-				<div class="clearfix"></div>
-				
+	<div class="video-card">
+		<img src="../images/gallary/video/tmp/<?php echo htmlspecialchars($row_video['image']); ?>" alt="<?php echo htmlspecialchars($row_video['title']); ?>" data-toggle="modal" data-target="#myModal<?php echo $row_video['id']; ?>" />
+		<div class="video-card__body">
+			<div class="video-card__title"><?php echo htmlspecialchars($row_video['title']); ?></div>
+			<p class="video-card__info"><?php echo htmlspecialchars($row_video['info']); ?></p>
+			<div class="video-card__actions">
+				<a class="btn btn-info" href="edit_videos.php?id=<?php echo $row_video['id']; ?>">Edit</a>
+				<a class="btn btn-danger" href="page_videos.php?del=<?php echo $row_video['id']; ?>" onclick="return deleletconfig()">Delete</a>
 			</div>
-			
 		</div>
-		
 	</div>
-	
-
 
 	<div id="myModal<?php echo $row_video['id']; ?>" class="modal fade" role="dialog">
 	  <div class="modal-dialog">
-
-	    <!-- Modal content-->
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
 	      </div>
 	      <div class="modal-body">
-	        <video width="100%" height="" controls>
+	        <video width="100%" controls>
 				<source src="../images/gallary/video/<?php echo $row_video['video']; ?>" type="video/mp4">
 			</video> 
 	      </div>
@@ -209,11 +188,14 @@ if(isset($_GET['del'])){
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 	      </div>
 	    </div>
-
 	  </div>
 	</div>
 	<?php } ?>
-</section>
+</div>
+
+	   </div>
+    </div>
+</div>
 
 
 

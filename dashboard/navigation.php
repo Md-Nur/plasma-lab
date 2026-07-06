@@ -15,6 +15,9 @@ $num_rows = mysqli_num_rows($message_num);
 
 $my_iframe="home.php";
 $inbox="";
+$dashboard="";
+$my_profile="";
+$lab_members="";
 
 $page_elements="";
 
@@ -61,7 +64,7 @@ if(isset($_GET['id'])){
 	elseif($myid=="page_activities"){$home_panal="active open"; $page_activities="active";$page_elements="active open";}
 	elseif($myid=="page_vission"){$home_panal="active open"; $page_vission="active";$page_elements="active open";}
 	
-	elseif($myid=="page_teachers"){$lab_members="active open"; $page_teachers="active";$page_elements="active open";}
+	elseif($myid=="page_teachers" || $myid=="page_members"){$lab_members="active open"; $page_teachers="active";$page_elements="active open";}
 	elseif($myid=="page_students"){$lab_members="active open"; $page_students="active";$page_elements="active open";}
 	
 	elseif($myid=="page_areas"){$page_areas="active";$page_elements="active open";}
@@ -93,6 +96,7 @@ if(isset($_GET['id'])){
     <aside class="modern-sidebar" id="modernSidebar">
         <div class="modern-sidebar-logo">
             <a href="index.php?id=dashboard"><?php echo $site_row['sitename'];?></a>
+            <button type="button" class="modern-sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">&times;</button>
         </div>
         <ul class="modern-sidebar-menu">
             <!-- Core Section -->

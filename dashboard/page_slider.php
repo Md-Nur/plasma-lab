@@ -179,8 +179,8 @@ $msg = '';
 		<input type="hidden" name="id" value="<?php echo $id; ?>">
 		
 		<div class="photo_post">
-			<input name="image" id="f02" type="file" placeholder="Add profile picture" onchange="loadFile(event)"/>
-			<label for="f02">Upload Photo</label>
+			<input name="image" id="f02" type="file" placeholder="Add profile picture" />
+			<label for="f02"><i class="fa fa-upload" style="margin-right:5px;"></i>Upload Photo</label>
 		</div>
 
 		<div class="clearfix"></div>
@@ -190,7 +190,7 @@ $msg = '';
 		</fieldset>
 
 		<fieldset  class="form-group">
-			<input class="form-control" placeholder="Image Sub-Title ...." type="text" name="sub_title" tabindex="1"  value="<?php echo $sub_title; ?>" required>
+			<input class="form-control" placeholder="Image Sub-Title ...." type="text" name="sub_title" tabindex="1"  value="<?php echo $sub_title; ?>">
 		</fieldset>
 
 		<fieldset class="form-group">
@@ -266,27 +266,21 @@ $msg = '';
 
 
 
+<script src="assets/js/dashboard-dialogs.js"></script>
 <script>
-  var loadFile = function(event) {
-    var reader = new FileReader();
-    reader.onload = function(){
-      var output = document.getElementById('output');
-      output.src = reader.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-  };
+  // Initialize image preview
+  Dashboard.initImagePreview('f02', 'output');
 </script>
 
 <script src="assets/js/bootstrap.min.js"></script>
 
 <script>
 function deleletconfig(){
-
-var del=confirm("Are you sure you want to delete this record?");
-if (del==true){
-   alert ("record deleted")
-}
-return del;
+  var del = confirm("Are you sure you want to delete this record?");
+  if (del == true) {
+    alert("Record deleted");
+  }
+  return del;
 }
 </script>
 

@@ -2,11 +2,15 @@
 	<i class="fa fa-angle-double-up" aria-hidden="true"></i>
 </button>
 
+<a href="/dashboard/" class="btn-dashboard-link" id="dashboardBtn" aria-label="Go to Dashboard" title="Admin Dashboard">
+	<i class="fa fa-tachometer" aria-hidden="true"></i>
+</a>
+
 <section class="footer">
 	<div class="copyright text-center">
 		<p style="text-align: center; color: rgba(255,255,255,0.85); font-size: 14px; margin: 0;">
 			&copy; <?php echo date('Y'); ?> <?php echo $site_row['sitename']; ?>. All rights reserved. | Designed by
-			<a href="http://www.facebook.com/adntechbd" target="_blank" style="color: #fff; font-weight: 700;">Ad&Tech <small style="font-size:10px; opacity: 0.8;">MULTIMEDIA</small></a>
+			<a href="http://www.codencognition.com" target="_blank" style="color: #fff; font-weight: 700;">Code & Cognition</a>
 		</p>
 	</div>
 </section>

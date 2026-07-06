@@ -62,6 +62,23 @@
 							View All Journal Publications
 						</a>
 					</div>
+
+					<?php
+					$i = 1;
+					$result_jur = mysqli_query($db, "SELECT * FROM journal ORDER BY id DESC");
+					if (mysqli_num_rows($result_jur) > 0) {
+					?>
+						<div class="journal-list">
+							<?php while($row_jur = mysqli_fetch_array($result_jur)){ ?>
+							<div class="journal-item">
+								<span class="journal-num"><?php echo $i; ?></span>
+								<div class="journal-text">
+									<?php echo $row_jur['journal']; ?>
+								</div>
+							</div>
+							<?php $i++; } ?>
+						</div>
+					<?php } ?>
 				</div>
 
 				<!-- Conference Tab -->
@@ -109,14 +126,16 @@
 			color: var(--lab-teal-dark) !important;
 			border: 0;
 		}
-		.conf-list {
+		.conf-list,
+		.journal-list {
 			background: #fff;
 			border: 1px solid var(--lab-line);
 			border-radius: 12px;
 			box-shadow: var(--lab-shadow);
 			overflow: hidden;
 		}
-		.conf-item {
+		.conf-item,
+		.journal-item {
 			display: flex;
 			align-items: flex-start;
 			gap: 18px;
@@ -124,9 +143,12 @@
 			border-bottom: 1px solid var(--lab-line);
 			transition: background 0.2s ease;
 		}
-		.conf-item:last-child { border-bottom: 0; }
-		.conf-item:hover { background: rgba(28,167,168,0.04); }
-		.conf-num {
+		.conf-item:last-child,
+		.journal-item:last-child { border-bottom: 0; }
+		.conf-item:hover,
+		.journal-item:hover { background: rgba(28,167,168,0.04); }
+		.conf-num,
+		.journal-num {
 			flex-shrink: 0;
 			width: 30px;
 			height: 30px;
@@ -141,7 +163,8 @@
 			color: var(--lab-teal-dark);
 			margin-top: 2px;
 		}
-		.conf-text {
+		.conf-text,
+		.journal-text {
 			font-size: 15px;
 			color: var(--lab-ink);
 			line-height: 1.6;

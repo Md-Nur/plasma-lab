@@ -1434,6 +1434,44 @@ section {
 	display: none !important;
 }
 
+/* Dashboard shortcut button — fixed bottom-right, beside back-to-top */
+.btn-dashboard-link {
+	position: fixed;
+	bottom: 65px;
+	right: 70px; /* 20px base + 40px back-to-top width + 10px gap */
+	z-index: 9998;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 4px;
+	background: var(--lab-plum, #6a3d6e);
+	color: #fff;
+	font-size: 16px;
+	box-shadow: 0 14px 28px rgba(106, 61, 110, 0.32);
+	text-decoration: none;
+	opacity: 0.85;
+	transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-dashboard-link:hover,
+.btn-dashboard-link:focus {
+	background: #7e4d83;
+	color: #fff;
+	text-decoration: none;
+	opacity: 1;
+	transform: translateY(-2px);
+	box-shadow: 0 20px 36px rgba(106, 61, 110, 0.42);
+}
+
+@media (max-width: 576px) {
+	.btn-dashboard-link {
+		bottom: 15px;
+		right: 65px;
+	}
+}
+
 .social {
 	top: 24%;
 }
