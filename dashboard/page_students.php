@@ -22,9 +22,15 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 				$msg = 'Student added successfully.';
 				$upload_ok = true;
 			} else {
-				$msg = 'Failed to save to database. Try again.';
-				if (is_file("../images/member/students/".$new_name)) {
-					unlink("../images/member/students/".$new_name);
+				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+				if ($db->query($sql_fallback) === TRUE) {
+					$msg = 'Student added successfully.';
+					$upload_ok = true;
+				} else {
+					$msg = 'Failed to save to database. Try again.';
+					if (is_file("../images/member/students/".$new_name)) {
+						unlink("../images/member/students/".$new_name);
+					}
 				}
 			}
 		} else {
@@ -75,10 +81,21 @@ include('navigation.php');
 
 			} else {
 
-				 $msg = 'Failed to add..';
+				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
 
-				$alert_failed = '';
+				if ($db->query($sql_fallback) === TRUE) {
 
+					$msg = 'Member Added..';
+
+					$alert_success = '';
+
+				} else {
+
+					 $msg = 'Failed to add..';
+
+					$alert_failed = '';
+
+				}
 
 			}
 
@@ -111,7 +128,13 @@ include('navigation.php');
 		
 	//retrive records
 	$result_current = mysqli_query($db, "SELECT * FROM students WHERE status='current' OR status IS NULL OR status='' ORDER BY id DESC");
+	if (!$result_current) {
+		$result_current = mysqli_query($db, "SELECT * FROM students ORDER BY id DESC");
+	}
 	$result_alumni  = mysqli_query($db, "SELECT * FROM students WHERE status='alumni' ORDER BY id DESC");
+	if (!$result_alumni) {
+		$result_alumni = mysqli_query($db, "SELECT * FROM students WHERE 1=0");
+	}
 ?>
 
 <style>

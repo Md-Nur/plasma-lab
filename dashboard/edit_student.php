@@ -29,6 +29,10 @@ $image = "demo_image.png";
 
 			$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
 
+			if ($sql_update === FALSE) {
+				$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email' WHERE id = $id ");
+			}
+
 			if ($sql_update === TRUE) {
 
 				$msg = 'Information Updated..';
@@ -55,6 +59,10 @@ $image = "demo_image.png";
 			if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
 
 				$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
+
+				if ($sql_update === FALSE) {
+					$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email' WHERE id = $id ");
+				}
 
 				if ($sql_update === TRUE) {
 

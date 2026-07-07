@@ -42,7 +42,13 @@ include 'db_connect.php';
     <?php
 $result_members = mysqli_query($db, "SELECT * FROM members");
 $result_current_students = mysqli_query($db, "SELECT * FROM students WHERE status='current' OR status IS NULL OR status=''");
+if (!$result_current_students) {
+    $result_current_students = mysqli_query($db, "SELECT * FROM students");
+}
 $result_alumni_students  = mysqli_query($db, "SELECT * FROM students WHERE status='alumni'");
+if (!$result_alumni_students) {
+    $result_alumni_students = mysqli_query($db, "SELECT * FROM students WHERE 1=0");
+}
 ?>
     <div class="clearfix"></div>
 
