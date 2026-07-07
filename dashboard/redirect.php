@@ -1,5 +1,9 @@
-<?php 
-session_start();
+<?php
+// Session is already started by server.php → head.php chain.
+// This check prevents "already started" warnings.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if(isset($_SESSION["sess_username"])){
      
      $admin_username = $_SESSION["sess_username"];
