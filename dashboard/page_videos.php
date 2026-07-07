@@ -264,6 +264,14 @@ function validateInsertForm() {
 	res.textContent = '';
 	return true;
 }
+
+// Relocate modal to document.body to bypass layout wrapper stacking context issue (backdrop covering modal)
+document.addEventListener('DOMContentLoaded', function() {
+	var modal = document.getElementById('insert_videos_modal');
+	if (modal) {
+		document.body.appendChild(modal);
+	}
+});
 </script>
 
 <?php include('bottom.php'); ?>
