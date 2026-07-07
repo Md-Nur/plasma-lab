@@ -32,7 +32,7 @@ if (file_exists(__DIR__ . '/config_secrets.php')) {
 // Check execution mode (CLI or Web)
 $is_cli = (php_sapi_name() === 'cli');
 
-if (!$is_cli) {
+if (!$is_cli && !defined('INTERNAL_MIGRATION')) {
     // If Web, verify migration token for security
     $expected_token = defined('MIGRATION_TOKEN') ? MIGRATION_TOKEN : getenv('MIGRATION_TOKEN');
     

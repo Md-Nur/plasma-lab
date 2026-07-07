@@ -30,6 +30,15 @@ if(isset($_SESSION["sess_username"])){
     if ($admin_image == '') {
     	$admin_image = 'admin.jpg';
     }
+
+    // Automatically run database migrations silently in the background once per session
+    if (!isset($_SESSION["migration_checked"])) {
+        $_SESSION["migration_checked"] = true;
+        define('INTERNAL_MIGRATION', true);
+        ob_start();
+        include_once(dirname(__DIR__) . '/Database/migrate.php');
+        ob_end_clean();
+    }
      
 }else {
      header('Location: /dashboard/login.php');
