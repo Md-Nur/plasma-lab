@@ -223,12 +223,13 @@ if (isset($_POST['update_email'])) {
           $email_form = 'hidden';
       } else {
           // Fallback for production: direct database update if verification fails
-          $sql_update = mysqli_query($db, "UPDATE website SET siteemail='$siteemail', sitepassword='$sitepassword' WHERE id = $id");
+          // website table always has id = 1; $id here is admin_id so we must hardcode 1
+          $sql_update = mysqli_query($db, "UPDATE website SET siteemail='$siteemail', sitepassword='$sitepassword' WHERE id = 1");
           if ($sql_update === TRUE) {
               $msg = "Warning: Verification email could not be sent (" . htmlspecialchars($error_msg) . "). Website's Email has been updated directly.";
               $alert_success = '';
           } else {
-              $msg = 'Could not update Website Email. Error: ' . htmlspecialchars($error_msg);
+              $msg = 'Could not update Website Email. Error: ' . htmlspecialchars($error_msg) . ' | DB Error: ' . mysqli_error($db);
               $alert_failed = '';
           }
       }
@@ -262,7 +263,8 @@ if (isset($_POST['validate_email'])) {
         $siteemail = $_SESSION['tmp_siteemail'];
         $sitepassword = $_SESSION['tmp_sitepassword'];
 
-        $sql_update = mysqli_query($db, "UPDATE website SET siteemail='$siteemail', sitepassword='$sitepassword' WHERE id = $id");
+        // website table always has id = 1; $id here is admin_id so we must hardcode 1
+        $sql_update = mysqli_query($db, "UPDATE website SET siteemail='$siteemail', sitepassword='$sitepassword' WHERE id = 1");
 
         if ($sql_update === TRUE) {
                    
@@ -276,7 +278,7 @@ if (isset($_POST['validate_email'])) {
 
         } else {
             
-            $msg = 'Could not updated.Please try again...';
+            $msg = 'Could not updated. DB Error: ' . mysqli_error($db);
             $alert_failed = '';
         }
 
@@ -437,7 +439,7 @@ include('navigation.php');
                     <div class="tab-pane  <?php echo $tab_siteemail; ?>" id="siteemail">
                         <form class="<?php echo $email_form; ?>" id="reg_form_email" action="page_security.php"
                             method="post">
-                            <input type="hidden" name="id" value="<?php echo $admin_id; ?>" required>
+                            <input type="hidden" name="id" value="1" required>
 
                             <fieldset class="form-group">
                                 <input class="form-control" placeholder="Website Email" type="text" name="siteemail"
