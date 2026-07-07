@@ -34,3 +34,5 @@
 		});
 	});
 </script>
+
+<?php include('chatbot.php'); ?>

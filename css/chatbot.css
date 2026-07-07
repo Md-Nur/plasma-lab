@@ -4,19 +4,19 @@
  * Matches design system tokens from main style.css.
  */
 
-/* Floating Action Button */
+/* Floating Action Button (Rightmost) */
 .pstl-chat-btn {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--lab-teal, #1ca7a8), var(--lab-teal-dark, #087d82));
     border: none;
     box-shadow: 0 8px 32px rgba(8, 125, 130, 0.35);
     color: #ffffff;
-    font-size: 24px;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -34,11 +34,54 @@
     transform: scale(0.95);
 }
 
+/* Back to Top button (Middle) - Override main styles to line up horizontally */
+.btn-back-to-top {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 84px !important; /* 24px right + 50px chat button width + 10px gap */
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background-color: var(--lab-teal-dark, #087d82) !important;
+    box-shadow: 0 8px 32px rgba(8, 125, 130, 0.2) !important;
+    opacity: 0.8 !important;
+    z-index: 9999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-back-to-top:hover {
+    opacity: 1 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 38px rgba(8, 125, 130, 0.35) !important;
+}
+
+/* Dashboard shortcut button (Leftmost) - Override main styles to line up horizontally */
+.btn-dashboard-link {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 144px !important; /* 84px right + 50px back-to-top width + 10px gap */
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important; /* Make it circular to look organized and uniform */
+    background: var(--lab-plum, #7b3d73) !important;
+    box-shadow: 0 8px 32px rgba(123, 61, 115, 0.2) !important;
+    opacity: 0.8 !important;
+    z-index: 9999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-dashboard-link:hover {
+    background: var(--lab-plum, #7b3d73) !important;
+    opacity: 1 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 38px rgba(123, 61, 115, 0.35) !important;
+}
+
 /* Chat Button Tooltip/Bubble */
 .pstl-chat-tooltip {
     position: fixed;
-    bottom: 34px;
-    right: 96px;
+    bottom: 32px;
+    right: 84px; /* Adjust beside the smaller chat button */
     background: var(--lab-ink, #17212f);
     color: #ffffff;
     padding: 8px 16px;
@@ -73,11 +116,11 @@
 /* Chat Window Panel */
 .pstl-chat-window {
     position: fixed;
-    bottom: 96px;
+    bottom: 84px; /* Move slightly up to clear the buttons below it */
     right: 24px;
     width: 380px;
     height: 560px;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 150px);
     max-width: calc(100vw - 48px);
     background: var(--lab-card, rgba(255, 255, 255, 0.95));
     border: 1px solid var(--lab-line, rgba(23, 33, 47, 0.1));
@@ -395,7 +438,26 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 480px) {
+@media (max-width: 576px) {
+    .pstl-chat-btn {
+        bottom: 15px !important;
+        right: 15px !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 18px !important;
+    }
+    .btn-back-to-top {
+        bottom: 15px !important;
+        right: 69px !important; /* 15px + 44px + 10px */
+        width: 44px !important;
+        height: 44px !important;
+    }
+    .btn-dashboard-link {
+        bottom: 15px !important;
+        right: 123px !important; /* 69px + 44px + 10px */
+        width: 44px !important;
+        height: 44px !important;
+    }
     .pstl-chat-window {
         bottom: 0 !important;
         right: 0 !important;
@@ -409,9 +471,6 @@
     .pstl-chat-header {
         border-radius: 0 !important;
         padding: 16px 20px !important;
-    }
-    .pstl-chat-btn {
-        display: none !important; /* Hide FAB if chat is fullscreen on small devices */
     }
     .pstl-chat-btn.active {
         display: none !important;
