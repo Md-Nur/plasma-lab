@@ -218,9 +218,9 @@ $(document).ready(function() {
         // Show loading state
         showTypingIndicator();
 
-        // Send POST request to chat_api.php
+        // Send POST request to assistant_api.php
         $.ajax({
-            url: 'chat_api.php',
+            url: 'assistant_api.php',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ contents: conversationHistory }),

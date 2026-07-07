@@ -7,7 +7,7 @@
 ?>
 
 <!-- Chatbot Stylesheet -->
-<link rel="stylesheet" href="css/chatbot.css?v=1.3">
+<link rel="stylesheet" href="css/assistant.css?v=1.3">
 
 <!-- Chat Trigger Button -->
 <button class="pstl-chat-btn" id="pstlChatBtn" aria-label="Open Chat Assistant">
@@ -78,4 +78,4 @@
 </div>
 
 <!-- Chatbot Client-Side Logic -->
-<script src="js/chatbot.js?v=1.3"></script>
+<script src="js/assistant.js?v=1.3"></script>

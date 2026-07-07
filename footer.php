@@ -35,4 +35,4 @@
 	});
 </script>
 
-<?php include('chatbot.php'); ?>
+<?php include('assistant.php'); ?>

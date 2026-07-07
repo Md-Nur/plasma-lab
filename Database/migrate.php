@@ -46,15 +46,15 @@ if (!$is_cli) {
     header('Content-Type: text/plain; charset=utf-8');
 }
 
-// Fix file permissions for static chatbot files (sometimes uploaded as 600 or 700)
-$chatbot_css = $base_dir . '/css/chatbot.css';
-$chatbot_js = $base_dir . '/js/chatbot.js';
-if (file_exists($chatbot_css)) {
-    @chmod($chatbot_css, 0644);
-}
-if (file_exists($chatbot_js)) {
-    @chmod($chatbot_js, 0644);
-}
+// Fix file permissions for assistant assets and scripts (sometimes uploaded as 600 or 700)
+$assistant_css = $base_dir . '/css/assistant.css';
+$assistant_js = $base_dir . '/js/assistant.js';
+$assistant_php = $base_dir . '/assistant.php';
+$assistant_api = $base_dir . '/assistant_api.php';
+if (file_exists($assistant_css)) { @chmod($assistant_css, 0644); }
+if (file_exists($assistant_js)) { @chmod($assistant_js, 0644); }
+if (file_exists($assistant_php)) { @chmod($assistant_php, 0664); }
+if (file_exists($assistant_api)) { @chmod($assistant_api, 0664); }
 
 echo "=== Starting Database Migrations ===\n";
 echo "Database Host: $db_host\n";
