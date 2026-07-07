@@ -5,314 +5,265 @@ include('head.php');
 include('redirect.php'); 
 include('navigation.php'); 
 
-//im=nitializing variable
+//initializing variables
 $title = "";
-$info = "";
-$video = "";
+$info  = "";
+$youtube_url = "";
 $image = "demo_image.png";
-$id = 0;
-	$alert_failed = 'display : none';
-$alert_success = 'display : none';
+$id    = 0;
+$alert_failed  = 'display:none';
+$alert_success = 'display:none';
 $msg = '';
 
+// ── Insert new video ─────────────────────────────────────────────────────────
+if (isset($_POST['insert'])) {
+	$title       = trim($_POST['title']);
+	$info        = trim($_POST['info']);
+	$youtube_url = trim($_POST['youtube_url']);
 
-//if save btn is clicked
-if(isset($_POST['insert'])){
-	//path to store
-
-	$target_dir = "../images/gallary/video/tmp/";
-	$target_file = $target_dir . basename($_FILES["image"]["name"]);
-	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-	
-	$title = $_POST['title'];
-	$info = $_POST['info'];
-	$video_id = $_POST['video_id'];
-	
-
-	$tmp_name_i = $_FILES['image']['tmp_name'];
-    $new_name = time().".".$imageFileType;
-
-
-    if ($imageFileType == 'jpg' | $imageFileType == 'jpeg' | $imageFileType == 'gif'| $imageFileType == 'png') {
-    	
-    	if (move_uploaded_file($tmp_name_i, "../images/gallary/video/tmp/".$new_name)) {
-
-	    	$sql_update = mysqli_query($db, "UPDATE videos SET title='$title', info = '$info', image = '$new_name' WHERE video_id = $video_id ");
-
-			if ($sql_update === TRUE) {
-
-				$msg = 'Video Uploaded';
-				$alert_success = '';
-
-			} else {
-
-				$msg = 'Failed to Upload';
-				$alert_failed = '';
-			}
-	    }else{
-	    	$msg = 'Failed to Upload';
-			$alert_failed = '';
-	    }
-
-
-    }else{
-
-    	
-    	$msg = 'Please select an image of jpeg/jpg/png/gif formate.';
+	if (empty($title)) {
+		$msg = 'Error: Video title is required.';
 		$alert_failed = '';
+	} elseif (empty($youtube_url)) {
+		$msg = 'Error: YouTube link is required.';
+		$alert_failed = '';
+	} elseif (!preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_\-]{11})/', $youtube_url)) {
+		$msg = 'Error: Please enter a valid YouTube URL (e.g. https://www.youtube.com/watch?v=XXXXXXXXXXX).';
+		$alert_failed = '';
+	} else {
+		$title_e       = mysqli_real_escape_string($db, $title);
+		$info_e        = mysqli_real_escape_string($db, $info);
+		$youtube_url_e = mysqli_real_escape_string($db, $youtube_url);
 
-    }
-
-
+		$sql = mysqli_query($db, "INSERT INTO videos (title, info, youtube_url, image) VALUES ('$title_e', '$info_e', '$youtube_url_e', 'demo_image.png')");
+		if ($sql) {
+			$msg = 'Video added successfully!';
+			$alert_success = '';
+			$title = $info = $youtube_url = '';
+		} else {
+			$msg = 'Database error: ' . mysqli_error($db);
+			$alert_failed = '';
+		}
+	}
 }
 
-//delete data
-if(isset($_GET['del'])){
-	$id = $_GET['del'];
-	
-
-	$result = mysqli_query($db, "SELECT * FROM videos WHERE id=$id");
-	$row = mysqli_fetch_array($result);
-	$video=$row['video'];
-	$image=$row['image'];
-	unlink("../images/gallary/video/".$video);
-	unlink("../images/gallary/video/tmp/".$image);
-	mysqli_query($db, "DELETE FROM videos WHERE id=$id");
-	
-	$msg = "Video deleted" ;
+// ── Delete video ─────────────────────────────────────────────────────────────
+if (isset($_GET['del'])) {
+	$del_id = (int)$_GET['del'];
+	mysqli_query($db, "DELETE FROM videos WHERE id=$del_id");
+	$msg = 'Video deleted.';
 	$alert_success = '';
 }
 
-
-		
-	
 ?>
 
+<!-- ── Page content ──────────────────────────────────────────────────────── -->
+<div class="well box-shadow col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top:50px;">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title pull-left"><i class="fa fa-youtube-play" style="margin-right:6px;color:#FF0000;"></i> Gallery: Videos</h3>
+			<button type="button" class="pull-right btn btn-info" data-toggle="modal" data-target="#insert_videos_modal">
+				<i class="fa fa-plus" style="margin-right:5px;"></i> Add Video
+			</button>
+			<div class="clearfix"></div>
+		</div>
+		<div class="panel-body">
 
-
-
-<script type="text/javascript">
-	function _(el) {
-          return document.getElementById(el);
-     }
-
-     function uploadFile() {
-
-     	
-
-     	var file = _("file1").files[0];
-     	// alert(file.name+" | "+file.size+" | "+file.type);
-     	var formdata = new FormData();
-     	formdata.append("file1", file);
-     	var ajax = new XMLHttpRequest();
-     	ajax.upload.addEventListener("progress", progressHandler, false);
-     	ajax.addEventListener("load", completeHandler, false);
-     	ajax.addEventListener("error", errorHandler, false);
-     	ajax.addEventListener("abort", abortHandler, false);
-     	ajax.open("POST", "file_upload_parser.php"); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
-     	//use file_upload_parser.php from above url
-     	ajax.send(formdata);
-     }
-
-     function progressHandler(event) {
-     var uploaded = event.loaded / 1000000;
-     var file_size = event.total / 1000000;
-
-       _("loaded_n_total").innerHTML = "Uploaded " + uploaded.toFixed(2) + "Mb/" + file_size.toFixed(2) + "Mb";
-       var percent = (event.loaded / event.total) * 100;
-       _("progressBar").value = Math.round(percent);
-       _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
-     }
-
-     function completeHandler(event) {
-       _("status").innerHTML = event.target.responseText;
-       _("progressBar").value = 100; //wil clear progress bar after successful upload
-     }
-
-     function errorHandler(event) {
-       _("status").innerHTML = "Upload Failed";
-     }
-
-     function abortHandler(event) {
-       _("status").innerHTML = "Upload Aborted";
-     }
-</script>
-
-
-
-
-<div class="well box-shadow col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xs-offset-0 col-sm-offset-0" style="margin-top:50px;">
-    <div class="panel panel-primary">
-	   <div class="panel-heading">
-               <h3 class="panel-title pull-left">Gallery: Videos</h3>
-               <button type="button" class="pull-right btn btn-info" data-toggle="modal" data-target="#insert_videos"><i class="fa fa-plus" style="margin-right:5px;"></i>Insert Videos</button>
-               <div class="clearfix"></div>
-	   </div>
-	   <div class="panel-body">
-             <div style="<?php echo $alert_success; ?>" id="update-alert" class="alert alert-success col-sm-12">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <strong><?php echo $msg; ?></strong>
-             </div>
-             <div style="<?php echo $alert_failed; ?>" id="update-alert" class="alert alert-danger col-sm-12">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <strong><?php echo $msg; ?></strong>
-             </div>
-
-<div class="videos-grid">
-	<?php $result_video = mysqli_query($db, "SELECT * FROM videos"); ?>
-	<?php while($row_video = mysqli_fetch_array($result_video)){ ?>
-	<div class="video-card">
-		<img src="../images/gallary/video/tmp/<?php echo htmlspecialchars($row_video['image']); ?>" alt="<?php echo htmlspecialchars($row_video['title']); ?>" data-toggle="modal" data-target="#myModal<?php echo $row_video['id']; ?>" />
-		<div class="video-card__body">
-			<div class="video-card__title"><?php echo htmlspecialchars($row_video['title']); ?></div>
-			<p class="video-card__info"><?php echo htmlspecialchars($row_video['info']); ?></p>
-			<div class="video-card__actions">
-				<a class="btn btn-info" href="edit_videos.php?id=<?php echo $row_video['id']; ?>">Edit</a>
-				<a class="btn btn-danger" href="page_videos.php?del=<?php echo $row_video['id']; ?>" onclick="return deleletconfig()">Delete</a>
+			<!-- Alerts -->
+			<div style="<?php echo $alert_success; ?>" class="alert alert-success col-sm-12">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
+				<strong><?php echo htmlspecialchars($msg); ?></strong>
 			</div>
+			<div style="<?php echo $alert_failed; ?>" class="alert alert-danger col-sm-12">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
+				<strong><?php echo htmlspecialchars($msg); ?></strong>
+			</div>
+
+			<!-- Video Cards Grid -->
+			<div class="videos-grid">
+				<?php
+				$result_video = mysqli_query($db, "SELECT * FROM videos ORDER BY id DESC");
+				while ($row_video = mysqli_fetch_array($result_video)):
+					// Auto-generate YouTube thumbnail
+					$yt_id = '';
+					if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_\-]{11})/', $row_video['youtube_url'] ?? '', $m)) {
+						$yt_id = $m[1];
+					}
+					$thumb = $yt_id
+						? "https://img.youtube.com/vi/{$yt_id}/hqdefault.jpg"
+						: ("../images/gallary/video/tmp/" . htmlspecialchars($row_video['image'] ?? 'demo_image.png'));
+				?>
+				<div class="video-card">
+					<!-- Thumbnail / Preview trigger -->
+					<a href="<?php echo $yt_id ? 'https://www.youtube.com/watch?v='.$yt_id : '#'; ?>"
+					   target="_blank" rel="noopener noreferrer"
+					   style="display:block; position:relative; line-height:0; text-decoration:none;">
+						<img src="<?php echo $thumb; ?>"
+						     alt="<?php echo htmlspecialchars($row_video['title']); ?>"
+						     onerror="this.src='../images/gallary/video/tmp/demo_image.png'">
+						<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+						             background:rgba(0,0,0,0.3); opacity:0; transition:opacity .2s;"
+						      class="vid-thumb-overlay">
+							<i class="fa fa-youtube-play" style="font-size:40px;color:#fff;"></i>
+						</span>
+					</a>
+					<div class="video-card__body">
+						<div class="video-card__title"><?php echo htmlspecialchars($row_video['title']); ?></div>
+						<p class="video-card__info"><?php echo htmlspecialchars($row_video['info']); ?></p>
+						<?php if (!empty($row_video['youtube_url'])): ?>
+						<p style="font-size:11px;margin:0 0 8px;word-break:break-all;opacity:0.6;">
+							<i class="fa fa-link" style="margin-right:4px;"></i>
+							<?php echo htmlspecialchars($row_video['youtube_url']); ?>
+						</p>
+						<?php endif; ?>
+						<div class="video-card__actions">
+							<a class="btn btn-info" href="edit_videos.php?id=<?php echo (int)$row_video['id']; ?>">
+								<i class="fa fa-pencil"></i> Edit
+							</a>
+							<a class="btn btn-danger"
+							   href="page_videos.php?del=<?php echo (int)$row_video['id']; ?>"
+							   onclick="return confirm('Delete this video?')">
+								<i class="fa fa-trash"></i> Delete
+							</a>
+						</div>
+					</div>
+				</div>
+				<?php endwhile; ?>
+			</div><!-- /.videos-grid -->
+
 		</div>
 	</div>
+</div>
 
-	<div id="myModal<?php echo $row_video['id']; ?>" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	      </div>
-	      <div class="modal-body">
-	        <video width="100%" controls>
-				<source src="../images/gallary/video/<?php echo $row_video['video']; ?>" type="video/mp4">
-			</video> 
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-	  </div>
+
+<!-- ── Insert Modal ───────────────────────────────────────────────────────── -->
+<div id="insert_videos_modal" class="modal fade" role="dialog">
+	<div class="modal-dialog" style="max-width:580px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">
+					<i class="fa fa-youtube-play" style="color:#FF0000;margin-right:8px;"></i>
+					Add YouTube Video
+				</h4>
+			</div>
+			<form id="insert_video_form" method="post" action="page_videos.php" onsubmit="return validateInsertForm()">
+				<div class="modal-body">
+
+					<div class="alert alert-info">
+						<i class="fa fa-info-circle"></i>
+						<strong>How it works:</strong> Paste a YouTube video link below. The video thumbnail and embed will be automatically generated from the link. Videos appear in the public <strong>Gallery &rarr; Videos</strong> section and on the home page.
+					</div>
+
+					<div class="form-group">
+						<label for="ins_youtube_url">
+							<i class="fa fa-youtube-play" style="color:#FF0000;margin-right:4px;"></i>
+							YouTube Video URL <span style="color:#e84b3a;">*</span>
+						</label>
+						<input type="url"
+						       class="form-control"
+						       id="ins_youtube_url"
+						       name="youtube_url"
+						       placeholder="https://www.youtube.com/watch?v=..."
+						       required>
+						<span class="help-block">Accepted formats: youtube.com/watch?v=... or youtu.be/...</span>
+					</div>
+
+					<!-- Live Preview -->
+					<div id="yt_preview_wrap" style="display:none; margin-bottom:16px;">
+						<label>Preview</label>
+						<div style="position:relative;width:100%;padding-bottom:56.25%;height:0;background:#000;border-radius:6px;overflow:hidden;">
+							<iframe id="yt_preview_frame"
+							        src=""
+							        frameborder="0"
+							        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							        allowfullscreen
+							        style="position:absolute;inset:0;width:100%;height:100%;"></iframe>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="ins_title">Video Title <span style="color:#e84b3a;">*</span></label>
+						<input type="text"
+						       class="form-control"
+						       id="ins_title"
+						       name="title"
+						       placeholder="Enter a descriptive title..."
+						       required>
+					</div>
+
+					<div class="form-group">
+						<label for="ins_info">Description</label>
+						<textarea class="form-control"
+						          id="ins_info"
+						          name="info"
+						          rows="3"
+						          placeholder="Brief description of the video (optional)..."></textarea>
+					</div>
+
+					<span id="insert_result" style="color:#e84b3a;font-size:13px;"></span>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" name="insert" class="btn btn-success">
+						<i class="fa fa-plus" style="margin-right:5px;"></i> Add Video
+					</button>
+				</div>
+			</form>
+		</div>
 	</div>
-	<?php } ?>
-</div>
-
-	   </div>
-    </div>
 </div>
 
 
-
-	
-
-<div id="insert_videos" class="modal fade" role="dialog">
-     <div class="modal-dialog"  style="width: 60%;">
-
-    <!-- Modal content-->
-          <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Insert Videos</h4>
-                </div>
-                <div class="modal-body">
-
-                	<div class="alert alert-info" style="margin-bottom:15px;">
-                		<strong><i class="fa fa-info-circle"></i> Where does this video appear?</strong><br>
-                		Uploaded videos will appear in the public <strong>Gallery &rarr; Videos</strong> section of the website.
-                	</div>
-
-                	<div id="status">
-                         
-                		<form id="upload_form" enctype="multipart/form-data" method="post" style="width: 200px;margin:0 auto;">
-          				<fieldset class="form-group">
-          					<input class="form-control" type="file" name="file1" id="file1" onchange="uploadFile()"/>
-          					<label for="file1">Select Video File</label>
-          				</fieldset>
-          			</form>
-          	      	
-          	      	<div id=""></div>
-
-                	</div>
-
-          		<progress id='progressBar' class='progressBar' value='0' max='100'></progress>
-          		<span id="loaded_n_total"></span>
-                	<div class="clearfix"></div>
-                    
-                </div>
-                     
-                <div class="modal-footer">
-                	<span id="result"></span>
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-
-          </div>
-
-     </div>
-</div>
-
-
-
+<style>
+.vid-thumb-overlay { cursor: pointer; }
+.video-card:hover .vid-thumb-overlay { opacity: 1 !important; }
+</style>
 
 <script>
-  var loadFile = function(event) {
-    var reader = new FileReader();
-    reader.onload = function(){
-      var output = document.getElementById('output');
-      output.src = reader.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-  };
+// Live YouTube preview inside the insert modal
+(function() {
+	var urlInput = document.getElementById('ins_youtube_url');
+	var previewWrap = document.getElementById('yt_preview_wrap');
+	var previewFrame = document.getElementById('yt_preview_frame');
+
+	if (!urlInput) return;
+
+	function extractYtId(url) {
+		var m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_\-]{11})/);
+		return m ? m[1] : null;
+	}
+
+	var timer;
+	urlInput.addEventListener('input', function() {
+		clearTimeout(timer);
+		timer = setTimeout(function() {
+			var id = extractYtId(urlInput.value.trim());
+			if (id) {
+				previewFrame.src = 'https://www.youtube.com/embed/' + id + '?rel=0';
+				previewWrap.style.display = 'block';
+			} else {
+				previewFrame.src = '';
+				previewWrap.style.display = 'none';
+			}
+		}, 600);
+	});
+})();
+
+function validateInsertForm() {
+	var url   = document.getElementById('ins_youtube_url').value.trim();
+	var title = document.getElementById('ins_title').value.trim();
+	var res   = document.getElementById('insert_result');
+
+	if (!url) { res.textContent = 'Please enter a YouTube URL.'; return false; }
+	if (!url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_\-]{11})/)) {
+		res.textContent = 'Please enter a valid YouTube URL.'; return false;
+	}
+	if (!title) { res.textContent = 'Please enter a video title.'; return false; }
+	res.textContent = '';
+	return true;
+}
 </script>
 
-
-
-
-<script type="text/javascript">
-	function validateform() {
-
-	var image=document.forms["upload_video"]["image"].value;
-	if (image==null || image==""){
-
-	  document.getElementById("result").innerHTML = " Error : Insert a Thumb image...";
-	  return false;
-	  
-	}
-
-	var title=document.forms["upload_video"]["title"].value;
-	if (title==null || title==""){
-
-	  document.getElementById("result").innerHTML = " Error : Video Title Empty...";
-	  return false;
-
-	}
-
-	var info=document.forms["upload_video"]["info"].value;
-	if (info==null || info==""){
-
-	  document.getElementById("result").innerHTML = " Error : Video Information required...";
-	  return false;
-
-	}
-
-
-	return( true );
-	}
-	
-</script>	
-
-
-
-
-
-
-
-<script>
-	function deleletconfig(){
-
-	var del=confirm("Are you sure you want to delete this record?");
-	if (del==true){
-	   alert ("record deleted")
-	}
-	return del;
-	}
-</script>
-
-
-
-<?php include('bottom.php');?>
+<?php include('bottom.php'); ?>

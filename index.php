@@ -89,6 +89,126 @@
 
 	<div class="clearfix"></div>
 
+	<!-- ── Featured Videos Section ─────────────────────── -->
+	<?php
+	$result_featured_vids = mysqli_query($db, "SELECT * FROM videos WHERE youtube_url != '' ORDER BY id DESC LIMIT 3");
+	$feat_count = mysqli_num_rows($result_featured_vids);
+	if ($feat_count > 0):
+	?>
+	<section style="padding: 80px 0; background: var(--lab-soft);">
+		<div class="container">
+			<div class="title-div text-center" style="margin-bottom: 16px;">
+				<h1><span>L</span>ab <span>V</span>ideos</h1>
+				<div class="tittle-style"></div>
+			</div>
+			<p style="text-align: center; color: var(--lab-muted); margin-bottom: 40px; font-size: 15px;">Watch research videos and recordings from our laboratory</p>
+
+			<div class="home-videos-grid">
+				<?php while($fv = mysqli_fetch_array($result_featured_vids)):
+					$yt_id = '';
+					if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_\-]{11})/', $fv['youtube_url'], $m)) {
+						$yt_id = $m[1];
+					}
+					if (!$yt_id) continue;
+				?>
+				<div class="home-video-embed">
+					<div class="home-video-frame-wrap">
+						<iframe src="https://www.youtube.com/embed/<?php echo htmlspecialchars($yt_id); ?>?rel=0"
+						        title="<?php echo htmlspecialchars($fv['title']); ?>"
+						        frameborder="0"
+						        loading="lazy"
+						        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						        allowfullscreen></iframe>
+					</div>
+					<div class="home-video-meta">
+						<h4><?php echo htmlspecialchars($fv['title']); ?></h4>
+						<?php if ($fv['info']): ?>
+						<p><?php echo htmlspecialchars($fv['info']); ?></p>
+						<?php endif; ?>
+					</div>
+				</div>
+				<?php endwhile; ?>
+			</div>
+
+			<div style="text-align: center; margin-top: 36px;">
+				<a href="gallary.php#videos" class="btn btn-info" style="padding: 12px 32px; font-size: 15px; border-radius: 8px;">
+					<i class="fa fa-play-circle" style="margin-right: 8px;"></i> View All Videos
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<style>
+	.home-videos-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 28px;
+	}
+
+	.home-video-embed {
+		background: #fff;
+		border-radius: 14px;
+		overflow: hidden;
+		box-shadow: 0 8px 28px rgba(23,33,47,0.10);
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.home-video-embed:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 18px 44px rgba(23,33,47,0.16);
+	}
+
+	.home-video-frame-wrap {
+		position: relative;
+		width: 100%;
+		padding-bottom: 56.25%;
+		height: 0;
+		background: #000;
+	}
+
+	.home-video-frame-wrap iframe {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.home-video-meta {
+		padding: 16px 20px 20px;
+	}
+
+	.home-video-meta h4 {
+		font-size: 16px;
+		font-weight: 800;
+		color: var(--lab-ink, #17212f);
+		margin: 0 0 6px;
+		line-height: 1.35;
+	}
+
+	.home-video-meta p {
+		font-size: 13px;
+		color: var(--lab-muted, #6b7280);
+		margin: 0;
+		line-height: 1.5;
+		white-space: normal;
+		text-align: left;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	@media (max-width: 600px) {
+		.home-videos-grid {
+			grid-template-columns: 1fr;
+			gap: 18px;
+		}
+	}
+	</style>
+	<?php endif; ?>
+
+	<div class="clearfix"></div>
+
 	<?php include('notice.php'); ?>
 
 	<?php include('footer.php'); ?>
