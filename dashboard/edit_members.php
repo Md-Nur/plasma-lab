@@ -22,7 +22,6 @@ $msg = '';
 		$link = $_POST['link'];
 		$info = addslashes($_POST['info']);
 		$id = $_POST['id'];
-		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
 		$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
 		$row = mysqli_fetch_array($result);
@@ -34,7 +33,7 @@ $msg = '';
 
 		if (empty($fileName)) {
 
-			$sql_update = mysqli_query($db, "UPDATE members SET name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link', status='$status' WHERE id = $id ");
+			$sql_update = mysqli_query($db, "UPDATE members SET name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link' WHERE id = $id ");
 
 			if ($sql_update === TRUE) {
 
@@ -61,7 +60,7 @@ $msg = '';
 
 			if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
 
-				$sql_update = mysqli_query($db, "UPDATE members SET image='$new_name', name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link', status='$status' WHERE id = $id ");
+				$sql_update = mysqli_query($db, "UPDATE members SET image='$new_name', name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
 					$image = $new_name;
@@ -101,7 +100,6 @@ if(isset($_GET['id'])){
 	$email=$row['email'];
 	$link=$row['link'];
 	$info=$row['info'];
-	$status=$row['status'] ?? 'current';
 }
 
 ?>
@@ -171,14 +169,6 @@ if(isset($_GET['id'])){
 						<fieldset class="form-group">
 							<label for="email">Email address:</label>
 							<input class="form-control" placeholder="example@domain.com" type="text" name="email" tabindex="1" value="<?php echo $email; ?>">
-						</fieldset>
-
-						<fieldset class="form-group">
-							<label for="member-status">Member Status:</label>
-							<select class="form-control" id="member-status" name="status">
-								<option value="current" <?php echo ($status == 'current') ? 'selected' : ''; ?>>Current Member</option>
-								<option value="alumni"  <?php echo ($status == 'alumni')  ? 'selected' : ''; ?>>Alumni</option>
-							</select>
 						</fieldset>
 
 						<fieldset class="form-group">

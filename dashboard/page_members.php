@@ -14,16 +14,15 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 		$email = mysqli_real_escape_string($db, $_POST['email']);
 		$link = mysqli_real_escape_string($db, $_POST['link']);
 		$info = mysqli_real_escape_string($db, $_POST['info']);
-		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
 		$tmp_name = $_FILES['image']['tmp_name'];
 		$new_name = time().".jpg";
 
 		if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
 			if ($link == '' || $link == null) {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email')";
 			} else {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link')";
 			}
 
 			if ($db->query($sql) === TRUE) {
@@ -72,7 +71,6 @@ include('navigation.php');
 		$email = $_POST['email'];
 		$link = $_POST['link'];
 		$info = addslashes($_POST['info']);
-		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 		
 		$tmp_name = $_FILES['image']['tmp_name'];
 		$new_name = time().".jpg";
@@ -81,7 +79,7 @@ include('navigation.php');
 		if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
 
 			if ($link=='' || $link == null) {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email')";
 
 				if ($db->query($sql) === TRUE) {
 
@@ -99,7 +97,7 @@ include('navigation.php');
 
 			}else {
 
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link')";
 
 				if ($db->query($sql) === TRUE) {
 
@@ -148,8 +146,7 @@ include('navigation.php');
 		$alert_success = '';
 	}
 	
-	$result_current = mysqli_query($db, "SELECT * FROM members WHERE status='current' OR status IS NULL OR status='' ORDER BY id DESC");
-	$result_alumni  = mysqli_query($db, "SELECT * FROM members WHERE status='alumni' ORDER BY id DESC");
+	$result = mysqli_query($db, "SELECT * FROM members");
 ?>
 
 
@@ -240,10 +237,8 @@ include('navigation.php');
 				<strong><?php echo $msg; ?></strong>
 			</div>
 
-			<!-- Current Members -->
-			<h5 style="margin: 10px 0 8px; color: #a5b4fc; font-size:13px; text-transform:uppercase; letter-spacing:.08em;"><i class="fa fa-user" style="margin-right:6px;"></i>Current Members</h5>
-			<div class="members-grid" id="grid-current">
-				<?php while($row = mysqli_fetch_array($result_current)){ ?>
+			<div class="members-grid">
+				<?php while($row = mysqli_fetch_array($result)){ ?>
 				<div class="member-card">
 					<img src="../images/member/members/<?php echo $row['image']; ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>">
 					<div class="member-card__body">
@@ -255,30 +250,6 @@ include('navigation.php');
 					</div>
 				</div>
 				<?php } ?>
-			</div>
-
-			<!-- Alumni Members -->
-			<h5 style="margin: 24px 0 8px; color: #c4b5fd; font-size:13px; text-transform:uppercase; letter-spacing:.08em;"><i class="fa fa-graduation-cap" style="margin-right:6px;"></i>Alumni Members</h5>
-			<div class="members-grid" id="grid-alumni" style="opacity:0.8;">
-				<?php
-				$alumni_count = 0;
-				while($row = mysqli_fetch_array($result_alumni)){
-					$alumni_count++;
-				?>
-				<div class="member-card" style="border-color:rgba(167,139,250,0.25);">
-					<img src="../images/member/members/<?php echo $row['image']; ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(30%);">
-					<div class="member-card__body">
-						<p class="member-card__name"><?php echo htmlspecialchars($row['name']); ?></p>
-						<div class="member-card__actions">
-							<a href="edit_members.php?id=<?php echo $row['id']; ?>" class="btn btn-success">Edit</a>
-							<a href="page_members.php?del=<?php echo $row['id']; ?>" onclick="return deleletconfig()" class="btn btn-danger">Delete</a>
-						</div>
-					</div>
-				</div>
-				<?php } ?>
-				<?php if ($alumni_count === 0): ?>
-				<p style="color:rgba(255,255,255,0.35); font-size:13px; padding:10px 0;">No alumni members yet.</p>
-				<?php endif; ?>
 			</div>
 		</div>
 	</div>
@@ -354,17 +325,9 @@ include('navigation.php');
 				<input class="form-control" id="member-link" placeholder="https://example.com" type="text" name="link" tabindex="5">
 			</fieldset>
 
-			<fieldset class="form-group">
-				<label for="member-status">Member Status:</label>
-				<select class="form-control" id="member-status" name="status" tabindex="6">
-					<option value="current" selected>Current Member</option>
-					<option value="alumni">Alumni</option>
-				</select>
-			</fieldset>
-
 			<fieldset class="form-group" style="margin-bottom:0;">
 				<label for="member-info">Member Info:</label>
-				<textarea class="form-control" id="member-info" placeholder="Short bio..." name="info" rows="4" tabindex="7"></textarea>
+				<textarea class="form-control" id="member-info" placeholder="Short bio..." name="info" rows="4" tabindex="6"></textarea>
 			</fieldset>
 		</div>
 

@@ -11,12 +11,13 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 		$name = mysqli_real_escape_string($db, $_POST['name']);
 		$session = mysqli_real_escape_string($db, $_POST['session']);
 		$email = mysqli_real_escape_string($db, $_POST['email']);
+		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
 		$tmp_name = $_FILES['image']['tmp_name'];
 		$new_name = time().".jpg";
 
 		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
-			$sql = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+			$sql = "INSERT INTO students(image, name, session, email, status) VALUES ('$new_name', '$name', '$session', '$email', '$status')";
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Student added successfully.';
 				$upload_ok = true;
@@ -57,13 +58,14 @@ include('navigation.php');
 		$name = $_POST['name'];
 		$session = $_POST['session'];
 		$email = $_POST['email'];
+		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 		
 		$tmp_name = $_FILES['image']['tmp_name'];
 		$new_name = time().".jpg";
 
 		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
 
-			$sql = "INSERT INTO students(image , name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+			$sql = "INSERT INTO students(image, name, session, email, status) VALUES ('$new_name', '$name', '$session', '$email', '$status')";
 
 			if ($db->query($sql) === TRUE) {
 
@@ -108,7 +110,8 @@ include('navigation.php');
 		
 		
 	//retrive records
-	$result = mysqli_query($db, "SELECT * FROM students");
+	$result_current = mysqli_query($db, "SELECT * FROM students WHERE status='current' OR status IS NULL OR status='' ORDER BY id DESC");
+	$result_alumni  = mysqli_query($db, "SELECT * FROM students WHERE status='alumni' ORDER BY id DESC");
 ?>
 
 <style>
@@ -188,9 +191,11 @@ include('navigation.php');
                   <strong><?php echo $msg; ?></strong>
              </div>
              
-		  <div class="students-grid">
+		  <!-- Current Students -->
+		  <h5 style="margin: 10px 0 8px; color: #a5b4fc; font-size:13px; text-transform:uppercase; letter-spacing:.08em;"><i class="fa fa-user" style="margin-right:6px;"></i>Current Students</h5>
+		  <div class="students-grid" id="grid-current">
 			 
-	<?php while($row = mysqli_fetch_array($result)){ ?>
+	<?php while($row = mysqli_fetch_array($result_current)){ ?>
 	<div class="student-card">
 		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>">
 		<div class="card-name"><?php echo htmlspecialchars($row['name']); ?></div>
@@ -201,6 +206,28 @@ include('navigation.php');
 	</div>
 	<?php } ?>
                
+		  </div>
+
+		  <!-- Alumni Students -->
+		  <h5 style="margin: 24px 0 8px; color: #c4b5fd; font-size:13px; text-transform:uppercase; letter-spacing:.08em;"><i class="fa fa-graduation-cap" style="margin-right:6px;"></i>Alumni Students</h5>
+		  <div class="students-grid" id="grid-alumni" style="opacity:0.8;">
+		  <?php
+		  $alumni_count = 0;
+		  while($row = mysqli_fetch_array($result_alumni)){
+			  $alumni_count++;
+		  ?>
+	<div class="student-card" style="border-color:rgba(167,139,250,0.25);">
+		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(30%);">
+		<div class="card-name"><?php echo htmlspecialchars($row['name']); ?></div>
+		<div class="card-actions">
+			<a href="edit_student.php?id=<?php echo $row['id']; ?>" class="btn btn-success">Edit</a>
+			<a class="btn btn-danger" href="page_students.php?del=<?php echo $row['id']; ?>" onclick="return deleletconfig()">Delete</a>
+		</div>
+	</div>
+	<?php } ?>
+	<?php if ($alumni_count === 0): ?>
+	<p style="color:rgba(255,255,255,0.35); font-size:13px; padding:10px 0;">No alumni students yet.</p>
+	<?php endif; ?>
 		  </div>
 	   </div>
     </div>
@@ -259,8 +286,16 @@ include('navigation.php');
         </fieldset>
 
         <fieldset class="form-group" style="margin-bottom:14px;">
+          <label for="student_status">Student Status</label>
+          <select class="form-control" id="student_status" name="status" tabindex="4">
+            <option value="current" selected>Current Student</option>
+            <option value="alumni">Alumni</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="form-group" style="margin-bottom:14px;">
           <label for="student_email">Email Address</label>
-          <input class="form-control" id="student_email" placeholder="example@domain.com" type="email" name="email" tabindex="3" required>
+          <input class="form-control" id="student_email" placeholder="example@domain.com" type="email" name="email" tabindex="5" required>
         </fieldset>
       </div>
     </div>

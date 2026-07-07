@@ -15,6 +15,7 @@ $image = "demo_image.png";
 		$session = $_POST['session'];
 		$email = $_POST['email'];
 		$id = $_POST['id'];
+		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
 		$result = mysqli_query($db, "SELECT * FROM students WHERE id=$id");
 		$row = mysqli_fetch_array($result);
@@ -26,7 +27,7 @@ $image = "demo_image.png";
 
 		if (empty($fileName)) {
 
-			$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email' WHERE id = $id ");
+			$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
 
 			if ($sql_update === TRUE) {
 
@@ -53,7 +54,7 @@ $image = "demo_image.png";
 
 			if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
 
-				$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email'  WHERE id = $id ");
+				$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
 
@@ -90,6 +91,7 @@ if(isset($_GET['id'])){
 	$name=$row['name'];
 	$session=$row['session'];
 	$email=$row['email'];
+	$status=$row['status'] ?? 'current';
 }
 
 ?>
@@ -147,6 +149,14 @@ if(isset($_GET['id'])){
 				<fieldset class="form-group">
 					<label for="session">Session:</label>
 					<input class="form-control" placeholder="Enter Session...." type="text" name="session" tabindex="1" value="<?php echo $session; ?>"  required>
+				</fieldset>
+
+				<fieldset class="form-group">
+					<label for="student-status">Student Status:</label>
+					<select class="form-control" id="student-status" name="status">
+						<option value="current" <?php echo ($status == 'current') ? 'selected' : ''; ?>>Current Student</option>
+						<option value="alumni"  <?php echo ($status == 'alumni')  ? 'selected' : ''; ?>>Alumni</option>
+					</select>
 				</fieldset>
 
 				<fieldset class="form-group">
