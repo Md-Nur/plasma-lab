@@ -1,0 +1,94 @@
+name: Deploy Website to Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint PHP Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: Lint PHP Files
+        run: |
+          echo "Linting PHP files to catch syntax errors..."
+          find . -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n 1 php -l
+
+  deploy:
+    name: Deploy to Server
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+          coverage: none
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Production Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
+
+      - name: Configure SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy Code via Rsync
+        run: |
+          echo "Deploying files to production server..."
+          # Set default port to 22 if secret not configured
+          SSH_PORT=${{ secrets.SSH_PORT }}
+          if [ -z "$SSH_PORT" ]; then
+            SSH_PORT=22
+          fi
+          
+          rsync -avz --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.DS_Store' \
+            -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+      - name: Run Database Migrations
+        run: |
+          echo "Executing database migration script on server..."
+          SSH_PORT=${{ secrets.SSH_PORT }}
+          if [ -z "$SSH_PORT" ]; then
+            SSH_PORT=22
+          fi
+          
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && \
+             PLASMA_DB_HOST='${{ secrets.PLASMA_DB_HOST }}' \
+             PLASMA_DB_NAME='${{ secrets.PLASMA_DB_NAME }}' \
+             PLASMA_DB_USER='${{ secrets.PLASMA_DB_USER }}' \
+             PLASMA_DB_PASS='${{ secrets.PLASMA_DB_PASS }}' \
+             php Database/migrate.php"
