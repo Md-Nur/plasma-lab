@@ -1,6 +1,6 @@
 /**
  * chatbot.js
- * Frontend logic for the PSTL Gemini Chatbot.
+ * Frontend logic for the PEL Gemini Chatbot.
  * Handles toggle state, message rendering, markdown parsing, API requests, and history persistence.
  */
 

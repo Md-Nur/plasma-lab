@@ -52,7 +52,7 @@
     <div class="pstl-chat-messages" id="pstlChatMessages">
         <!-- Welcome Card -->
         <div class="pstl-chat-welcome" id="pstlWelcomeBox">
-            <h4>Welcome to PSTL! 👋</h4>
+            <h4>Welcome to PEL! 👋</h4>
             <p>I am your Gemini-powered assistant. Ask me anything about our research, members, publications, or recent notices.</p>
         </div>
     </div>
@@ -60,7 +60,7 @@
     <!-- Suggestion Chips -->
     <div class="pstl-chat-chips-container">
         <div class="pstl-chat-chips">
-            <button class="pstl-chip">What is PSTL?</button>
+            <button class="pstl-chip">What is PEL?</button>
             <button class="pstl-chip">Research Activities</button>
             <button class="pstl-chip">Recent Notices</button>
             <button class="pstl-chip">Who are the members?</button>

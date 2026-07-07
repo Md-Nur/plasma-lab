@@ -35,6 +35,9 @@
 					<a href="instruments.php">Instruments</a>
 				</li>
 				<li>
+					<a href="products_services.php">Products & Services</a>
+				</li>
+				<li>
 					<a href="publication.php">Publications</a>
 				</li>
 				<li>
