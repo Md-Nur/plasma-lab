@@ -15,6 +15,9 @@ require_once 'db_connect.php';
 
 // Helper function to securely load environmental variables (from environment or .env file)
 function get_env_variable($key) {
+    if (defined($key)) {
+        return constant($key);
+    }
     $val = getenv($key);
     if ($val !== false) {
         return $val;
