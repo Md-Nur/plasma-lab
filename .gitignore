@@ -2,3 +2,4 @@
 Database/config_secrets.php
 .DS_Store
 vendor/
+!dashboard/vendor/
