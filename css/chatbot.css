@@ -4,11 +4,12 @@
  * Matches design system tokens from main style.css.
  */
 
-/* Floating Action Button (Rightmost) */
+/* Floating Action Button (Leftmost Corner) */
 .pstl-chat-btn {
     position: fixed;
     bottom: 24px;
-    right: 24px;
+    left: 24px;
+    right: auto;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -34,11 +35,11 @@
     transform: scale(0.95);
 }
 
-/* Back to Top button (Middle) - Override main styles to line up horizontally */
+/* Back to Top button (Rightmost Corner) - Override main styles to line up horizontally */
 .btn-back-to-top {
     position: fixed !important;
     bottom: 24px !important;
-    right: 84px !important; /* 24px right + 50px chat button width + 10px gap */
+    right: 24px !important; /* Move to right corner */
     width: 50px !important;
     height: 50px !important;
     border-radius: 50% !important;
@@ -55,11 +56,11 @@
     box-shadow: 0 12px 38px rgba(8, 125, 130, 0.35) !important;
 }
 
-/* Dashboard shortcut button (Leftmost) - Override main styles to line up horizontally */
+/* Dashboard shortcut button (Next to Back to Top) - Override main styles to line up horizontally */
 .btn-dashboard-link {
     position: fixed !important;
     bottom: 24px !important;
-    right: 144px !important; /* 84px right + 50px back-to-top width + 10px gap */
+    right: 84px !important; /* 24px right + 50px back-to-top width + 10px gap */
     width: 50px !important;
     height: 50px !important;
     border-radius: 50% !important; /* Make it circular to look organized and uniform */
@@ -81,7 +82,8 @@
 .pstl-chat-tooltip {
     position: fixed;
     bottom: 32px;
-    right: 84px; /* Adjust beside the smaller chat button */
+    left: 84px; /* Adjust beside the smaller left-side chat button */
+    right: auto;
     background: var(--lab-ink, #17212f);
     color: #ffffff;
     padding: 8px 16px;
@@ -92,7 +94,7 @@
     pointer-events: none;
     z-index: 9998;
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateX(-10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
     white-space: nowrap;
 }
@@ -100,12 +102,13 @@
 .pstl-chat-tooltip::after {
     content: '';
     position: absolute;
-    right: -6px;
+    left: -6px; /* Arrow pointing left to the chat button */
+    right: auto;
     top: 50%;
     transform: translateY(-50%);
-    border-width: 6px 0 6px 6px;
+    border-width: 6px 6px 6px 0;
     border-style: solid;
-    border-color: transparent transparent transparent var(--lab-ink, #17212f);
+    border-color: transparent var(--lab-ink, #17212f) transparent transparent;
 }
 
 .pstl-chat-btn:hover + .pstl-chat-tooltip {
@@ -117,7 +120,8 @@
 .pstl-chat-window {
     position: fixed;
     bottom: 84px; /* Move slightly up to clear the buttons below it */
-    right: 24px;
+    left: 24px;
+    right: auto;
     width: 380px;
     height: 560px;
     max-height: calc(100vh - 150px);
@@ -441,26 +445,28 @@
 @media (max-width: 576px) {
     .pstl-chat-btn {
         bottom: 15px !important;
-        right: 15px !important;
+        left: 15px !important;
+        right: auto !important;
         width: 44px !important;
         height: 44px !important;
         font-size: 18px !important;
     }
     .btn-back-to-top {
         bottom: 15px !important;
-        right: 69px !important; /* 15px + 44px + 10px */
+        right: 15px !important; /* Position rightmost on mobile */
         width: 44px !important;
         height: 44px !important;
     }
     .btn-dashboard-link {
         bottom: 15px !important;
-        right: 123px !important; /* 69px + 44px + 10px */
+        right: 69px !important; /* Next to back-to-top on mobile */
         width: 44px !important;
         height: 44px !important;
     }
     .pstl-chat-window {
         bottom: 0 !important;
-        right: 0 !important;
+        left: 0 !important;
+        right: auto !important;
         width: 100% !important;
         height: 100% !important;
         max-height: 100% !important;
