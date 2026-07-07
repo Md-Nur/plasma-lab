@@ -171,7 +171,7 @@ if (isset($_POST['update_email'])) {
 
   //send mail for confirmation
    
-   $subject = "Solar Laboratory: Change Website's Email Address.";
+   $subject = "Plasema Lab: Change Website's Email Address.";
    $body ="You have requested to change Website's email to $siteemail . Please use $code to validate this Email Address.";
    $altbody ="You have requested to change your email address. Please use $code to validate this Email Address.";
   
