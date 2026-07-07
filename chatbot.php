@@ -7,7 +7,7 @@
 ?>
 
 <!-- Chatbot Stylesheet -->
-<link rel="stylesheet" href="css/chatbot.css">
+<link rel="stylesheet" href="./css/chatbot.css">
 
 <!-- Chat Trigger Button -->
 <button class="pstl-chat-btn" id="pstlChatBtn" aria-label="Open Chat Assistant">
