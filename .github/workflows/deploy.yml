@@ -1,5 +1,9 @@
 name: Deploy Website to Server
 
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIGGER: Runs automatically when you push to the main branch,
+#          or manually from the Actions tab via "Run workflow".
+# ─────────────────────────────────────────────────────────────────────────────
 on:
   push:
     branches:
@@ -7,6 +11,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ───────────────────────────────────────────────────────────────────────────
+  # JOB 1 — LINT
+  # Checks all PHP files for syntax errors BEFORE deploying.
+  # A broken PHP file won't make it to the server.
+  # ───────────────────────────────────────────────────────────────────────────
   lint:
     name: Lint PHP Code
     runs-on: ubuntu-latest
@@ -14,17 +23,38 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           coverage: none
 
-      - name: Lint PHP Files
+      - name: Check PHP Syntax (all files, excluding vendor/)
         run: |
-          echo "Linting PHP files to catch syntax errors..."
+          echo "Linting PHP files to catch syntax errors before deploying..."
           find . -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n 1 php -l
+          echo "All PHP files passed syntax check."
 
+  # ───────────────────────────────────────────────────────────────────────────
+  # JOB 2 — DEPLOY
+  # Runs only after the Lint job passes successfully.
+  # Steps:
+  #   1. Install Composer production dependencies
+  #   2. Set up SSH key for server access
+  #   3. Sync all files to the server via rsync
+  #   4. Run the database migration script on the server
+  #
+  # REQUIRED GITHUB SECRETS (Settings → Secrets and variables → Actions):
+  #   SSH_HOST         — Server IP or hostname (e.g. 192.168.1.1)
+  #   SSH_USER         — SSH username (e.g. ubuntu or root)
+  #   SSH_PRIVATE_KEY  — Full content of the private SSH key file
+  #   SSH_PORT         — SSH port (optional, defaults to 22)
+  #   DEPLOY_PATH      — Absolute path on server (e.g. /var/www/html/plasmalab)
+  #   PLASMA_DB_HOST   — MySQL host on the server (usually localhost)
+  #   PLASMA_DB_NAME   — MySQL database name
+  #   PLASMA_DB_USER   — MySQL username
+  #   PLASMA_DB_PASS   — MySQL password
+  # ───────────────────────────────────────────────────────────────────────────
   deploy:
     name: Deploy to Server
     needs: lint
@@ -33,13 +63,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           tools: composer
           coverage: none
 
+      # Cache vendor/ directory to speed up repeat deployments
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -52,43 +83,67 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install Production Dependencies
+      - name: Install Production Composer Dependencies
         run: |
           composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 
-      - name: Configure SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Deploy Code via Rsync
+      # ── SSH SETUP ──────────────────────────────────────────────────────────
+      # We set up the SSH key manually (no third-party action needed).
+      # This avoids Node.js version warnings from external action dependencies.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Configure SSH Key
         run: |
-          echo "Deploying files to production server..."
-          # Set default port to 22 if secret not configured
-          SSH_PORT=${{ secrets.SSH_PORT }}
-          if [ -z "$SSH_PORT" ]; then
-            SSH_PORT=22
-          fi
-          
-          rsync -avz --delete \
+          mkdir -p ~/.ssh
+          # Write the private key from the secret to a file
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Add the server host to known_hosts to avoid interactive prompts
+          SSH_PORT="${{ secrets.SSH_PORT }}"
+          SSH_PORT="${SSH_PORT:-22}"
+          ssh-keyscan -p "$SSH_PORT" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "SSH configured successfully."
+
+      # ── FILE DEPLOYMENT ────────────────────────────────────────────────────
+      # rsync copies all files to the server. The --delete flag removes any
+      # files on the server that no longer exist in the repository.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Deploy Files to Server via Rsync
+        run: |
+          SSH_PORT="${{ secrets.SSH_PORT }}"
+          SSH_PORT="${SSH_PORT:-22}"
+          echo "Deploying to ${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}..."
+          rsync -az --delete \
             --exclude '.git/' \
             --exclude '.github/' \
             --exclude '.DS_Store' \
-            -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+          echo "Files deployed successfully."
 
-      - name: Run Database Migrations
+      # ── DATABASE MIGRATIONS ────────────────────────────────────────────────
+      # After the files are uploaded, run the migration script on the server.
+      # This will initialize the database (first deploy) or apply any new
+      # .sql files added to Database/migrations/.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Run Database Migrations on Server
         run: |
-          echo "Executing database migration script on server..."
-          SSH_PORT=${{ secrets.SSH_PORT }}
-          if [ -z "$SSH_PORT" ]; then
-            SSH_PORT=22
-          fi
-          
-          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          SSH_PORT="${{ secrets.SSH_PORT }}"
+          SSH_PORT="${SSH_PORT:-22}"
+          echo "Running database migrations on server..."
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
             "cd ${{ secrets.DEPLOY_PATH }} && \
              PLASMA_DB_HOST='${{ secrets.PLASMA_DB_HOST }}' \
              PLASMA_DB_NAME='${{ secrets.PLASMA_DB_NAME }}' \
              PLASMA_DB_USER='${{ secrets.PLASMA_DB_USER }}' \
              PLASMA_DB_PASS='${{ secrets.PLASMA_DB_PASS }}' \
              php Database/migrate.php"
+          echo "Database migrations completed."
+
+      # ── CLEANUP ────────────────────────────────────────────────────────────
+      # Remove the private key from the runner after use for security.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Cleanup SSH Key
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+          echo "SSH key cleaned up."
