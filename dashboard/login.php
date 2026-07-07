@@ -326,7 +326,7 @@ body {
             <div class="login-logo">
                 <i class="fa fa-bolt"></i>
             </div>
-            <h2>Plasma Energy Laboratory</h2>
+            <h2>Plasma Engineering Laboratory</h2>
             <p>Sign In to your Dashboard</p>
         </div>
 

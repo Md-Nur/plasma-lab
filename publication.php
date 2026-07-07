@@ -7,7 +7,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Publications | <?php echo $site_row['sitename']; ?></title>
-	<meta name="description" content="View journal and conference publications from the Plasma Science and Technology Laboratory.">
+	<meta name="description" content="View journal and conference publications from the Plasma Engineering Laboratory.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">

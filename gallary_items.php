@@ -13,7 +13,7 @@ $result_video = mysqli_query($db, $sql_video);
 			<h1><span>L</span>ab <span>P</span>hotos</h1>
 			<div class="tittle-style"></div>
 		</div>
-		<p style="text-align: center; color: var(--lab-muted); margin-bottom: 36px; font-size: 15px;">Latest photos from the Plasma Science &amp; Technology Laboratory</p>
+		<p style="text-align: center; color: var(--lab-muted); margin-bottom: 36px; font-size: 15px;">Latest photos from the Plasma Engineering Laboratory</p>
 
 		<div class="gallery-photos-grid">
 			<?php while($row_photo = mysqli_fetch_array($result_photo)){ ?>

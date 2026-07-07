@@ -1,7 +1,7 @@
 <?php
 /**
  * chatbot.php
- * HTML container & asset imports for the PSTL Gemini Chatbot.
+ * HTML container & asset imports for the PELGemini Chatbot.
  * This is included in footer.php to load site-wide.
  */
 ?>
@@ -29,7 +29,7 @@
                 <i class="fa fa-graduation-cap" aria-hidden="true"></i>
             </div>
             <div>
-                <h3 class="pstl-chat-header-title">PSTL AI Assistant</h3>
+                <h3 class="pstl-chat-header-title">PEL AI Assistant</h3>
                 <div class="pstl-chat-header-status">
                     <span class="pstl-chat-header-status-dot"></span>
                     <span>Powered by Gemini</span>

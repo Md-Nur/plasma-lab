@@ -1,6 +1,6 @@
 # Database Migrations
 
-This directory contains incremental database schema updates (migrations) for the Plasma Lab website.
+This directory contains incremental database schema updates (migrations) for the Plasma Engineering Laboratory website.
 
 ## How to use migrations
 

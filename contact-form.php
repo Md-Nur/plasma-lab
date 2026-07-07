@@ -19,7 +19,7 @@
 
 	//body table
 	$message = '<html><body>';
-	$message .= '<h3>Plasma Science & Technology Laboratory</h3>';
+	$message .= '<h3>Plasma Engineering Laboratory</h3>';
 	$message .= '<table rules="all" style="border-color: #666;" cellpadding="10">';
 	$message .= "<tr style='background: #eee;'><td><strong>From: </strong> </td><td>" .htmlspecialchars($name). "</td></tr>";
 	$message .= "<tr><td><strong>Email: </strong> </td><td>" .htmlspecialchars($email). "</td></tr>";

@@ -1,6 +1,6 @@
 # FTP Deployment and Database Migration Guide (InfinityFree / Shared Hosting)
 
-This guide explains how to set up automatic deployment for the Plasma Lab website to a free shared hosting service (like **InfinityFree**) using GitHub Actions.
+This guide explains how to set up automatic deployment for the Plasma Engineering Laboratory website to a free shared hosting service (like **InfinityFree**) using GitHub Actions.
 
 Since free shared hosting services do not support SSH, this setup uses **FTP** to upload your files, and triggers database migrations securely via an **HTTP web-hook**.
 
