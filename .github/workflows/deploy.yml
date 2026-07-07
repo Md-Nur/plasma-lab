@@ -90,15 +90,16 @@ jobs:
       - name: Generate Database Secrets File
         run: |
           echo "Generating config_secrets.php file..."
-          cat << 'EOF' > Database/config_secrets.php
-          <?php
-          $db_host = '${{ secrets.PLASMA_DB_HOST }}';
-          $db_name = '${{ secrets.PLASMA_DB_NAME }}';
-          $db_user = '${{ secrets.PLASMA_DB_USER }}';
-          $db_pass = '${{ secrets.PLASMA_DB_PASS }}';
-          define('MIGRATION_TOKEN', '${{ secrets.MIGRATION_TOKEN }}');
-          EOF
+          # Use printf so GitHub Actions secrets are expanded correctly.
+          # NOTE: 'EOF' with quotes prevents expansion — we must NOT quote it.
+          printf '<?php\n' > Database/config_secrets.php
+          printf '$db_host = "%s";\n' "${{ secrets.PLASMA_DB_HOST }}" >> Database/config_secrets.php
+          printf '$db_name = "%s";\n' "${{ secrets.PLASMA_DB_NAME }}" >> Database/config_secrets.php
+          printf '$db_user = "%s";\n' "${{ secrets.PLASMA_DB_USER }}" >> Database/config_secrets.php
+          printf '$db_pass = "%s";\n' "${{ secrets.PLASMA_DB_PASS }}" >> Database/config_secrets.php
+          printf "define('MIGRATION_TOKEN', \"%s\");\n" "${{ secrets.MIGRATION_TOKEN }}" >> Database/config_secrets.php
           echo "Database secrets file generated."
+          cat Database/config_secrets.php
 
       # ── FILE DEPLOYMENT via FTP ────────────────────────────────────────────
       # Deploy the files using FTP. InfinityFree requires files to be uploaded
