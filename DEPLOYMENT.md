@@ -77,3 +77,18 @@ When you need to make schema updates (e.g., adding a table or new column):
 1. Create a new `.sql` file in `Database/migrations/`.
 2. Follow the naming convention `XXXX_description.sql` (e.g. `0001_add_videos_table.sql`).
 3. Commit and push. The pipeline will upload it and trigger it automatically!
+
+---
+
+## 6. Important: InfinityFree Security Challenge (curl blocks)
+
+> [!WARNING]
+> InfinityFree features an automated browser verification system (AES challenge) to block bots. Because of this, the automated `curl` request in the GitHub Action might fail with `exit code 52`.
+> 
+> **This is expected and will NOT fail your deployment build.**
+> 
+> To apply your migrations, simply copy the URL printed in the GitHub Actions log (or construct it yourself):
+> `http://<YOUR_SITE_DOMAIN>/Database/migrate.php?token=<YOUR_MIGRATION_TOKEN>`
+> 
+> Open this URL in any web browser. Your browser will solve the challenge automatically, run the migration script, and display the migration logs on screen.
+

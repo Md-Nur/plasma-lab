@@ -121,9 +121,18 @@ jobs:
       # ── DATABASE MIGRATIONS ────────────────────────────────────────────────
       # Since we cannot run CLI commands via SSH on InfinityFree, we trigger 
       # the migration script by making a secure HTTP request to the live URL.
+      # Note: InfinityFree's browser-only security challenge may block curl.
+      # We use 'continue-on-error: true' so the build passes, and print the browser URL.
       # ──────────────────────────────────────────────────────────────────────
       - name: Trigger Database Migrations via Web
+        continue-on-error: true
         run: |
-          echo "Triggering database migrations at http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php..."
-          curl -sf "http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php?token=${{ secrets.MIGRATION_TOKEN }}"
-          echo "Database migrations triggered successfully."
+          echo "--------------------------------------------------------"
+          echo "Triggering database migrations at:"
+          echo "http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php?token=${{ secrets.MIGRATION_TOKEN }}"
+          echo "--------------------------------------------------------"
+          curl -sf "http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php?token=${{ secrets.MIGRATION_TOKEN }}" || {
+            echo "::warning::Automated trigger via curl was blocked by host security challenge."
+            echo "::warning::Please visit the URL above in your browser to run migrations."
+          }
+
