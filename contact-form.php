@@ -44,7 +44,9 @@
 
 	if ($db->query($query) === TRUE) {
 		// Attempt to send the email, but failure doesn't block showing a success response to the user
-		$mail->send();
+		if (!empty($website_email) && !empty($website_password)) {
+			$mail->send();
+		}
 		echo "<span style='color:green;'>Your Message has sent successfully.</span>";
 	} else {
 		echo "<span style='color:red;'>Sorry !! Something Went Wrong.Try again..</span>";

@@ -59,9 +59,20 @@ if(isset($_POST['submit'])){
         //time to send email
         include ('../mail.php');
 
-        //after maile sent condition
+        //after mail sent condition
+        $send_success = false;
+        $error_msg = 'Connection timeout';
 
-        if($mail->send()) {
+        if (empty($website_email) || empty($website_password)) {
+            $error_msg = 'Website Email settings are not configured in settings.';
+        } else {
+            $send_success = $mail->send();
+            if (!$send_success) {
+                $error_msg = $mail->ErrorInfo;
+            }
+        }
+
+        if($send_success) {
                      
       			$msg = "An email with validation code has been sent to this email.";
              $alert_success = '';
@@ -73,8 +84,22 @@ if(isset($_POST['submit'])){
              $_SESSION["retrive_id"]= $id;
                      
       		}else{
-      			$msg =  "Sorry !! Message not sent . Time out..";
-            $alert_failed = '';
+      			$msg =  "Sorry !! Message not sent. Error: " . htmlspecialchars($error_msg);
+            
+            // Check if local development mode to bypass verification block
+            $is_local = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || 
+                        (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false));
+            if ($is_local) {
+                $msg .= " [Local Dev Mode: Use validation code: " . $tmp_password . "]";
+                $_SESSION["pass_validate"]= $tmp_password;
+                $_SESSION["retrive_id"]= $id;
+                $visibility = 'hidden';
+                $pass_retrive = 'hidden';
+                $pass_validation= '';
+                $alert_success = ''; // Change alert format to success to display the code cleanly
+            } else {
+                $alert_failed = '';
+            }
       		}
 
 	}else{

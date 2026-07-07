@@ -31,9 +31,20 @@
 	//time to send email
 	include ('mail.php');
 
-	//after maile sent condition
+	//after mail sent condition
+	$send_success = false;
+	$error_msg = 'Connection timeout';
 
-	if($mail->send()) {
+	if (empty($website_email) || empty($website_password)) {
+		$error_msg = 'Website Email settings are not configured in Settings.';
+	} else {
+		$send_success = $mail->send();
+		if (!$send_success) {
+			$error_msg = $mail->ErrorInfo;
+		}
+	}
+
+	if($send_success) {
 
 		$query = "INSERT INTO sent_msg (name, email, subject, msg,time, date, success) VALUES ('$receiver_name', '$receiver_email', '$subject', '$msg','$time','$date', '1')";
 
@@ -50,7 +61,7 @@
 		$query = "INSERT INTO sent_msg (name, email, subject, msg, time, date,  success) VALUES ('$receiver_name', '$receiver_email', '$subject', '$msg', '$time','$date', '0')";
 		if ($db->query($query) === TRUE) {
 
-			echo "<span style='color:red;'>Sorry !! Message not sent and Saved to Draft. Time out...</span>";
+			echo "<span style='color:red;'>Sorry !! Message not sent and Saved to Draft. Error: " . htmlspecialchars($error_msg) . "</span>";
 			
 		} else {
 			echo "<span style='color:red;'>Sorry !! Something Went Wrong...</span>";

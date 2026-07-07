@@ -102,8 +102,10 @@ body.no-skin {
   padding: 30px;
   min-height: 100vh;
   box-sizing: border-box;
-  position: relative;
-  z-index: 10;
+  /* NOTE: Do NOT add z-index here — it creates a stacking context that
+     traps Bootstrap modals inside it, causing the backdrop to cover
+     the modal and making the page unclickable when a popup opens. */
+  position: static;
 }
 
 /* Sidebar Components */
@@ -1523,6 +1525,18 @@ input[type="file"] {
   }
 }
 
-
-
-
+/* ── Bootstrap Modal Z-Index Fixes ────────────────────────────────────────
+   Ensure Bootstrap modals and their backdrops always render above the
+   custom sidebar (z-index: 1000) and header (z-index: 900).
+   Without these overrides a stacking context anywhere in the page can
+   cause the backdrop to cover the modal, blocking all interaction.
+─────────────────────────────────────────────────────────────────────────── */
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+.modal {
+  z-index: 1050 !important;
+}
+.modal-dialog {
+  z-index: 1051 !important;
+}
