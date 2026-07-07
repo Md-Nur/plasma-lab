@@ -1,4 +1,4 @@
-name: Deploy Website to Server
+name: Deploy Website to Server via FTP
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TRIGGER: Runs automatically on push to main, or manually via Actions tab.
@@ -40,23 +40,19 @@ jobs:
   #
   # REQUIRED GITHUB SECRETS (repo Settings → Secrets and variables → Actions):
   #
-  #   SSH_HOST           — Your server IP or domain (e.g. 203.0.113.10)
-  #   SSH_USER           — SSH login username (e.g. ubuntu, root)
-  #   SSH_PRIVATE_KEY    — The PRIVATE key used to connect to your server
-  #                        (see DEPLOYMENT.md for how to generate this)
-  #   SSH_PORT           — SSH port. Optional, defaults to 22.
-  #   DEPLOY_PATH        — Full path on server (e.g. /var/www/html/plasmalab)
+  #   FTP_SERVER         — Your FTP host (e.g. ftpupload.net for InfinityFree)
+  #   FTP_USERNAME       — Your FTP login username (e.g. epiz_12345678)
+  #   FTP_PASSWORD       — Your FTP login password
+  #   SITE_DOMAIN        — Your website domain name (e.g. plasmalab.infinityfreeapp.com)
   #
-  #   MYSQL_ROOT_PASS    — The root password for MySQL on your server
-  #                        (used ONCE to create the app database & user)
-  #
-  #   PLASMA_DB_HOST     — DB host as seen from the server. Usually: localhost
-  #   PLASMA_DB_NAME     — Name of the database to create. e.g: plasma_lab_ru
-  #   PLASMA_DB_USER     — DB username to create.          e.g: plasma_user
-  #   PLASMA_DB_PASS     — DB password to set.             e.g: choose any strong password
+  #   PLASMA_DB_HOST     — DB Host given by hosting. (e.g. sql123.epizy.com)
+  #   PLASMA_DB_NAME     — Database name.            (e.g. epiz_12345678_plasma)
+  #   PLASMA_DB_USER     — Database username.        (e.g. epiz_12345678)
+  #   PLASMA_DB_PASS     — Database password.
+  #   MIGRATION_TOKEN    — A secure random token you choose (e.g. 32-character string)
   # ───────────────────────────────────────────────────────────────────────────
   deploy:
-    name: Deploy to Server
+    name: Deploy to Server via FTP
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -70,6 +66,7 @@ jobs:
           tools: composer
           coverage: none
 
+      # Cache vendor/ directory to speed up repeat deployments
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -86,84 +83,47 @@ jobs:
         run: |
           composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 
-      # ── SSH SETUP ──────────────────────────────────────────────────────────
-      # Write the private key and add the server to known_hosts so SSH
-      # commands below don't prompt for confirmation.
+      # ── PREPARE SECRETS FILE ───────────────────────────────────────────────
+      # Write credentials from GitHub Secrets directly into the config_secrets.php
+      # file so that the website can connect to the database on InfinityFree.
       # ──────────────────────────────────────────────────────────────────────
-      - name: Configure SSH Key
+      - name: Generate Database Secrets File
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          SSH_PORT="${{ secrets.SSH_PORT }}"
-          SSH_PORT="${SSH_PORT:-22}"
-          ssh-keyscan -p "$SSH_PORT" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
-          echo "SSH key configured."
+          echo "Generating config_secrets.php file..."
+          cat << 'EOF' > Database/config_secrets.php
+          <?php
+          $db_host = '${{ secrets.PLASMA_DB_HOST }}';
+          $db_name = '${{ secrets.PLASMA_DB_NAME }}';
+          $db_user = '${{ secrets.PLASMA_DB_USER }}';
+          $db_pass = '${{ secrets.PLASMA_DB_PASS }}';
+          define('MIGRATION_TOKEN', '${{ secrets.MIGRATION_TOKEN }}');
+          EOF
+          echo "Database secrets file generated."
 
-      # ── DATABASE SETUP ─────────────────────────────────────────────────────
-      # Connects to MySQL on the server as root and creates the database and
-      # application user if they do not already exist.
-      # On the FIRST deploy this sets everything up automatically.
-      # On subsequent deploys it safely skips (IF NOT EXISTS).
+      # ── FILE DEPLOYMENT via FTP ────────────────────────────────────────────
+      # Deploy the files using FTP. InfinityFree requires files to be uploaded
+      # to the 'htdocs' directory to be web accessible.
       # ──────────────────────────────────────────────────────────────────────
-      - name: Create Database and User on Server
-        run: |
-          SSH_PORT="${{ secrets.SSH_PORT }}"
-          SSH_PORT="${SSH_PORT:-22}"
-          echo "Setting up database and user on server..."
-          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "mysql -u root -p'${{ secrets.MYSQL_ROOT_PASS }}' <<'ENDSQL'
-          CREATE DATABASE IF NOT EXISTS \`${{ secrets.PLASMA_DB_NAME }}\`
-            CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-          CREATE USER IF NOT EXISTS '${{ secrets.PLASMA_DB_USER }}'@'localhost'
-            IDENTIFIED BY '${{ secrets.PLASMA_DB_PASS }}';
-          GRANT ALL PRIVILEGES ON \`${{ secrets.PLASMA_DB_NAME }}\`.*
-            TO '${{ secrets.PLASMA_DB_USER }}'@'localhost';
-          FLUSH PRIVILEGES;
-          ENDSQL"
-          echo "Database and user ready."
-
-      # ── FILE DEPLOYMENT ────────────────────────────────────────────────────
-      # rsync copies all project files to the server.
-      # --delete removes any server files that no longer exist in the repo.
-      # ──────────────────────────────────────────────────────────────────────
-      - name: Deploy Files to Server via Rsync
-        run: |
-          SSH_PORT="${{ secrets.SSH_PORT }}"
-          SSH_PORT="${SSH_PORT:-22}"
-          echo "Syncing files to ${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}..."
-          rsync -az --delete \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude '.DS_Store' \
-            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
-          echo "Files deployed."
+      - name: Deploy Files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: htdocs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            .DS_Store
 
       # ── DATABASE MIGRATIONS ────────────────────────────────────────────────
-      # After files are synced, run the migration script on the server.
-      # First deploy: imports the full Database/plasma_lab_ru.sql baseline.
-      # Later deploys: applies only new .sql files in Database/migrations/.
+      # Since we cannot run CLI commands via SSH on InfinityFree, we trigger 
+      # the migration script by making a secure HTTP request to the live URL.
       # ──────────────────────────────────────────────────────────────────────
-      - name: Run Database Migrations on Server
+      - name: Trigger Database Migrations via Web
         run: |
-          SSH_PORT="${{ secrets.SSH_PORT }}"
-          SSH_PORT="${SSH_PORT:-22}"
-          echo "Running database migrations..."
-          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd ${{ secrets.DEPLOY_PATH }} && \
-             PLASMA_DB_HOST='${{ secrets.PLASMA_DB_HOST }}' \
-             PLASMA_DB_NAME='${{ secrets.PLASMA_DB_NAME }}' \
-             PLASMA_DB_USER='${{ secrets.PLASMA_DB_USER }}' \
-             PLASMA_DB_PASS='${{ secrets.PLASMA_DB_PASS }}' \
-             php Database/migrate.php"
-          echo "Migrations done."
-
-      # ── CLEANUP ────────────────────────────────────────────────────────────
-      # Always delete the private key from the runner after the job finishes.
-      # ──────────────────────────────────────────────────────────────────────
-      - name: Cleanup SSH Key
-        if: always()
-        run: |
-          rm -f ~/.ssh/deploy_key
-          echo "SSH key removed from runner."
+          echo "Triggering database migrations at http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php..."
+          curl -sf "http://${{ secrets.SITE_DOMAIN }}/Database/migrate.php?token=${{ secrets.MIGRATION_TOKEN }}"
+          echo "Database migrations triggered successfully."

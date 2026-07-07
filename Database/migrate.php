@@ -4,7 +4,9 @@
  * 
  * This script runs automatically during deployment to initialize the database 
  * and apply any pending schema updates. It reads connection details from 
- * environment variables (with default values matching the development environment).
+ * environment variables or config_secrets.php.
+ * 
+ * Supports both CLI execution and Web execution (via secure token verification).
  */
 
 // Enable error reporting
@@ -21,6 +23,28 @@ $db_host = getenv('PLASMA_DB_HOST') ?: 'localhost';
 $db_name = getenv('PLASMA_DB_NAME') ?: 'plasma_lab_ru';
 $db_user = getenv('PLASMA_DB_USER') ?: 'plasma_user';
 $db_pass = getenv('PLASMA_DB_PASS') ?: 'plasma*&User24';
+
+// Override with secrets file if present (e.g. on production server)
+if (file_exists(__DIR__ . '/config_secrets.php')) {
+    include(__DIR__ . '/config_secrets.php');
+}
+
+// Check execution mode (CLI or Web)
+$is_cli = (php_sapi_name() === 'cli');
+
+if (!$is_cli) {
+    // If Web, verify migration token for security
+    $expected_token = defined('MIGRATION_TOKEN') ? MIGRATION_TOKEN : getenv('MIGRATION_TOKEN');
+    
+    if (!$expected_token || empty($_GET['token']) || $_GET['token'] !== $expected_token) {
+        header('HTTP/1.1 403 Forbidden');
+        echo "Error: Forbidden. Invalid or missing migration token.";
+        exit(1);
+    }
+    
+    // Output plain text for readability in browser/curl
+    header('Content-Type: text/plain; charset=utf-8');
+}
 
 echo "=== Starting Database Migrations ===\n";
 echo "Database Host: $db_host\n";
@@ -105,7 +129,11 @@ try {
     echo "\nMigrations completed successfully. Applied $applied_count new migration(s).\n";
 
 } catch (Exception $e) {
-    fwrite(STDERR, "\n[ERROR] Migration failed: " . $e->getMessage() . "\n");
+    if ($is_cli) {
+        fwrite(STDERR, "\n[ERROR] Migration failed: " . $e->getMessage() . "\n");
+    } else {
+        echo "\n[ERROR] Migration failed: " . $e->getMessage() . "\n";
+    }
     exit(1);
 }
 
@@ -152,7 +180,6 @@ function executeSqlFile($pdo, $filePath) {
                 $in_comment_block = true;
                 continue;
             } else {
-                // Single line block comment, skip it
                 continue;
             }
         }

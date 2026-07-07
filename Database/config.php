@@ -5,6 +5,11 @@ $db_name = getenv('PLASMA_DB_NAME') ?: 'plasma_lab_ru';
 $db_user = getenv('PLASMA_DB_USER') ?: 'plasma_user';
 $db_pass = getenv('PLASMA_DB_PASS') ?: 'plasma*&User24';
 
+if (file_exists(__DIR__ . '/config_secrets.php')) {
+    include(__DIR__ . '/config_secrets.php');
+}
+
+
 $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 
 if (!$db && !getenv('PLASMA_DB_USER')) {
