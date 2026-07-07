@@ -25,7 +25,29 @@ function uploadInstrumentImage($fileInputName, &$errorMessage) {
 	}
 
 	if ($_FILES[$fileInputName]['error'] !== UPLOAD_ERR_OK) {
-		$errorMessage = 'Photo upload failed. Please try again.';
+		switch ($_FILES[$fileInputName]['error']) {
+			case UPLOAD_ERR_INI_SIZE:
+				$errorMessage = 'Photo upload failed: The file size exceeds the upload_max_filesize directive in php.ini.';
+				break;
+			case UPLOAD_ERR_FORM_SIZE:
+				$errorMessage = 'Photo upload failed: The file exceeds the MAX_FILE_SIZE limit in the HTML form.';
+				break;
+			case UPLOAD_ERR_PARTIAL:
+				$errorMessage = 'Photo upload failed: The file was only partially uploaded.';
+				break;
+			case UPLOAD_ERR_NO_TMP_DIR:
+				$errorMessage = 'Photo upload failed: Temporary directory is missing in PHP configuration.';
+				break;
+			case UPLOAD_ERR_CANT_WRITE:
+				$errorMessage = 'Photo upload failed: Failed to write file to disk. Check disk space or folder permissions.';
+				break;
+			case UPLOAD_ERR_EXTENSION:
+				$errorMessage = 'Photo upload failed: A PHP extension stopped the file upload.';
+				break;
+			default:
+				$errorMessage = 'Photo upload failed: Unknown PHP upload error (Code: ' . $_FILES[$fileInputName]['error'] . ').';
+				break;
+		}
 		return false;
 	}
 
@@ -57,9 +79,14 @@ function uploadInstrumentImage($fileInputName, &$errorMessage) {
 		return false;
 	}
 
+	if (!is_writable($uploadDir)) {
+		$errorMessage = 'Instrument photo directory is not writeable. Current permissions: ' . substr(sprintf('%o', fileperms($uploadDir)), -4);
+		return false;
+	}
+
 	$new_name = time() . '_' . mt_rand(1000, 9999) . '.' . $allowedTypes[$imageInfo[2]];
 	if (!move_uploaded_file($tmp_name, $uploadDir . $new_name)) {
-		$errorMessage = 'Could not save the uploaded photo.';
+		$errorMessage = 'Could not save the uploaded photo. Check destination directory permissions: ' . $uploadDir;
 		return false;
 	}
 
@@ -98,7 +125,7 @@ if(isset($_POST['submit'])){
 			$specifications = "";
 			$status = "active";
 		} else {
-			$msg = 'Failed to add instrument. Database error.';
+			$msg = 'Failed to add instrument. Database error: ' . mysqli_error($db);
 			deleteInstrumentImage($new_name);
 			$alert_failed = '';
 		}
@@ -136,7 +163,7 @@ if(isset($_POST['update'])){
 			$id = 0;
 			$image = 'demo_image.png';
 		} else {
-			$msg = 'Failed to update instrument.';
+			$msg = 'Failed to update instrument. Database error: ' . mysqli_error($db);
 			$alert_failed = '';
 			$edit_state = true;
 		}
@@ -164,7 +191,7 @@ if(isset($_POST['update'])){
 				$id = 0;
 				$image = 'demo_image.png';
 			} else {
-				$msg = 'Failed to update instrument.';
+				$msg = 'Failed to update instrument. Database error: ' . mysqli_error($db);
 				deleteInstrumentImage($new_name);
 				$alert_failed = '';
 				$edit_state = true;
