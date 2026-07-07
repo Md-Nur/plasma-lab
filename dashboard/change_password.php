@@ -1,6 +1,7 @@
-<?php 
-include('head.php');
+<?php
+// session_start() MUST come before any output
 session_start();
+include('head.php');
 
 $pass_retrive = '';
 $pass_validation = 'hidden';

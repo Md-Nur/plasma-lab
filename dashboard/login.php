@@ -1,6 +1,8 @@
-<?php 
-include('head.php');
+<?php
+// session_start() MUST come before any output (including head.php which outputs HTML)
 session_start();
+include('head.php');
+
 if(isset($_SESSION["sess_username"])){
      header('Location: /dashboard/index.php');
      exit;
@@ -11,13 +13,6 @@ $alert_failed = 'display : none';
 $alert_success = 'display : none';
 $username_tmp = "";
 $password_tmp = "";
-
-
-
-if(isset($_SESSION["sess_username"])){
-     header('Location: /dashboard/index.php');
-     exit;
-}
 
 if(isset($_GET['change']) && isset($_SESSION["retrive_id"])) {
 	$id = $_GET['change'];
