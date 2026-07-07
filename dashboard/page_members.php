@@ -125,17 +125,24 @@ include('navigation.php');
 	
 	//delete data
 	if(isset($_GET['del'])){
-		$id = $_GET['del'];
+		$id = (int)$_GET['del'];
 		
-	
 		$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
-		$row = mysqli_fetch_array($result);
-		$image=$row['image'];
-		unlink("../images/member/members/".$image);
-		mysqli_query($db, "DELETE FROM members WHERE id=$id");
-		
-		$msg = 'Member Deleted..';
+		if ($result && $row = mysqli_fetch_array($result)) {
+			$del_image = $row['image'];
+			$img_path = "../images/member/members/" . $del_image;
+			if ($del_image && is_file($img_path)) {
+				unlink($img_path);
+			}
+			mysqli_query($db, "DELETE FROM members WHERE id=$id");
+		}
+		// Redirect to clear the ?del= from URL and prevent double-delete on refresh
+		header('Location: page_members.php?deleted=1');
+		exit;
+	}
 
+	if (isset($_GET['deleted'])) {
+		$msg = 'Member deleted successfully.';
 		$alert_success = '';
 	}
 	
@@ -262,60 +269,66 @@ include('navigation.php');
 	</div>
 
 	<form id="member_t" method="post" action="page_members.php" enctype="multipart/form-data">
-		<div class="dlg-body">
-			<div class="dlg-preview">
-				<img id="output" src="../images/member/members/<?php echo $image; ?>" alt="Member preview" onerror="this.style.display='none'">
-				<div class="preview-placeholder" id="previewPlaceholder" style="width:160px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.02); color:rgba(255,255,255,0.3); <?php if($image !== 'demo_image.png') echo 'display:none;'; ?>">
-					<i class="fa fa-user fa-2x" style="margin-bottom:8px;"></i>
-					<span style="font-size:12px; text-align:center; padding: 0 10px;">Preview</span>
+		<div class="dlg-body" style="display:block; padding:24px;">
+			<div class="info-banner" style="margin-bottom:16px;">
+				<i class="fa fa-info-circle"></i>
+				<span>Uploaded photos will appear on the public <strong>Members</strong> page.</span>
+			</div>
+
+			<input type="hidden" name="id" value="<?php echo $id; ?>">
+
+			<!-- Inline photo upload + preview -->
+			<div class="form-group" style="margin-bottom:16px;">
+				<label style="display:block; margin-bottom:8px; font-size:13px; font-weight:600; color:rgba(255,255,255,0.7);">Member Photo <span style="color:#ef4444;">*</span></label>
+				<div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+					<!-- Compact square preview -->
+					<div style="position:relative; width:72px; height:72px; border-radius:12px; overflow:hidden; border:1px dashed rgba(255,255,255,0.2); background:rgba(255,255,255,0.03); flex-shrink:0;">
+						<img id="output" src="" alt="Preview" style="width:100%; height:100%; object-fit:cover; display:none;">
+						<div id="previewPlaceholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);">
+							<i class="fa fa-user fa-lg"></i>
+						</div>
+					</div>
+					<!-- File picker -->
+					<div style="flex:1; min-width:0;">
+						<div class="photo_post" style="margin-bottom:6px;">
+							<input type="file" name="image" id="f02" accept="image/*">
+							<label for="f02"><i class="fa fa-upload" style="margin-right:5px;"></i>Choose Photo</label>
+						</div>
+						<span id="fileNameDisplay" style="display:block; color:#cbd5e1; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">No file selected</span>
+						<span style="display:block; color:rgba(255,255,255,0.35); font-size:11px; margin-top:3px;">Square image recommended (e.g. 300×300)</span>
+					</div>
 				</div>
 			</div>
 
-			<div class="dlg-form-col">
-				<div class="info-banner">
-					<i class="fa fa-info-circle"></i>
-					<span>Uploaded photos will appear on the public <strong>Members</strong> page.</span>
-				</div>
+			<fieldset class="form-group">
+				<label for="member-name">Full Name:</label>
+				<input class="form-control" id="member-name" placeholder="Full Name ...." type="text" name="name" tabindex="1" required>
+			</fieldset>
 
-				<input type="hidden" name="id" value="<?php echo $id; ?>">
+			<fieldset class="form-group">
+				<label for="member-designation">Designation:</label>
+				<input class="form-control" id="member-designation" placeholder="Member Designation...." type="text" name="designation" tabindex="2">
+			</fieldset>
 
-				<div class="photo_post form-group" style="margin-bottom:14px;">
-					<input type="file" name="image" id="f02" accept="image/*">
-					<label for="f02"><i class="fa fa-upload" style="margin-right:5px;"></i>Choose Photo</label>
-					<span id="fileNameDisplay" style="display:inline-block; margin-left:10px; color:#cbd5e1; font-size:13px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">No file selected</span>
-					<span style="display:block;color:var(--text-muted);font-size:11px;margin-top:4px;">Image must be Square Sized (e.g. 300×300)</span>
-				</div>
+			<fieldset class="form-group">
+				<label for="member-phone">Phone No:</label>
+				<input class="form-control" id="member-phone" placeholder="01XXX-XXXXXX" type="text" name="phone" tabindex="3">
+			</fieldset>
 
-				<fieldset class="form-group">
-					<label for="member-name">Full Name:</label>
-					<input class="form-control" id="member-name" placeholder="Full Name ...." type="text" name="name" tabindex="1" required>
-				</fieldset>
+			<fieldset class="form-group">
+				<label for="member-email">Email Address:</label>
+				<input class="form-control" id="member-email" placeholder="example@domain.com" type="email" name="email" tabindex="4">
+			</fieldset>
 
-				<fieldset class="form-group">
-					<label for="member-designation">Designation:</label>
-					<input class="form-control" id="member-designation" placeholder="Member Designation...." type="text" name="designation" tabindex="2">
-				</fieldset>
+			<fieldset class="form-group">
+				<label for="member-link">External Link: <span style="font-weight:400;text-transform:none;">(if exists)</span></label>
+				<input class="form-control" id="member-link" placeholder="https://example.com" type="text" name="link" tabindex="5">
+			</fieldset>
 
-				<fieldset class="form-group">
-					<label for="member-phone">Phone No:</label>
-					<input class="form-control" id="member-phone" placeholder="01XXX-XXXXXX" type="text" name="phone" tabindex="3">
-				</fieldset>
-
-				<fieldset class="form-group">
-					<label for="member-email">Email Address:</label>
-					<input class="form-control" id="member-email" placeholder="example@domain.com" type="email" name="email" tabindex="4">
-				</fieldset>
-
-				<fieldset class="form-group">
-					<label for="member-link">External Link: <span style="font-weight:400;text-transform:none;">(if exists)</span></label>
-					<input class="form-control" id="member-link" placeholder="https://example.com" type="text" name="link" tabindex="5">
-				</fieldset>
-
-				<fieldset class="form-group">
-					<label for="member-info">Member Info:</label>
-					<textarea class="form-control" id="member-info" placeholder="Short bio..." name="info" rows="4" tabindex="6"></textarea>
-				</fieldset>
-			</div>
+			<fieldset class="form-group" style="margin-bottom:0;">
+				<label for="member-info">Member Info:</label>
+				<textarea class="form-control" id="member-info" placeholder="Short bio..." name="info" rows="4" tabindex="6"></textarea>
+			</fieldset>
 		</div>
 
 		<div class="dlg-footer">
