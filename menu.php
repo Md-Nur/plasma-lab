@@ -12,7 +12,7 @@
 				<div class="logo-container">
 					<img src="images/ru_logo.png" alt="RU Logo" class="brand-logo">
 					<div class="brand-text">
-						<!-- <span class="brand-title"><?php echo $site_row['sitename']; ?></span> -->
+						<!-- <span class="brand-title">Plasma Engineering Laboratory</span> -->
 						<span class="brand-title">Plasma Engineering Laboratory</span>
 						<span class="brand-sub"><?php echo $site_row['university']; ?> • <?php echo $site_row['department']; ?></span>
 					</div>
@@ -30,6 +30,9 @@
 				</li>
 				<li>
 					<a href="research.php">Research</a>
+				</li>
+				<li>
+					<a href="instruments.php">Instruments</a>
 				</li>
 				<li>
 					<a href="publication.php">Publications</a>

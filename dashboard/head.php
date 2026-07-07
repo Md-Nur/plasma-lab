@@ -11,7 +11,7 @@ include('server.php');
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta charset="utf-8" />
 	<title>
-		<?php echo $site_row['sitename']; ?>
+		Plasma Engineering Laboratory
 	</title>
 
 	<meta name="description" content="" />

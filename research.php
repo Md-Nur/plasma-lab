@@ -6,7 +6,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Research Areas | <?php echo $site_row['sitename']; ?></title>
+	<title>Research Areas | Plasma Engineering Laboratory</title>
 	<meta name="description" content="Explore the research areas at the Plasma Engineering Laboratory.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/font-awesome.min.css">

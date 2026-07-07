@@ -37,6 +37,7 @@ $page_students  ="";
               
 $research_panal ="";
 $page_areas ="";
+$page_instruments = "";
                
 $pub_panal ="";
 $page_journal ="";
@@ -68,6 +69,7 @@ if(isset($_GET['id'])){
 	elseif($myid=="page_students"){$lab_members="active open"; $page_students="active";$page_elements="active open";}
 	
 	elseif($myid=="page_areas"){$page_areas="active";$page_elements="active open";}
+	elseif($myid=="page_instruments"){$page_instruments="active";$page_elements="active open";}
 	
 	elseif($myid=="page_journal"){$pub_panal="active open"; $page_journal="active";$page_elements="active open";}
 	elseif($myid=="page_conference"){$pub_panal="active open"; $page_conference="active";$page_elements="active open";}
@@ -95,7 +97,7 @@ if(isset($_GET['id'])){
     <!-- Modern Sidebar -->
     <aside class="modern-sidebar" id="modernSidebar">
         <div class="modern-sidebar-logo">
-            <a href="index.php?id=dashboard"><?php echo $site_row['sitename'];?></a>
+            <a href="index.php?id=dashboard">Plasma Engineering Laboratory</a>
             <button type="button" class="modern-sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">&times;</button>
         </div>
         <ul class="modern-sidebar-menu">
@@ -161,6 +163,11 @@ if(isset($_GET['id'])){
             <li class="modern-sidebar-item <?php echo $page_areas; ?>">
                 <a class="modern-sidebar-link" href="page_areas.php?id=page_areas">
                     <i class="fa fa-flask"></i> <span>Research Areas</span>
+                </a>
+            </li>
+            <li class="modern-sidebar-item <?php echo $page_instruments; ?>">
+                <a class="modern-sidebar-link" href="page_instruments.php?id=page_instruments">
+                    <i class="fa fa-cogs"></i> <span>Lab Instruments</span>
                 </a>
             </li>
             <li class="modern-sidebar-item <?php echo $page_journal; ?>">
@@ -231,6 +238,7 @@ if(isset($_GET['id'])){
                         elseif($myid=="page_members") echo "Faculty Members Editor";
                         elseif($myid=="page_students") echo "Students Directory";
                         elseif($myid=="page_areas") echo "Research Areas";
+                        elseif($myid=="page_instruments") echo "Lab Instruments";
                         elseif($myid=="page_journal") echo "Journal Publications";
                         elseif($myid=="page_conference") echo "Conference Publications";
                         elseif($myid=="page_photos") echo "Photo Gallery";

@@ -9,7 +9,7 @@
 <section class="footer">
 	<div class="copyright text-center">
 		<p style="text-align: center; color: rgba(255,255,255,0.85); font-size: 14px; margin: 0;">
-			&copy; <?php echo date('Y'); ?> <?php echo $site_row['sitename']; ?>. All rights reserved. | Designed by
+			&copy; <?php echo date('Y'); ?> Plasma Engineering Laboratory. All rights reserved. | Designed by
 			<a href="http://www.codencognition.com" target="_blank" style="color: #fff; font-weight: 700;">Code & Cognition</a>
 		</p>
 	</div>
