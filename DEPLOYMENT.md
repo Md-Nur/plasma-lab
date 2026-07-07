@@ -1,113 +1,131 @@
-# Deployment and Database Migration Guide
+# Deployment Guide
 
-This document describes how the automated GitHub Actions deployment pipeline is structured for the Plasma Lab website, how to configure the required GitHub Secrets, and how to manage database updates.
-
----
-
-## Architecture Overview
-
-Whenever a push is made to the `main` branch (or you manually trigger the workflow), the following pipeline executes:
-
-```mermaid
-graph TD
-    A[Push to main] --> B[Lint Check: Verify PHP syntax]
-    B --> C[Build: Install Composer dependencies]
-    C --> D[Deploy: Rsync files to target server via SSH]
-    D --> E[Database: Execute Database/migrate.php on server]
-    E --> F[Finished Successfully]
-```
+This document explains how to fully set up automated deployment for the Plasma Lab website.
 
 ---
 
-## 1. Server SSH Configuration
+## Step 1 — Get your SSH_PRIVATE_KEY
 
-To allow GitHub Actions to copy files and execute commands on your server, you need to set up SSH access:
+SSH uses a **key pair**: a private key (secret, goes in GitHub) and a public key (goes on the server to grant access). Think of the public key as a lock, and the private key as the only key that opens it.
 
-### Step 1.1: Generate an SSH Key Pair
-If you don't already have a dedicated deployment key, generate one on your local computer:
+### 1.1 — Generate the key pair (run this on your local computer)
+
+Open a terminal and run:
+
 ```bash
-ssh-keygen -t ed25519 -C "github-actions-deploy" -f id_github_deploy
+ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/github_deploy
 ```
-*Do not enter a passphrase when prompted (press Enter twice).*
 
-This generates two files:
-1. `id_github_deploy` (Private Key - keep secret!)
-2. `id_github_deploy.pub` (Public Key)
+- Press **Enter** twice when asked for a passphrase (leave it empty).
+- This creates two files:
+  - `~/.ssh/github_deploy` → **Private key** (keep this secret)
+  - `~/.ssh/github_deploy.pub` → **Public key** (share this with the server)
 
-### Step 1.2: Add the Public Key to the Remote Server
-Log into your target remote server and add the public key content to the deployment user's `authorized_keys` file:
+### 1.2 — Add the public key to your server
+
+Log into your server via SSH and run:
+
 ```bash
 mkdir -p ~/.ssh
-echo "PASTE_THE_CONTENT_OF_id_github_deploy.pub_HERE" >> ~/.ssh/authorized_keys
+cat >> ~/.ssh/authorized_keys << 'EOF'
+PASTE_THE_CONTENTS_OF_github_deploy.pub_HERE
+EOF
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
 ```
 
----
-
-## 2. GitHub Secrets Setup
-
-Go to your repository on GitHub:
-1. Click **Settings** -> **Secrets and variables** -> **Actions**.
-2. Click **New repository secret** to add each of the following secrets:
-
-| Secret Name | Description | Example Value |
-| :--- | :--- | :--- |
-| `SSH_HOST` | The hostname or IP address of your remote server | `192.168.1.100` or `example.com` |
-| `SSH_USER` | The user name to connect via SSH | `root` or `ubuntu` |
-| `SSH_PRIVATE_KEY`| The entire contents of the private key (`id_github_deploy` file) | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `SSH_PORT` | The SSH port of your server *(Optional: defaults to 22)* | `22` or `2222` |
-| `DEPLOY_PATH` | The absolute path on the server where files should reside | `/var/www/html/plasmalab` |
-| `PLASMA_DB_HOST` | The MySQL host accessible from the remote server | `localhost` or `127.0.0.1` |
-| `PLASMA_DB_NAME` | The name of your database | `plasma_lab_ru` |
-| `PLASMA_DB_USER` | The MySQL username on the server | `plasma_user` |
-| `PLASMA_DB_PASS` | The MySQL password on the server | `your_database_password` |
-
----
-
-## 3. Database Migrations Guide
-
-Instead of manually importing database schemas or completely overwriting the database during updates (which would erase user data), we use a structured migration system.
-
-### Baseline Initialization
-On the very first deployment, the script checks if the core `members` table exists in your target database.
-- If it **does not exist**, it automatically imports the complete base schema from `Database/plasma_lab_ru.sql`.
-- If it **does exist**, it skips the baseline import to preserve your data.
-
-### How to Apply New Database Changes
-When you need to make schema updates (e.g. creating a new table, adding a column, or altering a column size):
-1. Create a new `.sql` file in the `Database/migrations/` directory.
-2. Follow the naming convention `XXXX_description.sql` where `XXXX` is a sequential 4-digit number.
-   - Example: `0001_create_logs_table.sql`
-   - Example: `0002_add_phone_to_members.sql`
-3. Commit and push the file to the `main` branch.
-4. During deployment, the workflow will detect the new file, execute it, and record it in the `migrations` database table so it never runs again.
-
----
-
-## 4. Manual Verification & Troubleshooting
-
-If you need to test the database migration script manually on your server, you can log in via SSH and run:
-
+To see the public key contents on your local computer:
 ```bash
-PLASMA_DB_HOST="localhost" \
-PLASMA_DB_NAME="plasma_lab_ru" \
-PLASMA_DB_USER="plasma_user" \
-PLASMA_DB_PASS="your_password" \
-php Database/migrate.php
+cat ~/.ssh/github_deploy.pub
 ```
 
-### Common Issues
+### 1.3 — Copy the private key into GitHub
 
-#### 1. SSH Handshake or Connection Refused
-- Double-check that your server's firewall allows incoming connections on the SSH port.
-- Make sure `SSH_HOST`, `SSH_USER`, and `SSH_PORT` are configured correctly.
-- Verify that `SSH_PRIVATE_KEY` matches the public key in your server's `~/.ssh/authorized_keys`.
+On your local computer, run:
+```bash
+cat ~/.ssh/github_deploy
+```
 
-#### 2. Rsync / Permission Denied
-- Ensure the user specified in `SSH_USER` has write permissions on the directory path specified in `DEPLOY_PATH` on the server.
-- You can grant permission on the server using: `chown -R user:group /var/www/html/plasmalab`
+Copy the **entire output** (including the `-----BEGIN...` and `-----END...` lines).
 
-#### 3. Migration: Connection Refused or Database Access Denied
-- Check that the MySQL/MariaDB server is running.
-- Ensure that the database credentials in the GitHub secrets are correct and that the MySQL user has privileges to create tables and execute queries on the specified database.
+Go to: **GitHub → Your Repo → Settings → Secrets and variables → Actions → New repository secret**
+
+- Name: `SSH_PRIVATE_KEY`
+- Value: paste the entire private key content
+
+---
+
+## Step 2 — Add all GitHub Secrets
+
+Go to: **GitHub repo → Settings → Secrets and variables → Actions**
+
+Add the following secrets one by one:
+
+| Secret Name | What it is | Example |
+|:---|:---|:---|
+| `SSH_HOST` | Your server's IP address or domain | `203.0.113.55` |
+| `SSH_USER` | Your server SSH login username | `ubuntu` or `root` |
+| `SSH_PRIVATE_KEY` | The entire private key (from Step 1.3) | `-----BEGIN OPENSSH...` |
+| `SSH_PORT` | SSH port *(optional, skip if 22)* | `22` |
+| `DEPLOY_PATH` | Full path on server where the site lives | `/var/www/html/plasmalab` |
+| `MYSQL_ROOT_PASS` | The MySQL root password on your server | `YourServerMySQLRootPass` |
+| `PLASMA_DB_HOST` | MySQL host (almost always `localhost`) | `localhost` |
+| `PLASMA_DB_NAME` | Name for your database | `plasma_lab_ru` |
+| `PLASMA_DB_USER` | Username for the app's DB user (you choose) | `plasma_user` |
+| `PLASMA_DB_PASS` | Password for the app's DB user (you choose) | `Str0ng!P@ssword99` |
+
+> **`PLASMA_DB_USER` and `PLASMA_DB_PASS` are credentials you invent.**
+> The deployment workflow will automatically create this user in MySQL on your server
+> the first time it runs. You don't need to create it manually.
+> Choose any username and a strong password — then add both as GitHub Secrets.
+
+---
+
+## Step 3 — What happens on deployment
+
+Once all secrets are set, every `git push` to `main` will:
+
+```
+1. Lint Check     → Verify all PHP files have no syntax errors
+2. DB Setup       → Create the MySQL database + app user (if not exists)
+3. File Sync      → Copy all project files to the server via rsync
+4. DB Migrations  → Run Database/migrate.php to initialize or update the schema
+```
+
+On the **first deploy**, the migration script imports the full baseline database from `Database/plasma_lab_ru.sql`.
+On **subsequent deploys**, it only runs new `.sql` files you add to `Database/migrations/`.
+
+---
+
+## Step 4 — Adding future database changes
+
+When you need to change the database schema (add a table, add a column, etc.):
+
+1. Create a new file in `Database/migrations/` with a numbered name:
+   ```
+   Database/migrations/0001_add_videos_table.sql
+   Database/migrations/0002_add_phone_to_members.sql
+   ```
+2. Write your SQL inside the file.
+3. Commit and push — the workflow will run it automatically.
+
+---
+
+## Troubleshooting
+
+### "Permission denied (publickey)" during rsync or ssh
+- Make sure the **public key** content is correctly added to `~/.ssh/authorized_keys` on the server.
+- Make sure the **private key** in GitHub secrets starts with `-----BEGIN OPENSSH PRIVATE KEY-----`.
+- Check that the `SSH_USER` secret matches the user whose `authorized_keys` you edited.
+
+### "Access denied for user" on MySQL step
+- `MYSQL_ROOT_PASS` is wrong. Verify the MySQL root password on your server with:
+  ```bash
+  mysql -u root -p
+  ```
+
+### "No such file or directory" for DEPLOY_PATH
+- The directory doesn't exist on the server yet. Create it:
+  ```bash
+  mkdir -p /var/www/html/plasmalab
+  ```
