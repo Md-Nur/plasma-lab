@@ -14,7 +14,7 @@
 					<div class="brand-text">
 						<!-- <span class="brand-title">Plasma Engineering Laboratory</span> -->
 						<span class="brand-title">Plasma Engineering Laboratory</span>
-						<span class="brand-sub"><?php echo $site_row['university']; ?> • <?php echo $site_row['department']; ?></span>
+						<span class="brand-sub"><?php echo (isset($site_row) && $site_row) ? htmlspecialchars($site_row['university']) : ''; ?> • <?php echo (isset($site_row) && $site_row) ? htmlspecialchars($site_row['department']) : ''; ?></span>
 					</div>
 				</div>
 			</a>

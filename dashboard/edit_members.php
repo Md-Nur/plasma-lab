@@ -53,9 +53,9 @@ $msg = '';
 			$tmp_name = $_FILES['image']['tmp_name'];
 			$new_name = time().".jpg";
 
-			$result = mysqli_query($db, "SELECT * FROM activities WHERE id=$id");
-			$row = mysqli_fetch_array($result);
-			$image = $row['image'];
+		$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
+		$row = mysqli_fetch_array($result);
+		$image = $row['image'];
 			unlink("../images/member/members/".$image);
 
 			if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {

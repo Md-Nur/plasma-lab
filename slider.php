@@ -33,7 +33,7 @@
 					$row_about = mysqli_fetch_array($result_about);
 					?>
 					<p style="margin: 0; font-size: 16px; line-height: 1.8; color: var(--lab-muted); text-align: justify;">
-						<?php echo $row_about['about']; ?>
+						<?php echo $row_about ? htmlspecialchars($row_about['about']) : ''; ?>
 					</p>
 				</div>
 			</div>

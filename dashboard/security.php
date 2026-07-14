@@ -316,8 +316,8 @@ if (isset($_POST['update_password'])) {
 
                          <div class="tab-pane <?php echo $tab_username; ?>" id="username">
                 
-                              <form id="reg_form_username" method="post" action="security.php">
-                                   <input type="hidden" name="id" value="<?php echo $id; ?>" required>
+                                <form id="reg_form_username" method="post" action="security.php">
+                                    <input type="hidden" name="id" value="<?php echo $admin_id; ?>" required>
 
                                    <fieldset class="form-group">
                                         <input class="form-control" placeholder="Username" type="text" name="username" tabindex="1" value="<?php echo $admin_username; ?>" required>

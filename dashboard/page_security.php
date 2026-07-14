@@ -17,12 +17,15 @@ $nav_email = '';
 $nav_department = '';
 $nav_university = '';
 $nav_founder = '';
+$nav_siteemail = '';
 
 $tab_sitename = 'active in';
 $tab_email = 'fade';
-$tab_email = 'fade';
-$tab_email = 'fade';
+$tab_department = 'fade';
+$tab_siteemail = 'fade';
+$tab_university = 'fade';
 $tab_founder = 'fade';
+$email_form = '';
 
 if(isset($_SESSION["email_validation"])){
      
@@ -34,13 +37,16 @@ if(isset($_SESSION["email_validation"])){
 
 $for_website = mysqli_query($db, "SELECT * FROM website WHERE id = $id");
 $record_website = mysqli_fetch_array($for_website);
-$sitename = $record_website['sitename'];
-$short_name = $record_website['short_name'];
-$siteemail = $record_website['siteemail'];
-$sitepassword = $record_website['sitepassword'];
-$department = $record_website['department'];
-$university = $record_website['university'];
-$founder = $record_website['founder'];
+$sitename = $short_name = $siteemail = $sitepassword = $department = $university = $founder = '';
+if ($record_website) {
+    $sitename = $record_website['sitename'];
+    $short_name = $record_website['short_name'];
+    $siteemail = $record_website['siteemail'];
+    $sitepassword = $record_website['sitepassword'];
+    $department = $record_website['department'];
+    $university = $record_website['university'];
+    $founder = $record_website['founder'];
+}
 
 //update Site Name
 if (isset($_POST['update_sitename'])) {
@@ -177,6 +183,7 @@ if (isset($_POST['update_email'])) {
   
   $website_email = $siteemail;
   $website_password = $sitepassword;
+  $website_name = $sitename;
 
   $receiver_email = $admin_email;
   $receiver_name = $admin_fullname;
@@ -549,12 +556,12 @@ function myfnu() {
 //--------------------------------------------------------------------------------
 function myfne() {
 
-    var x = document.forms["reg_form_email"]["email"].value;
+    var x = document.forms["reg_form_email"]["siteemail"].value;
     var atpos = x.indexOf("@");
     var dotpos = x.lastIndexOf(".");
 
 
-    var b = document.forms["reg_form_email"]["email"].value;
+    var b = document.forms["reg_form_email"]["siteemail"].value;
     if (b == null || b == "") {
         document.getElementById("js_msg").innerHTML =
             '<div class="alert alert-danger col-sm-12">Email field must be filled...</div>';

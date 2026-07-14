@@ -3,6 +3,16 @@
 session_start();
 include('head.php');
 
+$admin_password = '';
+if (isset($_SESSION["change_permitted_password"])) {
+    $cp_id = (int) $_SESSION["change_permitted_password"];
+    $cp_res = mysqli_query($db, "SELECT password FROM admin_login WHERE id = $cp_id");
+    $cp_row = mysqli_fetch_array($cp_res);
+    if ($cp_row) {
+        $admin_password = $cp_row['password'];
+    }
+}
+
 $pass_retrive = '';
 $pass_validation = 'hidden';
 $alert_failed = 'display : none';

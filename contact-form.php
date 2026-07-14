@@ -1,9 +1,9 @@
 <?php 
 	include ('db_connect.php');
-	$name = $_POST['name'];
-	$email = $_POST['email'];
-	$subject= $_POST['subject'];
-	$msg = $_POST['message'];
+	$name = $_POST['name'] ?? '';
+	$email = $_POST['email'] ?? '';
+	$subject= $_POST['subject'] ?? '';
+	$msg = $_POST['message'] ?? '';
 
 	date_default_timezone_set('Asia/Dhaka');
 	$date = date("Y/m/d");
@@ -11,10 +11,14 @@
 
 	$rec = mysqli_query($db, "SELECT * FROM admin_login WHERE id=1");
 	$record = mysqli_fetch_array($rec);
-	$receiver_email = $record['email'];
-	$receiver_firstname = $record['firstname'];
-	$receiver_lastname = $record['lastname'];
-	$receiver_name = $receiver_firstname.' '.$receiver_lastname;
+	$receiver_email = '';
+	$receiver_name = '';
+	if ($record) {
+		$receiver_email = $record['email'];
+		$receiver_firstname = $record['firstname'];
+		$receiver_lastname = $record['lastname'];
+		$receiver_name = $receiver_firstname.' '.$receiver_lastname;
+	}
 
 
 	//body table

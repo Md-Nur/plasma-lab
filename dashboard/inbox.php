@@ -7,6 +7,7 @@ include('navigation.php');
 $active_inbox = 'active';
 $active_sent = '';
 $active_draft = '';
+$active_write = '';
 
 $alert_failed = 'display : none';
 $alert_success = 'display : none';

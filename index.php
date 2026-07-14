@@ -78,10 +78,10 @@
 				$row_vission = mysqli_fetch_array($result_vission);
 				?>
 				<h3 style="font-size: 24px; font-weight: 800; color: var(--lab-plum); line-height: 1.5; margin-bottom: 24px; font-style: italic;">
-					&ldquo;<?php echo htmlspecialchars($row_vission['title']); ?>&rdquo;
+					&ldquo;<?php echo $row_vission ? htmlspecialchars($row_vission['title']) : ''; ?>&rdquo;
 				</h3>
 				<p style="font-size: 16px; color: var(--lab-muted); line-height: 1.8; text-align: justify; text-justify: inter-word; white-space: pre-line; margin: 0;">
-					<?php echo htmlspecialchars($row_vission['description']); ?>
+					<?php echo $row_vission ? htmlspecialchars($row_vission['description']) : ''; ?>
 				</p>
 			</div>
 		</div>

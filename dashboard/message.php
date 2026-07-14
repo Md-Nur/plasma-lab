@@ -11,8 +11,10 @@ if (isset($_GET['user'])) {
      
     $rec = mysqli_query($db, "SELECT * FROM message WHERE id = '$id'");
     $record = mysqli_fetch_array($rec);
-    $to_name = $record['name'];
-    $to_email = $record['email'];
+    if ($record) {
+        $to_name = $record['name'];
+        $to_email = $record['email'];
+    }
 }
 
 

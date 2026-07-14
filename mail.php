@@ -16,7 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
 $mail = new PHPMailer(false);                              // Passing `false` disables exceptions
-$mail->Timeout = 3;                                   // SMTP connection timeout (seconds)
+$mail->Timeout = 30;                                  // SMTP connection timeout (seconds)
 
 //Server settings
 
