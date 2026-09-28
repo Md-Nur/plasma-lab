@@ -34,7 +34,19 @@ include 'db_connect.php';
 
 
     <?php
-$result_members = mysqli_query($db, "SELECT * FROM members");
+$result_current_members = mysqli_query($db, "SELECT * FROM members WHERE status='current' OR status IS NULL OR status=''");
+if (!$result_current_members) {
+    $result_current_members = mysqli_query($db, "SELECT * FROM members");
+}
+$result_alumni_members = mysqli_query($db, "SELECT * FROM members WHERE status='alumni'");
+if (!$result_alumni_members) {
+    $result_alumni_members = mysqli_query($db, "SELECT * FROM members WHERE 1=0");
+}
+$current_members = [];
+while ($m = mysqli_fetch_array($result_current_members)) { $current_members[] = $m; }
+$alumni_members = [];
+while ($m = mysqli_fetch_array($result_alumni_members)) { $alumni_members[] = $m; }
+
 $result_current_students = mysqli_query($db, "SELECT * FROM students WHERE status='current' OR status IS NULL OR status=''");
 if (!$result_current_students) {
     $result_current_students = mysqli_query($db, "SELECT * FROM students");
@@ -49,17 +61,17 @@ if (!$result_alumni_students) {
 
 
 
-    <!-- ── Lab Members ──────────────────────────────── -->
+    <!-- ── Current Lab Members ──────────────────────────── -->
     <section id="team" class="pb-5">
         <div class="container">
             <div class="title-div text-center">
-                <h1><span>L</span>ab <span>M</span>embers</h1>
+                <h1><span>C</span>urrent <span>M</span>embers</h1>
             </div>
             <div class="tittle-style" style="margin-bottom: 50px;"></div>
             <div class="clearfix"></div>
 
             <div class="members-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px;">
-                <?php while ($row_members = mysqli_fetch_array($result_members)) {
+                <?php foreach ($current_members as $row_members) {
                     $show_designation = ($row_members['designation'] == "" || $row_members['designation'] == null) ? 'hidden' : '';
                     $show_phone = ($row_members['phone'] == "" || $row_members['phone'] == null) ? 'hidden' : '';
                     $show_email = ($row_members['email'] == "" || $row_members['email'] == null) ? 'hidden' : '';
@@ -116,6 +128,76 @@ if (!$result_alumni_students) {
             </div>
         </div>
     </section>
+
+    <!-- ── Alumni Members ──────────────────────────────── -->
+    <?php if (count($alumni_members) > 0): ?>
+    <section id="alumni-members" style="padding: 60px 0; background: var(--lab-soft, #f8fafc);">
+        <div class="container">
+            <div class="title-div text-center">
+                <h1><span>A</span>lumni <span>M</span>embers</h1>
+            </div>
+            <div class="tittle-style" style="margin-bottom: 50px;"></div>
+            <div class="clearfix"></div>
+
+            <div class="members-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px;">
+                <?php foreach ($alumni_members as $row_members):
+                    $show_designation = ($row_members['designation'] == "" || $row_members['designation'] == null) ? 'hidden' : '';
+                    $show_phone = ($row_members['phone'] == "" || $row_members['phone'] == null) ? 'hidden' : '';
+                    $show_email = ($row_members['email'] == "" || $row_members['email'] == null) ? 'hidden' : '';
+                    $show_info = ($row_members['info'] == "" || $row_members['info'] == null) ? 'hidden' : '';
+                    $show_link = ($row_members['link'] == "" || $row_members['link'] == null) ? 'hidden' : '';
+                ?>
+                <div class="member-card-wrapper">
+                    <div class="view view-first" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').showModal();" style="opacity: 0.9;">
+                        <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="<?php echo $row_members['name']; ?>" style="filter: grayscale(20%);" />
+                        <div class="mask">
+                            <h2><?php echo $row_members['name']; ?></h2>
+                            <p><?php echo $row_members['designation']; ?></p>
+                            <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').showModal();">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Native HTML5 Dialog Modal -->
+                <dialog id="myModal_alumni_<?php echo $row_members['id']; ?>" closedby="any" class="modern-dialog">
+                    <div class="dialog-header">
+                        <h3 class="dialog-title"><?php echo htmlspecialchars($row_members['name']); ?> <span style="font-size:12px; font-weight:normal; color:var(--lab-muted);">(Alumni)</span></h3>
+                        <button class="dialog-close-btn" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').close();" aria-label="Close dialog">&times;</button>
+                    </div>
+                    <div class="dialog-body text-center">
+                        <div class="modal-img" style="margin-bottom: 20px;">
+                            <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="img"
+                                 style="max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin: 0 auto; display: block; object-fit: cover;">
+                        </div>
+                        <div class="member-meta" style="text-align: left; max-width: 480px; margin: 0 auto;">
+                            <h4 class="<?php echo $show_designation; ?>" style="font-weight: 700; color: var(--lab-plum); font-size: 16px; margin-bottom: 12px;">
+                                <?php echo htmlspecialchars($row_members['designation']); ?>
+                            </h4>
+                            <h4 class="<?php echo $show_phone; ?>" style="font-size: 14px; color: var(--lab-ink); margin: 6px 0;">
+                                <strong>Phone:</strong> <?php echo htmlspecialchars($row_members['phone']); ?>
+                            </h4>
+                            <h4 class="<?php echo $show_email; ?>" style="font-size: 14px; color: var(--lab-teal-dark); margin: 6px 0;">
+                                <strong>E-mail:</strong> <a href="mailto:<?php echo htmlspecialchars($row_members['email']); ?>" style="color: var(--lab-teal-dark); text-decoration: underline;"><?php echo htmlspecialchars($row_members['email']); ?></a>
+                            </h4>
+                            <div class="members-description <?php echo $show_info; ?>" style="margin-top: 15px; border-top: 1px dashed var(--lab-line); padding-top: 15px;">
+                                <p style="font-size: 14px; line-height: 1.6; color: var(--lab-muted); text-align: left;">
+                                    <?php echo nl2br(htmlspecialchars($row_members['info'])); ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dialog-footer">
+                        <button type="button" class="btn btn-danger" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').close();">Close</button>
+                        <a class="<?php echo $show_link; ?>" href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank">
+                            <button type="button" class="btn btn-primary">More Details</button>
+                        </a>
+                    </div>
+                </dialog>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <div class="clearfix"></div>
 

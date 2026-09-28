@@ -38,6 +38,7 @@ $page_students  ="";
 $research_panal ="";
 $page_areas ="";
 $page_instruments = "";
+$page_products_services = "";
                
 $pub_panal ="";
 $page_journal ="";
@@ -70,6 +71,7 @@ if(isset($_GET['id'])){
 	
 	elseif($myid=="page_areas"){$page_areas="active";$page_elements="active open";}
 	elseif($myid=="page_instruments"){$page_instruments="active";$page_elements="active open";}
+	elseif($myid=="page_products_services"){$page_products_services="active";$page_elements="active open";}
 	
 	elseif($myid=="page_journal"){$pub_panal="active open"; $page_journal="active";$page_elements="active open";}
 	elseif($myid=="page_conference"){$pub_panal="active open"; $page_conference="active";$page_elements="active open";}
@@ -170,6 +172,11 @@ if(isset($_GET['id'])){
                     <i class="fa fa-cogs"></i> <span>Lab Instruments</span>
                 </a>
             </li>
+            <li class="modern-sidebar-item <?php echo $page_products_services; ?>">
+                <a class="modern-sidebar-link" href="page_products_services.php?id=page_products_services">
+                    <i class="fa fa-cube"></i> <span>Products & Services</span>
+                </a>
+            </li>
             <li class="modern-sidebar-item <?php echo $page_journal; ?>">
                 <a class="modern-sidebar-link" href="page_journal.php?id=page_journal">
                     <i class="fa fa-book"></i> <span>Journal Pubs</span>
@@ -239,6 +246,7 @@ if(isset($_GET['id'])){
                         elseif($myid=="page_students") echo "Students Directory";
                         elseif($myid=="page_areas") echo "Research Areas";
                         elseif($myid=="page_instruments") echo "Lab Instruments";
+                        elseif($myid=="page_products_services") echo "Products & Services";
                         elseif($myid=="page_journal") echo "Journal Publications";
                         elseif($myid=="page_conference") echo "Conference Publications";
                         elseif($myid=="page_photos") echo "Photo Gallery";

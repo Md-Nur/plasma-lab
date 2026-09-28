@@ -1,4 +1,92 @@
-<?php include('db_connect.php'); ?>
+<?php 
+include('db_connect.php'); 
+
+// Fetch services from DB
+$services_data = [];
+$services_res = mysqli_query($db, "SELECT * FROM services WHERE status='active' ORDER BY id ASC");
+if ($services_res && mysqli_num_rows($services_res) > 0) {
+    while ($row = mysqli_fetch_array($services_res)) {
+        $services_data[] = $row;
+    }
+} else {
+    // Fallback default services if table not yet populated
+    $services_data = [
+        [
+            'title' => 'Surface Modification & Treatment',
+            'description' => 'Plasma-based surface treatment to improve wettability, adhesion, sterilization, and biocompatibility of polymers, metals, and bio-materials using DBD and atmospheric plasma jets.',
+            'tags' => 'DBD Plasma, Wettability, Adhesion, Biocompatibility',
+            'icon' => 'fa-bolt'
+        ],
+        [
+            'title' => 'Nanomaterial Synthesis',
+            'description' => 'Controlled synthesis of metal nanoparticles, carbon nanostructures, and functional thin films via plasma-assisted deposition and reactive sputtering processes.',
+            'tags' => 'Nanoparticles, Thin Films, Sputtering, Carbon Nanotubes',
+            'icon' => 'fa-circle-o'
+        ],
+        [
+            'title' => 'Thin Film Deposition',
+            'description' => 'Physical and chemical vapor deposition of functional coatings including anti-reflection, hard coatings, and dielectric layers for optical and electronic applications.',
+            'tags' => 'PVD, CVD, Optical Coatings, Hard Coatings',
+            'icon' => 'fa-television'
+        ],
+        [
+            'title' => 'Consulting & Analytical Testing',
+            'description' => 'Material characterization using XRD, SEM, UV-Vis spectroscopy, and plasma diagnostics. Expert consultation on experimental design for industry and academic research teams.',
+            'tags' => 'XRD Analysis, SEM/TEM, UV-Vis, Consulting',
+            'icon' => 'fa-bar-chart'
+        ],
+        [
+            'title' => 'Plasma Agriculture & Biomedical',
+            'description' => 'Cold plasma treatment for seed germination enhancement, food safety, wound disinfection, and cancer research applications using non-thermal atmospheric plasma systems.',
+            'tags' => 'Cold Plasma, Seed Treatment, Sterilization, Biomedical',
+            'icon' => 'fa-medkit'
+        ],
+        [
+            'title' => 'Lab Visit & Training Programs',
+            'description' => 'Guided lab tours, short-course workshops, and hands-on training sessions for students and researchers on plasma physics fundamentals and equipment operation.',
+            'tags' => 'Workshop, Training, Lab Tour, Researchers',
+            'icon' => 'fa-graduation-cap'
+        ]
+    ];
+}
+
+// Fetch products from DB
+$products_data = [];
+$products_res = mysqli_query($db, "SELECT * FROM products WHERE status='active' ORDER BY id ASC");
+if ($products_res && mysqli_num_rows($products_res) > 0) {
+    while ($row = mysqli_fetch_array($products_res)) {
+        $products_data[] = $row;
+    }
+} else {
+    // Fallback default products if table not yet populated
+    $products_data = [
+        [
+            'name' => 'Atmospheric Pressure Plasma Jet (APPJ)',
+            'badge' => 'Plasma System',
+            'badge_theme' => 'teal',
+            'icon_emoji' => '⚡',
+            'description' => 'Compact, bench-top plasma jet systems for surface treatment, biomedical, and environmental applications. Operates at room temperature — safe for heat-sensitive substrates.',
+            'specifications' => "Frequency: 1–100 kHz operation\nWorking gases: He, Ar, N₂, air mixtures\nPlasma temperature: Near room temperature\nCustom nozzle configurations available"
+        ],
+        [
+            'name' => 'Dielectric Barrier Discharge (DBD) Reactor',
+            'badge' => 'Discharge System',
+            'badge_theme' => 'plum',
+            'icon_emoji' => '🔬',
+            'description' => 'High-efficiency DBD reactors for ozone generation, pollutant decomposition, and large-area surface activation. Scalable electrode configurations for lab and pilot scale.',
+            'specifications' => "Voltage: Up to 30 kV peak\nTreatment area: 5 × 5 cm to 30 × 30 cm\nPower: 10W–2kW configurations\nAir and nitrogen compatible"
+        ],
+        [
+            'name' => 'Plasma Synthesis Accessories & Probes',
+            'badge' => 'Accessories',
+            'badge_theme' => 'coral',
+            'icon_emoji' => '🧪',
+            'description' => 'Langmuir probes, high-voltage power supplies, impedance matching networks, and diagnostic accessories for plasma parameter measurement and system optimization.',
+            'specifications' => "Single & double Langmuir probes\nHigh-voltage measurement dividers\nImpedance matching (13.56 MHz, 2.45 GHz)\nCustom-designed on request"
+        ]
+    ];
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -482,103 +570,29 @@
 		</div>
 
 		<div class="services-grid">
-
-			<!-- Service 1 -->
+			<?php foreach ($services_data as $srv): ?>
 			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-bolt"></i></div>
-				<h3>Surface Modification & Treatment</h3>
-				<p>Plasma-based surface treatment to improve wettability, adhesion, sterilization, and biocompatibility of polymers, metals, and bio-materials using DBD and atmospheric plasma jets.</p>
+				<div class="service-card-icon"><i class="fa <?php echo htmlspecialchars($srv['icon'] ?: 'fa-cogs'); ?>"></i></div>
+				<h3><?php echo htmlspecialchars($srv['title']); ?></h3>
+				<p><?php echo htmlspecialchars($srv['description']); ?></p>
 				<div class="service-tags">
-					<span class="service-tag">DBD Plasma</span>
-					<span class="service-tag">Wettability</span>
-					<span class="service-tag">Adhesion</span>
-					<span class="service-tag">Biocompatibility</span>
+					<?php 
+					if (!empty($srv['tags'])) {
+						$tags = explode(',', $srv['tags']);
+						foreach ($tags as $tag) {
+							$t = trim($tag);
+							if (!empty($t)) {
+								echo '<span class="service-tag">' . htmlspecialchars($t) . '</span> ';
+							}
+						}
+					}
+					?>
 				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Book Surface Treatment Service')">
+				<button class="btn-book-service" onclick="openContactDialog('Book Service: <?php echo htmlspecialchars(addslashes($srv['title'])); ?>')">
 					<i class="fa fa-calendar"></i> Book This Service
 				</button>
 			</div>
-
-			<!-- Service 2 -->
-			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-atom" style="font-family:'FontAwesome'; content: '\f111';"></i><i class="fa fa-circle-o"></i></div>
-				<h3>Nanomaterial Synthesis</h3>
-				<p>Controlled synthesis of metal nanoparticles, carbon nanostructures, and functional thin films via plasma-assisted deposition and reactive sputtering processes.</p>
-				<div class="service-tags">
-					<span class="service-tag">Nanoparticles</span>
-					<span class="service-tag">Thin Films</span>
-					<span class="service-tag">Sputtering</span>
-					<span class="service-tag">Carbon Nanotubes</span>
-				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Request Nanomaterial Synthesis Service')">
-					<i class="fa fa-calendar"></i> Book This Service
-				</button>
-			</div>
-
-			<!-- Service 3 -->
-			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-television"></i></div>
-				<h3>Thin Film Deposition</h3>
-				<p>Physical and chemical vapor deposition of functional coatings including anti-reflection, hard coatings, and dielectric layers for optical and electronic applications.</p>
-				<div class="service-tags">
-					<span class="service-tag">PVD</span>
-					<span class="service-tag">CVD</span>
-					<span class="service-tag">Optical Coatings</span>
-					<span class="service-tag">Hard Coatings</span>
-				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Request Thin Film Deposition Service')">
-					<i class="fa fa-calendar"></i> Book This Service
-				</button>
-			</div>
-
-			<!-- Service 4 -->
-			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-bar-chart"></i></div>
-				<h3>Consulting & Analytical Testing</h3>
-				<p>Material characterization using XRD, SEM, UV-Vis spectroscopy, and plasma diagnostics. Expert consultation on experimental design for industry and academic research teams.</p>
-				<div class="service-tags">
-					<span class="service-tag">XRD Analysis</span>
-					<span class="service-tag">SEM/TEM</span>
-					<span class="service-tag">UV-Vis</span>
-					<span class="service-tag">Consulting</span>
-				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Book a Consultation')">
-					<i class="fa fa-calendar"></i> Book a Consultation
-				</button>
-			</div>
-
-			<!-- Service 5 -->
-			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-medkit"></i></div>
-				<h3>Plasma Agriculture & Biomedical</h3>
-				<p>Cold plasma treatment for seed germination enhancement, food safety, wound disinfection, and cancer research applications using non-thermal atmospheric plasma systems.</p>
-				<div class="service-tags">
-					<span class="service-tag">Cold Plasma</span>
-					<span class="service-tag">Seed Treatment</span>
-					<span class="service-tag">Sterilization</span>
-					<span class="service-tag">Biomedical</span>
-				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Inquire about Plasma Agriculture & Biomedical Service')">
-					<i class="fa fa-calendar"></i> Book This Service
-				</button>
-			</div>
-
-			<!-- Service 6 -->
-			<div class="service-card">
-				<div class="service-card-icon"><i class="fa fa-graduation-cap"></i></div>
-				<h3>Lab Visit & Training Programs</h3>
-				<p>Guided lab tours, short-course workshops, and hands-on training sessions for students and researchers on plasma physics fundamentals and equipment operation.</p>
-				<div class="service-tags">
-					<span class="service-tag">Workshop</span>
-					<span class="service-tag">Training</span>
-					<span class="service-tag">Lab Tour</span>
-					<span class="service-tag">Researchers</span>
-				</div>
-				<button class="btn-book-service" onclick="openContactDialog('Schedule a Lab Visit')">
-					<i class="fa fa-calendar"></i> Schedule a Visit
-				</button>
-			</div>
-
+			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
@@ -634,64 +648,34 @@
 		</div>
 
 		<div class="products-grid">
-
-			<!-- Product 1 -->
+			<?php foreach ($products_data as $prd): 
+				$b_theme = htmlspecialchars($prd['badge_theme'] ?: 'teal');
+			?>
 			<div class="product-card">
-				<div class="product-card-banner teal-bg">⚡</div>
+				<div class="product-card-banner <?php echo $b_theme; ?>-bg"><?php echo htmlspecialchars($prd['icon_emoji'] ?: '⚡'); ?></div>
 				<div class="product-card-body">
-					<span class="product-card-badge teal-badge">Plasma System</span>
-					<h3>Atmospheric Pressure Plasma Jet (APPJ)</h3>
-					<p>Compact, bench-top plasma jet systems for surface treatment, biomedical, and environmental applications. Operates at room temperature — safe for heat-sensitive substrates.</p>
+					<span class="product-card-badge <?php echo $b_theme; ?>-badge"><?php echo htmlspecialchars($prd['badge'] ?: 'Plasma System'); ?></span>
+					<h3><?php echo htmlspecialchars($prd['name']); ?></h3>
+					<p><?php echo htmlspecialchars($prd['description']); ?></p>
+					<?php if (!empty($prd['specifications'])): ?>
 					<ul class="product-specs">
-						<li><i class="fa fa-check-circle"></i> Frequency: 1–100 kHz operation</li>
-						<li><i class="fa fa-check-circle"></i> Working gases: He, Ar, N₂, air mixtures</li>
-						<li><i class="fa fa-check-circle"></i> Plasma temperature: Near room temperature</li>
-						<li><i class="fa fa-check-circle"></i> Custom nozzle configurations available</li>
+						<?php 
+						$specs = explode("\n", trim($prd['specifications']));
+						foreach ($specs as $spec) {
+							$s = trim($spec);
+							if (!empty($s)) {
+								echo '<li><i class="fa fa-check-circle"></i> ' . htmlspecialchars($s) . '</li>';
+							}
+						}
+						?>
 					</ul>
-					<button class="btn-inquire-product" onclick="openContactDialog('Inquire about Atmospheric Pressure Plasma Jet (APPJ)')">
+					<?php endif; ?>
+					<button class="btn-inquire-product" onclick="openContactDialog('Inquire about <?php echo htmlspecialchars(addslashes($prd['name'])); ?>')">
 						<i class="fa fa-envelope"></i> Inquire About This Product
 					</button>
 				</div>
 			</div>
-
-			<!-- Product 2 -->
-			<div class="product-card">
-				<div class="product-card-banner plum-bg">🔬</div>
-				<div class="product-card-body">
-					<span class="product-card-badge plum-badge">Discharge System</span>
-					<h3>Dielectric Barrier Discharge (DBD) Reactor</h3>
-					<p>High-efficiency DBD reactors for ozone generation, pollutant decomposition, and large-area surface activation. Scalable electrode configurations for lab and pilot scale.</p>
-					<ul class="product-specs">
-						<li><i class="fa fa-check-circle"></i> Voltage: Up to 30 kV peak</li>
-						<li><i class="fa fa-check-circle"></i> Treatment area: 5 × 5 cm to 30 × 30 cm</li>
-						<li><i class="fa fa-check-circle"></i> Power: 10W–2kW configurations</li>
-						<li><i class="fa fa-check-circle"></i> Air and nitrogen compatible</li>
-					</ul>
-					<button class="btn-inquire-product" onclick="openContactDialog('Inquire about Dielectric Barrier Discharge (DBD) Reactor')">
-						<i class="fa fa-envelope"></i> Inquire About This Product
-					</button>
-				</div>
-			</div>
-
-			<!-- Product 3 -->
-			<div class="product-card">
-				<div class="product-card-banner coral-bg">🧪</div>
-				<div class="product-card-body">
-					<span class="product-card-badge coral-badge">Accessories</span>
-					<h3>Plasma Synthesis Accessories & Probes</h3>
-					<p>Langmuir probes, high-voltage power supplies, impedance matching networks, and diagnostic accessories for plasma parameter measurement and system optimization.</p>
-					<ul class="product-specs">
-						<li><i class="fa fa-check-circle"></i> Single & double Langmuir probes</li>
-						<li><i class="fa fa-check-circle"></i> High-voltage measurement dividers</li>
-						<li><i class="fa fa-check-circle"></i> Impedance matching (13.56 MHz, 2.45 GHz)</li>
-						<li><i class="fa fa-check-circle"></i> Custom-designed on request</li>
-					</ul>
-					<button class="btn-inquire-product" onclick="openContactDialog('Inquire about Plasma Synthesis Accessories & Probes')">
-						<i class="fa fa-envelope"></i> Inquire About This Product
-					</button>
-				</div>
-			</div>
-
+			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
