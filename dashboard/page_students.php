@@ -11,13 +11,14 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 		$name = mysqli_real_escape_string($db, $_POST['name']);
 		$session = mysqli_real_escape_string($db, $_POST['session']);
 		$email = mysqli_real_escape_string($db, $_POST['email']);
+		$link = mysqli_real_escape_string($db, $_POST['link'] ?? '');
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
 		$tmp_name = $_FILES['image']['tmp_name'];
 		$new_name = time().".jpg";
 
 		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
-			$sql = "INSERT INTO students(image, name, session, email, status) VALUES ('$new_name', '$name', '$session', '$email', '$status')";
+			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name', '$name', '$session', '$email', '$link', '$status')";
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Student added successfully.';
 				$upload_ok = true;
@@ -64,6 +65,7 @@ include('navigation.php');
 		$name = $_POST['name'];
 		$session = $_POST['session'];
 		$email = $_POST['email'];
+		$link = $_POST['link'] ?? '';
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 		
 		$tmp_name = $_FILES['image']['tmp_name'];
@@ -71,7 +73,7 @@ include('navigation.php');
 
 		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
 
-			$sql = "INSERT INTO students(image, name, session, email, status) VALUES ('$new_name', '$name', '$session', '$email', '$status')";
+			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name', '$name', '$session', '$email', '$link', '$status')";
 
 			if ($db->query($sql) === TRUE) {
 
@@ -319,6 +321,11 @@ include('navigation.php');
         <fieldset class="form-group" style="margin-bottom:14px;">
           <label for="student_email">Email Address</label>
           <input class="form-control" id="student_email" placeholder="example@domain.com" type="email" name="email" tabindex="5" required>
+        </fieldset>
+
+        <fieldset class="form-group" style="margin-bottom:14px;">
+          <label for="student_link">External Profile / Link (LinkedIn, ResearchGate, Website)</label>
+          <input class="form-control" id="student_link" placeholder="https://linkedin.com/in/... or https://researchgate.net/..." type="text" name="link" tabindex="6">
         </fieldset>
       </div>
     </div>

@@ -10,9 +10,8 @@
 			</button>
 			<a class="navbar-brand" href="index.php">
 				<div class="logo-container">
-					<img src="images/ru_logo.png" alt="RU Logo" class="brand-logo">
+					<img src="images/logo.png" alt="Plasma Engineering Laboratory Logo" class="brand-logo">
 					<div class="brand-text">
-						<!-- <span class="brand-title">Plasma Engineering Laboratory</span> -->
 						<span class="brand-title">Plasma Engineering Laboratory</span>
 						<span class="brand-sub"><?php echo (isset($site_row) && $site_row) ? htmlspecialchars($site_row['university']) : ''; ?> • <?php echo (isset($site_row) && $site_row) ? htmlspecialchars($site_row['department']) : ''; ?></span>
 					</div>

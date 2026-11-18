@@ -14,6 +14,7 @@ $image = "demo_image.png";
 		$name = $_POST['name'];
 		$session = $_POST['session'];
 		$email = $_POST['email'];
+		$link = $_POST['link'] ?? '';
 		$id = $_POST['id'];
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
@@ -27,10 +28,10 @@ $image = "demo_image.png";
 
 		if (empty($fileName)) {
 
-			$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
+			$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email',link='$link',status='$status' WHERE id = $id ");
 
 			if ($sql_update === FALSE) {
-				$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email' WHERE id = $id ");
+				$sql_update = mysqli_query($db, "UPDATE students SET name='$name',session='$session',email='$email',link='$link' WHERE id = $id ");
 			}
 
 			if ($sql_update === TRUE) {
@@ -58,10 +59,10 @@ $image = "demo_image.png";
 
 			if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
 
-				$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email',status='$status' WHERE id = $id ");
+				$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email',link='$link',status='$status' WHERE id = $id ");
 
 				if ($sql_update === FALSE) {
-					$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email' WHERE id = $id ");
+					$sql_update = mysqli_query($db, "UPDATE students SET image='$new_name',name='$name',session='$session',email='$email',link='$link' WHERE id = $id ");
 				}
 
 				if ($sql_update === TRUE) {
@@ -99,6 +100,7 @@ if(isset($_GET['id'])){
 	$name=$row['name'];
 	$session=$row['session'];
 	$email=$row['email'];
+	$link=$row['link'] ?? '';
 	$status=$row['status'] ?? 'current';
 }
 
@@ -170,6 +172,11 @@ if(isset($_GET['id'])){
 				<fieldset class="form-group">
 					<label for="email">Email address:</label>
 					<input class="form-control" placeholder="example@domain.com" type="text" name="email" tabindex="1" value="<?php echo $email; ?>"  required>
+				</fieldset>
+
+				<fieldset class="form-group">
+					<label for="link">External Profile / Link:</label>
+					<input class="form-control" placeholder="https://linkedin.com/in/... or https://researchgate.net/..." type="text" name="link" tabindex="1" value="<?php echo htmlspecialchars($link); ?>">
 				</fieldset>
 
 				<fieldset class="form-group">

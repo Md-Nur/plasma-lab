@@ -137,7 +137,7 @@ $msg = '';
 		
 		
 	//retrive records
-	$result = mysqli_query($db, "SELECT * FROM slider");
+	$result = mysqli_query($db, "SELECT * FROM slider ORDER BY id DESC");
 ?>
 
 

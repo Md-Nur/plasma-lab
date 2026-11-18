@@ -84,7 +84,14 @@ if (!$result_alumni_students) {
                         <div class="mask">
                             <h2><?php echo $row_members['name']; ?></h2>
                             <p><?php echo $row_members['designation']; ?></p>
-                            <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_<?php echo $row_members['id']; ?>').showModal();">Read More</a>
+                            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:6px;">
+                                <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_<?php echo $row_members['id']; ?>').showModal();">Bio</a>
+                                <?php if (!empty($row_members['link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank" rel="noopener" class="info" onclick="event.stopPropagation();" style="background:var(--lab-teal); color:#fff;">
+                                        <i class="fa fa-external-link"></i> Link
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -118,10 +125,12 @@ if (!$result_alumni_students) {
                         </div>
                     </div>
                     <div class="dialog-footer">
-                        <button type="button" class="btn btn-danger" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').close();">Close</button>
-                        <a class="<?php echo $show_link; ?>" href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank">
-                            <button type="button" class="btn btn-primary">More Details</button>
-                        </a>
+                        <button type="button" class="btn btn-default" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').close();">Close</button>
+                        <?php if (!empty($row_members['link'])): ?>
+                            <a href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank" rel="noopener" class="btn btn-primary">
+                                <i class="fa fa-external-link" style="margin-right:6px;"></i> External Profile
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </dialog>
                 <?php } ?>
@@ -153,7 +162,14 @@ if (!$result_alumni_students) {
                         <div class="mask">
                             <h2><?php echo $row_members['name']; ?></h2>
                             <p><?php echo $row_members['designation']; ?></p>
-                            <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').showModal();">Read More</a>
+                            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:6px;">
+                                <a href="#" class="info" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').showModal();">Bio</a>
+                                <?php if (!empty($row_members['link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank" rel="noopener" class="info" onclick="event.stopPropagation();" style="background:var(--lab-teal); color:#fff;">
+                                        <i class="fa fa-external-link"></i> Link
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -187,10 +203,12 @@ if (!$result_alumni_students) {
                         </div>
                     </div>
                     <div class="dialog-footer">
-                        <button type="button" class="btn btn-danger" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').close();">Close</button>
-                        <a class="<?php echo $show_link; ?>" href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank">
-                            <button type="button" class="btn btn-primary">More Details</button>
-                        </a>
+                        <button type="button" class="btn btn-default" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').close();">Close</button>
+                        <?php if (!empty($row_members['link'])): ?>
+                            <a href="<?php echo htmlspecialchars($row_members['link']); ?>" target="_blank" rel="noopener" class="btn btn-primary">
+                                <i class="fa fa-external-link" style="margin-right:6px;"></i> External Profile
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </dialog>
                 <?php endforeach; ?>
@@ -226,7 +244,14 @@ if (!$result_alumni_students) {
                                 <h3 style="margin-top: 10px; font-size: 17px; font-weight: 800;"><?php echo htmlspecialchars($row_students['name']); ?></h3>
                                 <h4 class="email" style="font-size: 13px; margin: 4px 0;"><a href="mailto:<?php echo htmlspecialchars($row_students['email']); ?>" style="color: var(--lab-teal-dark); word-break: break-all;"><?php echo htmlspecialchars($row_students['email']); ?></a></h4>
                             </div>
-                            <h4 style="font-size: 13px; color: var(--lab-muted); margin-top: 8px;">Session: <?php echo htmlspecialchars($row_students['session']); ?></h4>
+                            <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                <span style="font-size: 12px; color: var(--lab-muted);">Session: <?php echo htmlspecialchars($row_students['session']); ?></span>
+                                <?php if (!empty($row_students['link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($row_students['link']); ?>" target="_blank" rel="noopener" title="External Profile" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--lab-teal-dark), var(--lab-teal)); padding: 4px 10px; border-radius: 12px; text-decoration: none;">
+                                        <i class="fa fa-external-link"></i> Profile
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -262,7 +287,14 @@ if (!$result_alumni_students) {
                                 <h3 style="margin-top: 10px; font-size: 17px; font-weight: 800;"><?php echo htmlspecialchars($row_students['name']); ?></h3>
                                 <h4 class="email" style="font-size: 13px; margin: 4px 0;"><a href="mailto:<?php echo htmlspecialchars($row_students['email']); ?>" style="color: var(--lab-teal-dark); word-break: break-all;"><?php echo htmlspecialchars($row_students['email']); ?></a></h4>
                             </div>
-                            <h4 style="font-size: 13px; color: var(--lab-muted); margin-top: 8px;">Session: <?php echo htmlspecialchars($row_students['session']); ?></h4>
+                            <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                <span style="font-size: 12px; color: var(--lab-muted);">Session: <?php echo htmlspecialchars($row_students['session']); ?></span>
+                                <?php if (!empty($row_students['link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($row_students['link']); ?>" target="_blank" rel="noopener" title="External Profile" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--lab-teal-dark), var(--lab-teal)); padding: 4px 10px; border-radius: 12px; text-decoration: none;">
+                                        <i class="fa fa-external-link"></i> Profile
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -16,6 +16,7 @@ $s_title = '';
 $s_description = '';
 $s_tags = '';
 $s_icon = 'fa-cogs';
+$s_image = '';
 $s_status = 'active';
 $s_edit_state = false;
 
@@ -25,6 +26,7 @@ $p_name = '';
 $p_badge = 'Plasma System';
 $p_badge_theme = 'teal';
 $p_icon_emoji = '⚡';
+$p_image = '';
 $p_description = '';
 $p_specifications = '';
 $p_status = 'active';
@@ -39,9 +41,17 @@ if (isset($_POST['save_service'])) {
     $description = mysqli_real_escape_string($db, $_POST['description']);
     $tags = mysqli_real_escape_string($db, $_POST['tags']);
     $icon = mysqli_real_escape_string($db, $_POST['icon'] ?: 'fa-cogs');
+    $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
+    if (!empty($_FILES['image_file']['name'])) {
+        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
+        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/activities/' . $new_name)) {
+            $image = 'images/activities/' . $new_name;
+        }
+    }
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
 
-    $sql = "INSERT INTO services (title, description, tags, icon, status) VALUES ('$title', '$description', '$tags', '$icon', '$status')";
+    $sql = "INSERT INTO services (title, description, tags, icon, image, status) VALUES ('$title', '$description', '$tags', '$icon', '$image', '$status')";
     if (mysqli_query($db, $sql)) {
         $msg = 'Service added successfully!';
         $alert_success = '';
@@ -60,9 +70,17 @@ if (isset($_POST['update_service'])) {
     $description = mysqli_real_escape_string($db, $_POST['description']);
     $tags = mysqli_real_escape_string($db, $_POST['tags']);
     $icon = mysqli_real_escape_string($db, $_POST['icon'] ?: 'fa-cogs');
+    $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
+    if (!empty($_FILES['image_file']['name'])) {
+        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
+        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/activities/' . $new_name)) {
+            $image = 'images/activities/' . $new_name;
+        }
+    }
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
 
-    $sql = "UPDATE services SET title='$title', description='$description', tags='$tags', icon='$icon', status='$status' WHERE id=$id";
+    $sql = "UPDATE services SET title='$title', description='$description', tags='$tags', icon='$icon', image='$image', status='$status' WHERE id=$id";
     if (mysqli_query($db, $sql)) {
         $msg = 'Service updated successfully!';
         $alert_success = '';
@@ -99,6 +117,7 @@ if (isset($_GET['edit_service'])) {
         $s_description = $row['description'];
         $s_tags = $row['tags'];
         $s_icon = $row['icon'];
+        $s_image = $row['image'] ?? '';
         $s_status = $row['status'];
     }
     $active_tab = 'services';
@@ -113,11 +132,19 @@ if (isset($_POST['save_product'])) {
     $badge = mysqli_real_escape_string($db, $_POST['badge']);
     $badge_theme = in_array($_POST['badge_theme'] ?? '', ['teal', 'plum', 'coral']) ? $_POST['badge_theme'] : 'teal';
     $icon_emoji = mysqli_real_escape_string($db, $_POST['icon_emoji'] ?: '⚡');
+    $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
+    if (!empty($_FILES['image_file']['name'])) {
+        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
+        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/instruments/' . $new_name)) {
+            $image = 'images/instruments/' . $new_name;
+        }
+    }
     $description = mysqli_real_escape_string($db, $_POST['description']);
     $specifications = mysqli_real_escape_string($db, $_POST['specifications']);
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
 
-    $sql = "INSERT INTO products (name, badge, badge_theme, icon_emoji, description, specifications, status) VALUES ('$name', '$badge', '$badge_theme', '$icon_emoji', '$description', '$specifications', '$status')";
+    $sql = "INSERT INTO products (name, badge, badge_theme, icon_emoji, image, description, specifications, status) VALUES ('$name', '$badge', '$badge_theme', '$icon_emoji', '$image', '$description', '$specifications', '$status')";
     if (mysqli_query($db, $sql)) {
         $msg = 'Product added successfully!';
         $alert_success = '';
@@ -136,11 +163,19 @@ if (isset($_POST['update_product'])) {
     $badge = mysqli_real_escape_string($db, $_POST['badge']);
     $badge_theme = in_array($_POST['badge_theme'] ?? '', ['teal', 'plum', 'coral']) ? $_POST['badge_theme'] : 'teal';
     $icon_emoji = mysqli_real_escape_string($db, $_POST['icon_emoji'] ?: '⚡');
+    $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
+    if (!empty($_FILES['image_file']['name'])) {
+        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
+        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/instruments/' . $new_name)) {
+            $image = 'images/instruments/' . $new_name;
+        }
+    }
     $description = mysqli_real_escape_string($db, $_POST['description']);
     $specifications = mysqli_real_escape_string($db, $_POST['specifications']);
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
 
-    $sql = "UPDATE products SET name='$name', badge='$badge', badge_theme='$badge_theme', icon_emoji='$icon_emoji', description='$description', specifications='$specifications', status='$status' WHERE id=$id";
+    $sql = "UPDATE products SET name='$name', badge='$badge', badge_theme='$badge_theme', icon_emoji='$icon_emoji', image='$image', description='$description', specifications='$specifications', status='$status' WHERE id=$id";
     if (mysqli_query($db, $sql)) {
         $msg = 'Product updated successfully!';
         $alert_success = '';
@@ -177,6 +212,7 @@ if (isset($_GET['edit_product'])) {
         $p_badge = $row['badge'];
         $p_badge_theme = $row['badge_theme'];
         $p_icon_emoji = $row['icon_emoji'];
+        $p_image = $row['image'] ?? '';
         $p_description = $row['description'];
         $p_specifications = $row['specifications'];
         $p_status = $row['status'];
@@ -307,7 +343,7 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                     <?php endif; ?>
                 </h4>
 
-                <form method="POST" action="page_products_services.php?id=page_products_services&tab=services">
+                <form method="POST" action="page_products_services.php?id=page_products_services&tab=services" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<?php echo $s_id; ?>">
 
                     <div class="form-group">
@@ -318,6 +354,15 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                     <div class="form-group">
                         <label style="color: #cbd5e1; font-size: 13px;">Description *</label>
                         <textarea name="description" rows="4" class="form-control" placeholder="Describe the scientific/analytical service offered..." required style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;"><?php echo htmlspecialchars($s_description); ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color: #cbd5e1; font-size: 13px;">Service Image (Path or Upload)</label>
+                        <input type="text" name="image" class="form-control" placeholder="e.g. images/activities/Consulting.png" value="<?php echo htmlspecialchars($s_image); ?>" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff; margin-bottom: 6px;">
+                        <input type="file" name="image_file" class="form-control" accept="image/*" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
+                        <?php if (!empty($s_image)): ?>
+                            <small style="color: #2dd4bf;">Current: <?php echo htmlspecialchars($s_image); ?></small>
+                        <?php endif; ?>
                     </div>
 
                     <div class="form-group">
@@ -377,8 +422,12 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                     <div class="card-item-box">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
                             <div style="display: flex; gap: 14px;">
-                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(28,167,168,0.15); color: #2dd4bf; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
-                                    <i class="fa <?php echo htmlspecialchars($s['icon'] ?: 'fa-cogs'); ?>"></i>
+                                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(28,167,168,0.15); color: #2dd4bf; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow:hidden;">
+                                    <?php if (!empty($s['image']) && file_exists('../' . $s['image'])): ?>
+                                        <img src="../<?php echo htmlspecialchars($s['image']); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
+                                    <?php else: ?>
+                                        <i class="fa <?php echo htmlspecialchars($s['icon'] ?: 'fa-cogs'); ?>"></i>
+                                    <?php endif; ?>
                                 </div>
                                 <div>
                                     <h5 style="color: #fff; font-weight: 700; font-size: 15px; margin: 0 0 6px;">
@@ -437,12 +486,21 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                     <?php endif; ?>
                 </h4>
 
-                <form method="POST" action="page_products_services.php?id=page_products_services&tab=products">
+                <form method="POST" action="page_products_services.php?id=page_products_services&tab=products" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<?php echo $p_id; ?>">
 
                     <div class="form-group">
                         <label style="color: #cbd5e1; font-size: 13px;">Product Name *</label>
                         <input type="text" name="name" class="form-control" placeholder="e.g. Atmospheric Pressure Plasma Jet (APPJ)" value="<?php echo htmlspecialchars($p_name); ?>" required style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color: #cbd5e1; font-size: 13px;">Product Image (Path or Upload)</label>
+                        <input type="text" name="image" class="form-control" placeholder="e.g. images/instruments/Film Deposition Using Plasma.png" value="<?php echo htmlspecialchars($p_image); ?>" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff; margin-bottom: 6px;">
+                        <input type="file" name="image_file" class="form-control" accept="image/*" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
+                        <?php if (!empty($p_image)): ?>
+                            <small style="color: #2dd4bf;">Current: <?php echo htmlspecialchars($p_image); ?></small>
+                        <?php endif; ?>
                     </div>
 
                     <div class="row">
@@ -521,8 +579,12 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                     <div class="card-item-box">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
                             <div style="display: flex; gap: 14px;">
-                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
-                                    <?php echo htmlspecialchars($p['icon_emoji'] ?: '⚡'); ?>
+                                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow:hidden;">
+                                    <?php if (!empty($p['image']) && file_exists('../' . $p['image'])): ?>
+                                        <img src="../<?php echo htmlspecialchars($p['image']); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($p['icon_emoji'] ?: '⚡'); ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div>
                                     <div style="margin-bottom: 4px;">

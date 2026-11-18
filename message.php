@@ -71,12 +71,16 @@
 							</div>
 						</div>
 
-						<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+						<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;" class="form-group-row">
 							<fieldset class="form-group" style="margin-bottom:0;">
 								<input class="form-control" placeholder="Your Name" type="text" name="name" value="" tabindex="1" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto;">
 							</fieldset>
 							<fieldset class="form-group" style="margin-bottom:0;">
-								<input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" tabindex="2" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; height: auto;" />
+								<div style="position:relative;">
+									<input type="email" class="form-control" name="email" id="email" placeholder="Your Gmail / Email" data-rule="email" tabindex="2" required style="border-radius: 8px; border: 1px solid var(--lab-line); padding: 12px 16px; padding-right: 36px; height: auto;" autocomplete="email" />
+									<span id="email-verify-icon" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); display:none; font-size:16px;"></span>
+								</div>
+								<div id="email-verify-feedback" style="font-size:11px; margin-top:4px; font-weight:600; display:none;"></div>
 							</fieldset>
 						</div>
 
@@ -122,37 +126,105 @@
 </style>
 
 <script type="text/javascript">
-	function validateform() {
-		var a = document.forms["myform"]["name"].value;
-		if (a == null || a == "") {
-			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Name field must be filled...</span>";
+	function checkEmailVerification(emailVal) {
+		var email = (emailVal || '').trim();
+		var feedback = document.getElementById('email-verify-feedback');
+		var icon = document.getElementById('email-verify-icon');
+		if (!email) {
+			if (feedback) feedback.style.display = 'none';
+			if (icon) icon.style.display = 'none';
 			return false;
 		}
 
-		var x = document.forms["myform"]["email"].value;
-		var atpos = x.indexOf("@");
-		var dotpos = x.lastIndexOf(".");
-
-		var b = document.forms["myform"]["email"].value;
-		if (b == null || b == "") {
-			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Email field must be filled...</span>";
+		var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+		if (!emailRegex.test(email)) {
+			if (feedback) {
+				feedback.style.display = 'block';
+				feedback.style.color = '#e85d75';
+				feedback.innerHTML = '<i class="fa fa-times-circle"></i> Invalid email format';
+			}
+			if (icon) {
+				icon.style.display = 'block';
+				icon.style.color = '#e85d75';
+				icon.innerHTML = '<i class="fa fa-times-circle"></i>';
+			}
 			return false;
-		} else {
-			if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= x.length) {
-				document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Please enter a valid email address...</span>";
+		}
+
+		var lower = email.toLowerCase();
+		if (lower.indexOf('@gmail.com') !== -1) {
+			var userPart = lower.split('@')[0];
+			if (userPart.length < 6 || userPart.length > 30 || !/^[a-zA-Z0-9.]+$/.test(userPart) || userPart.startsWith('.') || userPart.endsWith('.') || userPart.indexOf('..') !== -1) {
+				if (feedback) {
+					feedback.style.display = 'block';
+					feedback.style.color = '#e85d75';
+					feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gmail username must be 6–30 chars (letters, numbers, dots)';
+				}
+				if (icon) {
+					icon.style.display = 'block';
+					icon.style.color = '#e85d75';
+					icon.innerHTML = '<i class="fa fa-exclamation-circle"></i>';
+				}
 				return false;
 			}
+			if (feedback) {
+				feedback.style.display = 'block';
+				feedback.style.color = '#10b981';
+				feedback.innerHTML = '<i class="fa fa-check-circle"></i> Verified Gmail Address';
+			}
+			if (icon) {
+				icon.style.display = 'block';
+				icon.style.color = '#10b981';
+				icon.innerHTML = '<i class="fa fa-check-circle"></i>';
+			}
+			return true;
+		} else {
+			if (feedback) {
+				feedback.style.display = 'block';
+				feedback.style.color = '#10b981';
+				feedback.innerHTML = '<i class="fa fa-check-circle"></i> Valid Email Address';
+			}
+			if (icon) {
+				icon.style.display = 'block';
+				icon.style.color = '#10b981';
+				icon.innerHTML = '<i class="fa fa-check-circle"></i>';
+			}
+			return true;
 		}
+	}
 
-		var c = document.forms["myform"]["subject"].value;
-		if (c == null || c == "") {
-			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Subject field must be filled...</span>";
+	function validateform() {
+		var a = document.forms["myform"]["name"].value.trim();
+		if (a == null || a == "") {
+			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Name field must be filled...</span>";
+			document.forms["myform"]["name"].focus();
 			return false;
 		}
 
-		var d = document.forms["myform"]["message"].value;
+		var email = document.forms["myform"]["email"].value.trim();
+		if (email == null || email == "") {
+			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Email field must be filled...</span>";
+			document.forms["myform"]["email"].focus();
+			return false;
+		}
+
+		if (!checkEmailVerification(email)) {
+			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Please enter a valid verified Gmail / Email address...</span>";
+			document.forms["myform"]["email"].focus();
+			return false;
+		}
+
+		var c = document.forms["myform"]["subject"].value.trim();
+		if (c == null || c == "") {
+			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Subject field must be filled...</span>";
+			document.forms["myform"]["subject"].focus();
+			return false;
+		}
+
+		var d = document.forms["myform"]["message"].value.trim();
 		if (d == null || d == "") {
 			document.getElementById("result").innerHTML = "<span style='color:#e85d75;'>&#9888; Please write a message...</span>";
+			document.forms["myform"]["message"].focus();
 			return false;
 		}
 
@@ -216,6 +288,11 @@
 		// Set min date to today for the booking date picker
 		var today = new Date().toISOString().split('T')[0];
 		$('#booking-date').attr('min', today);
+
+		// Real-time email verification listener
+		$('#email').on('input blur', function() {
+			checkEmailVerification($(this).val());
+		});
 
 		$('#myform').submit(function(event) {
 			event.preventDefault();

@@ -9,7 +9,7 @@
 			<div id="slider" style="flex: 1 1 500px; min-width: 0;">
 				<ul class="slider-wrapper">
 					<?php 
-					$resultt = mysqli_query($db, "SELECT * FROM slider");
+					$resultt = mysqli_query($db, "SELECT * FROM slider ORDER BY id DESC");
 					$i = 1;
 					while($row = mysqli_fetch_array($resultt)){ 
 						$active = ($i == 1) ? 'current-slide' : '';

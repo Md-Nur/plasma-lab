@@ -1,9 +1,28 @@
 <?php 
 	include ('db_connect.php');
-	$name = $_POST['name'] ?? '';
-	$email = $_POST['email'] ?? '';
-	$subject= $_POST['subject'] ?? '';
-	$msg = $_POST['message'] ?? '';
+	$name = trim($_POST['name'] ?? '');
+	$email = trim($_POST['email'] ?? '');
+	$subject = trim($_POST['subject'] ?? '');
+	$msg = trim($_POST['message'] ?? '');
+
+	if (empty($name) || empty($email) || empty($subject) || empty($msg)) {
+		echo "<span style='color:#e85d75;'><i class='fa fa-exclamation-triangle'></i> All fields are required. Please fill out the form completely.</span>";
+		exit;
+	}
+
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		echo "<span style='color:#e85d75;'><i class='fa fa-exclamation-triangle'></i> Invalid email address format. Please enter a valid Gmail / Email address.</span>";
+		exit;
+	}
+
+	if (stripos($email, '@gmail.com') !== false) {
+		$parts = explode('@', $email);
+		$user = strtolower($parts[0]);
+		if (strlen($user) < 6 || strlen($user) > 30 || !preg_match('/^[a-z0-9.]+$/', $user) || $user[0] === '.' || substr($user, -1) === '.' || strpos($user, '..') !== false) {
+			echo "<span style='color:#e85d75;'><i class='fa fa-exclamation-triangle'></i> Invalid Gmail username format (must be 6-30 characters, letters, numbers, dots).</span>";
+			exit;
+		}
+	}
 
 	date_default_timezone_set('Asia/Dhaka');
 	$date = date("Y/m/d");

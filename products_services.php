@@ -238,6 +238,9 @@ if ($products_res && mysqli_num_rows($products_res) > 0) {
 			border-color: rgba(28,167,168,0.25);
 		}
 		.service-card:hover::before { opacity: 1; }
+		.service-card:hover .service-card-image-wrap img {
+			transform: scale(1.06);
+		}
 
 		.service-card-icon {
 			width: 54px; height: 54px;
@@ -572,7 +575,16 @@ if ($products_res && mysqli_num_rows($products_res) > 0) {
 		<div class="services-grid">
 			<?php foreach ($services_data as $srv): ?>
 			<div class="service-card">
-				<div class="service-card-icon"><i class="fa <?php echo htmlspecialchars($srv['icon'] ?: 'fa-cogs'); ?>"></i></div>
+				<?php if (!empty($srv['image']) && file_exists($srv['image'])): ?>
+					<div class="service-card-image-wrap" style="height: 180px; margin: -32px -28px 20px -28px; overflow: hidden; position: relative;">
+						<img src="<?php echo htmlspecialchars($srv['image']); ?>" alt="<?php echo htmlspecialchars($srv['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;">
+						<div style="position: absolute; bottom: 12px; left: 16px; width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--lab-teal-dark);">
+							<i class="fa <?php echo htmlspecialchars($srv['icon'] ?: 'fa-cogs'); ?>"></i>
+						</div>
+					</div>
+				<?php else: ?>
+					<div class="service-card-icon"><i class="fa <?php echo htmlspecialchars($srv['icon'] ?: 'fa-cogs'); ?>"></i></div>
+				<?php endif; ?>
 				<h3><?php echo htmlspecialchars($srv['title']); ?></h3>
 				<p><?php echo htmlspecialchars($srv['description']); ?></p>
 				<div class="service-tags">
@@ -652,7 +664,13 @@ if ($products_res && mysqli_num_rows($products_res) > 0) {
 				$b_theme = htmlspecialchars($prd['badge_theme'] ?: 'teal');
 			?>
 			<div class="product-card">
-				<div class="product-card-banner <?php echo $b_theme; ?>-bg"><?php echo htmlspecialchars($prd['icon_emoji'] ?: '⚡'); ?></div>
+				<div class="product-card-banner <?php echo $b_theme; ?>-bg">
+					<?php if (!empty($prd['image']) && file_exists($prd['image'])): ?>
+						<img src="<?php echo htmlspecialchars($prd['image']); ?>" alt="<?php echo htmlspecialchars($prd['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+					<?php else: ?>
+						<?php echo htmlspecialchars($prd['icon_emoji'] ?: '⚡'); ?>
+					<?php endif; ?>
+				</div>
 				<div class="product-card-body">
 					<span class="product-card-badge <?php echo $b_theme; ?>-badge"><?php echo htmlspecialchars($prd['badge'] ?: 'Plasma System'); ?></span>
 					<h3><?php echo htmlspecialchars($prd['name']); ?></h3>
