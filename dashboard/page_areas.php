@@ -21,24 +21,23 @@ $msg = '';
 		$title = addslashes($_POST['title']);
 		$info = addslashes($_POST['info']);
 
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/areas/', $uploadErr);
 		
-		if (move_uploaded_file($tmp_name, "../images/areas/".$new_name)) {
-			$query = "INSERT INTO areas (image, title, info) VALUES ('$new_name','$title', '$info')";
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$query = "INSERT INTO areas (image, title, info) VALUES ('$new_name_esc','$title', '$info')";
 
 			if ($db->query($query) === TRUE) {
-
 				$msg = 'Inserted..';
-
 				$alert_success = '';
-				
 			} else {
-				 $msg = 'Failed..';
-
+				$msg = 'Failed..';
 				$alert_failed = '';
 			}
-
+		} else {
+			$msg = $uploadErr ?: 'Upload failed.';
+			$alert_failed = '';
 		}
 	}
 
@@ -88,41 +87,31 @@ $msg = '';
 			}
 
 		}else {
-			$tmp_name = $_FILES['image']['tmp_name'];
-			$new_name = time().".jpg";
+			$uploadErr = '';
+			$new_name = upload_dashboard_image($_FILES['image'], '../images/areas/', $uploadErr);
 
-			$result = mysqli_query($db, "SELECT * FROM areas WHERE id=$id");
-			$row = mysqli_fetch_array($result);
-			$image=$row['image'];
-			unlink("../images/areas/".$image);
+			if ($new_name) {
+				$result = mysqli_query($db, "SELECT * FROM areas WHERE id=$id");
+				$row = mysqli_fetch_array($result);
+				$old_image = $row['image'];
+				safe_delete_image($old_image, "../images/areas/");
 
-			if (move_uploaded_file($tmp_name, "../images/areas/".$new_name)) {
-
-				$sql_update = mysqli_query($db, "UPDATE areas SET image='$new_name', title='$title', info = '$info' WHERE id = $id ");
+				$new_name_esc = mysqli_real_escape_string($db, $new_name);
+				$sql_update = mysqli_query($db, "UPDATE areas SET image='$new_name_esc', title='$title', info = '$info' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
-
 					$msg = 'Updated..';
 					$image = $new_name;
 					$alert_success = '';
 					$edit_state = true;
-
 				} else {
-
-					 $msg = 'Failed..';
-
-				$alert_failed = '';
-
+					$msg = 'Failed..';
+					$alert_failed = '';
 				}
-
-			}else {
-
-				$msg = 'Failed..';
-
+			} else {
+				$msg = $uploadErr ?: 'Failed..';
 				$alert_failed = '';
-
 			}
-
 		}
 
 	}
@@ -132,8 +121,12 @@ $msg = '';
 	//delete data
 	if(isset($_GET['del'])){
 		$id = $_GET['del'];
+		$result = mysqli_query($db, "SELECT * FROM areas WHERE id=$id");
+		if ($result && $row = mysqli_fetch_array($result)) {
+			safe_delete_image($row['image'], "../images/areas/");
+		}
 		mysqli_query($db, "DELETE FROM areas WHERE id=$id");
-		$msg = 'Deletet..';
+		$msg = 'Deleted..';
 		$alert_success = '';
 	}
 	
@@ -191,7 +184,7 @@ $msg = '';
 	<form  method="post" action="page_areas.php" enctype="multipart/form-data">
 		
 		<div class="col-md-4">
-	        <img id="output" class="img-responsive" src="../images/areas/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
+	        <img id="output" class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($image, '../images/areas/')); ?>" style="width:100%;height: 300px; object-fit: cover;" onerror="this.style.display='none'">
 	    </div>
 
 	    <div class="col-md-8">
@@ -252,7 +245,7 @@ $msg = '';
 		<div class="col-md-4 col-sm-6 ">
             <div class="service-box">
                 <div class="service-icon">
-                    <img src="../images/areas/<?php echo $row_areas['image'] ;?>" style="width: 100%;height: 100%;">
+                    <img src="<?php echo htmlspecialchars(get_image_url($row_areas['image'], '../images/areas/')); ?>" style="width: 100%;height: 100%; object-fit: cover;">
                 </div>
                 <div class="service-content">
                     <h3 style="color: red;"><?php echo $row_areas['title'] ;?></h3>

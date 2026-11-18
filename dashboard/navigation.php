@@ -269,7 +269,7 @@ if(isset($_GET['id'])){
                 </a>
                 
                 <div class="modern-nav-user" id="userMenuDropdownBtn">
-                    <img src="assets/images/admin/<?php echo $userphoto;?>" alt="Admin Avatar" />
+                    <img src="<?php echo htmlspecialchars(get_image_url($userphoto, 'assets/images/admin/')); ?>" alt="Admin Avatar" />
                     <span><?php echo $_SESSION["sess_username"];?></span>
                     <i class="fa fa-caret-down"></i>
                     

@@ -48,6 +48,7 @@ Go to your repository on GitHub:
 | `PLASMA_DB_USER`| Your hosting MySQL database username | `epiz_12345678` |
 | `PLASMA_DB_PASS`| Your hosting MySQL database password | `YourDbPassword123` |
 | `MIGRATION_TOKEN`| Any secure random string of your choice | `a_long_random_string_xyz_456` |
+| `IMGBB_API_KEY` | Your ImgBB API Key for cloud image hosting | `55f282a5d7df51d89b9c2c8f...` |
 
 ---
 

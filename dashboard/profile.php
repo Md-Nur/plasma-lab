@@ -11,10 +11,10 @@
 	   <div class="panel-body">
 		  <div class="row">
 			 <div class="col-md-3 col-lg-3 hidden-xs hidden-sm">
-				<img class=" img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture">
+				<img class=" img-responsive" src="<?php echo htmlspecialchars(get_image_url($admin_image, 'assets/images/admin/')); ?>" alt="Profile Picture">
 			 </div>
 			 <div class="col-xs-12 col-sm-2 hidden-md hidden-lg">
-				<img class=" img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture">
+				<img class=" img-responsive" src="<?php echo htmlspecialchars(get_image_url($admin_image, 'assets/images/admin/')); ?>" alt="Profile Picture">
 			 </div>
 
 			 <div class=" col-md-9 col-lg-9">

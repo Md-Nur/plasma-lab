@@ -325,7 +325,7 @@
 				<div class="instrument-card" data-status="<?php echo $status_val; ?>" data-name="<?php echo htmlspecialchars(strtolower($row_inst['name'])); ?>">
 					<div class="instrument-card-image-wrap">
 						<span class="status-badge <?php echo $badge_class; ?>"><?php echo $status_label; ?></span>
-						<img src="images/instruments/<?php echo htmlspecialchars($row_inst['image']); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" onerror="this.src='images/activities/demo_image.png'">
+						<img src="<?php echo htmlspecialchars(get_image_url($row_inst['image'], 'images/instruments/')); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" onerror="this.src='images/activities/demo_image.png'">
 					</div>
 					<div class="instrument-card-body">
 						<h3><?php echo htmlspecialchars($row_inst['name']); ?></h3>
@@ -344,7 +344,7 @@
 					</div>
 					<div class="dialog-body" style="padding: 24px; max-height: 70vh; overflow-y: auto;">
 						<div class="modal-img" style="margin-bottom: 24px;">
-							<img src="images/instruments/<?php echo htmlspecialchars($row_inst['image']); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>"
+							<img src="<?php echo htmlspecialchars(get_image_url($row_inst['image'], 'images/instruments/')); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>"
 								 style="max-width: 100%; max-height: 280px; width: auto; height: auto; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin: 0 auto; display: block; object-fit: cover;" onerror="this.src='images/activities/demo_image.png'">
 						</div>
 						<div class="instrument-meta" style="text-align: left; max-width: 520px; margin: 0 auto;">

@@ -34,35 +34,34 @@ if (isset($_POST['update'])) {
           
      }   
      else {
+          $uploadErr = '';
+          $new_name = upload_dashboard_image($_FILES['image'], "assets/images/admin/", $uploadErr);
           
-          $tmp_name = $_FILES['image']['tmp_name'];
-          $new_name = time().".jpg";
-          
-          if (move_uploaded_file($tmp_name, "assets/images/admin/".$new_name)){
-          	$firstname = $_POST['firstname'];
-          	$lastname = $_POST['lastname'];
-               $phone = $_POST['phone'];
-          	$id =$_POST['id'];
+          if ($new_name){
+          	$firstname = mysqli_real_escape_string($db, $_POST['firstname']);
+          	$lastname = mysqli_real_escape_string($db, $_POST['lastname']);
+            $phone = mysqli_real_escape_string($db, $_POST['phone']);
+          	$id = (int)$_POST['id'];
 
-          	$sql_update = mysqli_query($db, "UPDATE admin_login SET firstname='$firstname', lastname='$lastname', phone='$phone', image='$new_name' WHERE id=$id");
-               if ($sql_update === TRUE) {
-                    
-                    unlink("assets/images/admin/".$admin_image);
-                    $alert_success = '';
+            $new_name_esc = mysqli_real_escape_string($db, $new_name);
+          	$sql_update = mysqli_query($db, "UPDATE admin_login SET firstname='$firstname', lastname='$lastname', phone='$phone', image='$new_name_esc' WHERE id=$id");
+            if ($sql_update === TRUE) {
+                 safe_delete_image($admin_image, "assets/images/admin/");
+                 $alert_success = '';
                	$msg = "Profile Updated";
-                    $admin_image = $new_name;
-                    $admin_firstname = $firstname;
-                    $admin_lastname = $lastname;
-                    $admin_phone = $phone;
+                 $admin_image = $new_name;
+                 $admin_firstname = $firstname;
+                 $admin_lastname = $lastname;
+                 $admin_phone = $phone;
 
-               } else {
-                    
-                    $alert_failed = "";
-               	$msg = "Update Failed. Try again";
-
-               }
+            } else {
+                 $alert_failed = "";
+                 $msg = "Update Failed. Try again";
+            }
+          } else {
+             $alert_failed = "";
+             $msg = $uploadErr ?: "Image upload failed. Try again";
           }
-          
      }
      
      
@@ -109,10 +108,10 @@ if (isset($_POST['update'])) {
 				</div>
 			 </div>
 			 <div class="col-md-3 col-lg-3 hidden-xs hidden-sm">
-				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture" onerror="this.style.display='none'">
+				<img id="output" class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($admin_image, 'assets/images/admin/')); ?>" alt="Profile Picture" onerror="this.style.display='none'">
 			 </div>
 			 <div class="col-xs-12 col-sm-2 hidden-md hidden-lg">
-				<img id="output"  class="img-responsive" src="assets/images/admin/<?php echo $admin_image; ?>" alt="Profile Picture" onerror="this.style.display='none'">
+				<img id="output" class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($admin_image, 'assets/images/admin/')); ?>" alt="Profile Picture" onerror="this.style.display='none'">
 			 </div>
 
 			 <div class=" col-md-9 col-lg-9">

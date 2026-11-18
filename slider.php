@@ -15,7 +15,7 @@
 						$active = ($i == 1) ? 'current-slide' : '';
 					?>
 					<li class="<?php echo $active; ?>">
-						<img src="images/slider/<?php echo $row['image']; ?>" alt="Slide Image" style="width: 100%; height: 100%; object-fit: cover;">
+						<img src="<?php echo htmlspecialchars(get_image_url($row['image'], 'images/slider/')); ?>" alt="Slide Image" style="width: 100%; height: 100%; object-fit: cover;">
 						<div class="caption">
 							<h2 class="slider-title"><?php echo htmlspecialchars($row['title']); ?></h2>
 							<p><?php echo htmlspecialchars($row['sub_title']); ?></p>

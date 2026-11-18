@@ -80,7 +80,7 @@ if (!$result_alumni_students) {
                 ?>
                 <div class="member-card-wrapper">
                     <div class="view view-first" onclick="document.getElementById('myModal_<?php echo $row_members['id']; ?>').showModal();">
-                        <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="<?php echo $row_members['name']; ?>" />
+                        <img src="<?php echo htmlspecialchars(get_image_url($row_members['image'], 'images/member/members/')); ?>" alt="<?php echo $row_members['name']; ?>" />
                         <div class="mask">
                             <h2><?php echo $row_members['name']; ?></h2>
                             <p><?php echo $row_members['designation']; ?></p>
@@ -104,7 +104,7 @@ if (!$result_alumni_students) {
                     </div>
                     <div class="dialog-body text-center">
                         <div class="modal-img" style="margin-bottom: 20px;">
-                            <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="img"
+                            <img src="<?php echo htmlspecialchars(get_image_url($row_members['image'], 'images/member/members/')); ?>" alt="img"
                                  style="max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin: 0 auto; display: block; object-fit: cover;">
                         </div>
                         <div class="member-meta" style="text-align: left; max-width: 480px; margin: 0 auto;">
@@ -158,7 +158,7 @@ if (!$result_alumni_students) {
                 ?>
                 <div class="member-card-wrapper">
                     <div class="view view-first" onclick="document.getElementById('myModal_alumni_<?php echo $row_members['id']; ?>').showModal();" style="opacity: 0.9;">
-                        <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="<?php echo $row_members['name']; ?>" style="filter: grayscale(20%);" />
+                        <img src="<?php echo htmlspecialchars(get_image_url($row_members['image'], 'images/member/members/')); ?>" alt="<?php echo $row_members['name']; ?>" style="filter: grayscale(20%);" />
                         <div class="mask">
                             <h2><?php echo $row_members['name']; ?></h2>
                             <p><?php echo $row_members['designation']; ?></p>
@@ -182,7 +182,7 @@ if (!$result_alumni_students) {
                     </div>
                     <div class="dialog-body text-center">
                         <div class="modal-img" style="margin-bottom: 20px;">
-                            <img src="images/member/members/<?php echo $row_members['image']; ?>" alt="img"
+                            <img src="<?php echo htmlspecialchars(get_image_url($row_members['image'], 'images/member/members/')); ?>" alt="img"
                                  style="max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin: 0 auto; display: block; object-fit: cover;">
                         </div>
                         <div class="member-meta" style="text-align: left; max-width: 480px; margin: 0 auto;">
@@ -238,7 +238,7 @@ if (!$result_alumni_students) {
                 <?php foreach ($current_students as $row_students): ?>
                 <div class="student-item-wrapper">
                     <div class="student-item" style="height: 100%; display: flex; flex-direction: column;">
-                        <img class="img-responsive" src="images/member/students/<?php echo $row_students['image']; ?>" alt="<?php echo $row_students['name']; ?>" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+                        <img class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($row_students['image'], 'images/member/students/')); ?>" alt="<?php echo $row_students['name']; ?>" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
                         <div class="student-info" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
                                 <h3 style="margin-top: 10px; font-size: 17px; font-weight: 800;"><?php echo htmlspecialchars($row_students['name']); ?></h3>
@@ -281,7 +281,7 @@ if (!$result_alumni_students) {
                 <?php foreach ($alumni_students as $row_students): ?>
                 <div class="student-item-wrapper">
                     <div class="student-item" style="height: 100%; display: flex; flex-direction: column; opacity: 0.85;">
-                        <img class="img-responsive" src="images/member/students/<?php echo $row_students['image']; ?>" alt="<?php echo $row_students['name']; ?>" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; filter: grayscale(25%);">
+                        <img class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($row_students['image'], 'images/member/students/')); ?>" alt="<?php echo $row_students['name']; ?>" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; filter: grayscale(25%);">
                         <div class="student-info" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
                                 <h3 style="margin-top: 10px; font-size: 17px; font-weight: 800;"><?php echo htmlspecialchars($row_students['name']); ?></h3>

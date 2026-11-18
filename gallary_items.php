@@ -17,10 +17,11 @@ $result_video = mysqli_query($db, $sql_video);
 
 		<div class="gallery-photos-grid">
 			<?php while($row_photo = mysqli_fetch_array($result_photo)){ ?>
-			<a href="images/gallary/photos/<?php echo $row_photo['image']; ?>" 
+			<?php $photo_url = get_image_url($row_photo['image'], 'images/gallary/photos/'); ?>
+			<a href="<?php echo htmlspecialchars($photo_url); ?>" 
 			   class="gallery-photo-item"
 			   data-fancybox="gallery">
-				<img src="images/gallary/photos/<?php echo $row_photo['image']; ?>" 
+				<img src="<?php echo htmlspecialchars($photo_url); ?>" 
 				     alt="Lab Photo">
 				<div class="gallery-photo-overlay">
 					<i class="fa fa-search-plus"></i>

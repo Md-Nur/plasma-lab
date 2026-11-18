@@ -51,41 +51,30 @@ $msg = '';
 			}
 
 		}else {
-			$tmp_name = $_FILES['image']['tmp_name'];
-			$new_name = time().".jpg";
+			$uploadErr = '';
+			$new_name = upload_dashboard_image($_FILES['image'], '../images/member/members/', $uploadErr);
 
-		$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
-		$row = mysqli_fetch_array($result);
-		$image = $row['image'];
-			unlink("../images/member/members/".$image);
+			if ($new_name) {
+				$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
+				$row = mysqli_fetch_array($result);
+				$old_image = $row['image'];
+				safe_delete_image($old_image, "../images/member/members/");
 
-			if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
-
-				$sql_update = mysqli_query($db, "UPDATE members SET image='$new_name', name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link', status='$status' WHERE id = $id ");
+				$new_name_esc = mysqli_real_escape_string($db, $new_name);
+				$sql_update = mysqli_query($db, "UPDATE members SET image='$new_name_esc', name='$name',designation='$designation',phone='$phone',email='$email', info = '$info', link = '$link', status='$status' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
 					$image = $new_name;
 					$msg = 'Information Updated..';
-
-				$alert_success = '';
-
-
+					$alert_success = '';
 				} else {
-
-					 $msg = 'Failed to update..';
-
-				$alert_failed = '';
-
+					$msg = 'Failed to update..';
+					$alert_failed = '';
 				}
-
-			}else {
-
-				$msg = 'Failed to update..';
-
+			} else {
+				$msg = $uploadErr ?: 'Failed to upload photo.';
 				$alert_failed = '';
-
 			}
-
 		}
 
 	}
@@ -141,7 +130,7 @@ if(isset($_GET['id'])){
 			</div>
 
 			<div class="col-md-4">
-					<img id="output" class="img-responsive" src="../images/member/members/<?php echo $image; ?>" style="width:100%;">
+					<img id="output" class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($image, '../images/member/members/')); ?>" style="width:100%;">
 				</div>
 
 				<div class="col-md-8">

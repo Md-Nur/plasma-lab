@@ -9,6 +9,8 @@ if (file_exists(__DIR__ . '/config_secrets.php')) {
     include(__DIR__ . '/config_secrets.php');
 }
 
+require_once __DIR__ . '/imgbb.php';
+
 
 $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 

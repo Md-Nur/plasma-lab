@@ -43,10 +43,10 @@ if (isset($_POST['save_service'])) {
     $icon = mysqli_real_escape_string($db, $_POST['icon'] ?: 'fa-cogs');
     $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
     if (!empty($_FILES['image_file']['name'])) {
-        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
-        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
-        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/activities/' . $new_name)) {
-            $image = 'images/activities/' . $new_name;
+        $uploadErr = '';
+        $uploaded = upload_dashboard_image($_FILES['image_file'], '../images/activities/', $uploadErr);
+        if ($uploaded) {
+            $image = preg_match('~^https?://~i', $uploaded) ? $uploaded : ('images/activities/' . $uploaded);
         }
     }
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
@@ -72,10 +72,10 @@ if (isset($_POST['update_service'])) {
     $icon = mysqli_real_escape_string($db, $_POST['icon'] ?: 'fa-cogs');
     $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
     if (!empty($_FILES['image_file']['name'])) {
-        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
-        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
-        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/activities/' . $new_name)) {
-            $image = 'images/activities/' . $new_name;
+        $uploadErr = '';
+        $uploaded = upload_dashboard_image($_FILES['image_file'], '../images/activities/', $uploadErr);
+        if ($uploaded) {
+            $image = preg_match('~^https?://~i', $uploaded) ? $uploaded : ('images/activities/' . $uploaded);
         }
     }
     $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
@@ -134,10 +134,10 @@ if (isset($_POST['save_product'])) {
     $icon_emoji = mysqli_real_escape_string($db, $_POST['icon_emoji'] ?: '⚡');
     $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
     if (!empty($_FILES['image_file']['name'])) {
-        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
-        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
-        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/instruments/' . $new_name)) {
-            $image = 'images/instruments/' . $new_name;
+        $uploadErr = '';
+        $uploaded = upload_dashboard_image($_FILES['image_file'], '../images/instruments/', $uploadErr);
+        if ($uploaded) {
+            $image = preg_match('~^https?://~i', $uploaded) ? $uploaded : ('images/instruments/' . $uploaded);
         }
     }
     $description = mysqli_real_escape_string($db, $_POST['description']);
@@ -165,10 +165,10 @@ if (isset($_POST['update_product'])) {
     $icon_emoji = mysqli_real_escape_string($db, $_POST['icon_emoji'] ?: '⚡');
     $image = mysqli_real_escape_string($db, $_POST['image'] ?? '');
     if (!empty($_FILES['image_file']['name'])) {
-        $ext = pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION);
-        $new_name = time() . '_' . rand(100, 999) . '.' . $ext;
-        if (move_uploaded_file($_FILES['image_file']['tmp_name'], '../images/instruments/' . $new_name)) {
-            $image = 'images/instruments/' . $new_name;
+        $uploadErr = '';
+        $uploaded = upload_dashboard_image($_FILES['image_file'], '../images/instruments/', $uploadErr);
+        if ($uploaded) {
+            $image = preg_match('~^https?://~i', $uploaded) ? $uploaded : ('images/instruments/' . $uploaded);
         }
     }
     $description = mysqli_real_escape_string($db, $_POST['description']);
@@ -423,8 +423,8 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
                             <div style="display: flex; gap: 14px;">
                                 <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(28,167,168,0.15); color: #2dd4bf; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow:hidden;">
-                                    <?php if (!empty($s['image']) && file_exists('../' . $s['image'])): ?>
-                                        <img src="../<?php echo htmlspecialchars($s['image']); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
+                                    <?php if (!empty($s['image']) && (preg_match('~^https?://~i', $s['image']) || file_exists('../' . $s['image']))): ?>
+                                        <img src="<?php echo htmlspecialchars(get_image_url($s['image'], '../')); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
                                     <?php else: ?>
                                         <i class="fa <?php echo htmlspecialchars($s['icon'] ?: 'fa-cogs'); ?>"></i>
                                     <?php endif; ?>
@@ -580,8 +580,8 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
                             <div style="display: flex; gap: 14px;">
                                 <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow:hidden;">
-                                    <?php if (!empty($p['image']) && file_exists('../' . $p['image'])): ?>
-                                        <img src="../<?php echo htmlspecialchars($p['image']); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
+                                    <?php if (!empty($p['image']) && (preg_match('~^https?://~i', $p['image']) || file_exists('../' . $p['image']))): ?>
+                                        <img src="<?php echo htmlspecialchars(get_image_url($p['image'], '../')); ?>" alt="img" style="width:100%; height:100%; object-fit:cover;">
                                     <?php else: ?>
                                         <?php echo htmlspecialchars($p['icon_emoji'] ?: '⚡'); ?>
                                     <?php endif; ?>

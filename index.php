@@ -50,7 +50,7 @@
 				?>
 				<div class="service-box activity-card">
 					<div class="service-icon">
-						<img src="images/activities/<?php echo htmlspecialchars($row_activities['image']); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>">
+						<img src="<?php echo htmlspecialchars(get_image_url($row_activities['image'], 'images/activities/')); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>">
 					</div>
 					<div class="service-content">
 						<h4><?php echo htmlspecialchars($row_activities['title']); ?></h4>

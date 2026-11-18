@@ -19,14 +19,15 @@ $msg = '';
 	//if save btn is clicked
 	if(isset($_POST['insert'])){
 
-		$title = $_POST['title'];
-		$sub_title = $_POST['sub_title'];
+		$title = mysqli_real_escape_string($db, $_POST['title']);
+		$sub_title = mysqli_real_escape_string($db, $_POST['sub_title']);
 
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/slider/', $uploadErr);
 		
-		if (move_uploaded_file($tmp_name, "../images/slider/".$new_name)) {
-			$sql = "INSERT INTO slider(image , title , sub_title) VALUES ('$new_name', '$title', '$sub_title')";
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql = "INSERT INTO slider(image , title , sub_title) VALUES ('$new_name_esc', '$title', '$sub_title')";
 
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Slider Image Added..';
@@ -37,6 +38,9 @@ $msg = '';
 				$alert_failed = '';
 			}
 
+		} else {
+			$msg = $uploadErr ?: 'Unable to Upload Image.';
+			$alert_failed = '';
 		}
 	}
 
@@ -81,37 +85,31 @@ $msg = '';
 			}
 
 		}else {
-			$tmp_name = $_FILES['image']['tmp_name'];
-			$new_name = time().".jpg";
+			$uploadErr = '';
+			$new_name = upload_dashboard_image($_FILES['image'], '../images/slider/', $uploadErr);
 
-			$result = mysqli_query($db, "SELECT * FROM slider WHERE id=$id");
-			$row = mysqli_fetch_array($result);
-			$image=$row['image'];
-			unlink("../images/slider/".$image);
+			if ($new_name) {
+				$result = mysqli_query($db, "SELECT * FROM slider WHERE id=$id");
+				$row = mysqli_fetch_array($result);
+				$old_image = $row['image'];
+				safe_delete_image($old_image, "../images/slider/");
 
-			if (move_uploaded_file($tmp_name, "../images/slider/".$new_name)) {
-
-				$sql_update = mysqli_query($db, "UPDATE slider SET image='$new_name', title='$title', sub_title = '$sub_title' WHERE id = $id ");
+				$new_name_esc = mysqli_real_escape_string($db, $new_name);
+				$title_esc = mysqli_real_escape_string($db, $title);
+				$sub_title_esc = mysqli_real_escape_string($db, $sub_title);
+				$sql_update = mysqli_query($db, "UPDATE slider SET image='$new_name_esc', title='$title_esc', sub_title = '$sub_title_esc' WHERE id = $id ");
 
 				if ($sql_update === TRUE) {
-
-                    $msg = 'Slider Information Updated.';  
-             $alert_success = '';
-                    
+					$msg = 'Slider Information Updated.';  
+					$alert_success = '';
 				} else {
-
-					 $msg = 'Unable to Update.';  
-             $alert_failed = '';
-
+					$msg = 'Unable to Update.';  
+					$alert_failed = '';
 				}
-
-			}else {
-
-				$msg = 'Unable to Update.';  
-             $alert_failed = '';
-
+			} else {
+				$msg = $uploadErr ?: 'Unable to Update.';  
+				$alert_failed = '';
 			}
-
 		}
 
 	}
@@ -125,7 +123,7 @@ $msg = '';
 		$result = mysqli_query($db, "SELECT * FROM slider WHERE id=$id");
 		$row = mysqli_fetch_array($result);
 		$image=$row['image'];
-		unlink("../images/slider/".$image);
+		safe_delete_image($image, "../images/slider/");
 		mysqli_query($db, "DELETE FROM slider WHERE id=$id");
 		
 		$msg = "Slider Image deleted" ;
@@ -171,7 +169,7 @@ $msg = '';
 			</div>
 
 <div class="col-md-4">
-    <img id="output" class="img-responsive" src="../images/slider/<?php echo $image; ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
+    <img id="output" class="img-responsive" src="<?php echo htmlspecialchars(get_image_url($image, '../images/slider/')); ?>" style="width:100%;height: 300px;" onerror="this.style.display='none'">
 </div>
 
 <div class="col-md-8">
@@ -231,7 +229,7 @@ $msg = '';
 				<?php while($row = mysqli_fetch_array($result)){ ?>
 				<div class="col-md-4" style="margin-bottom: 10px;">
 					<div class="col-md-12" style="padding: 10px; background-color: #EBEDEF;">
-						<img src="../images/slider/<?php echo $row['image']; ?>" class="img-responsive" alt="" style="width:100%; height: 150px;">
+						<img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/slider/')); ?>" class="img-responsive" alt="" style="width:100%; height: 150px; object-fit: cover;">
 						<div class="clearfix"></div>
 						<br>
 						<div class="col-md-6">

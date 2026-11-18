@@ -16,14 +16,15 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 		$info = mysqli_real_escape_string($db, $_POST['info']);
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/member/members/', $uploadErr);
 
-		if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
 			if ($link == '' || $link == null) {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name_esc', '$name', '$info', '$designation', '$phone', '$email', '$status')";
 			} else {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name_esc', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
 			}
 
 			if ($db->query($sql) === TRUE) {
@@ -31,12 +32,10 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 				$upload_ok = true;
 			} else {
 				$msg = 'Failed to save member to database. Try again.';
-				if (is_file("../images/member/members/".$new_name)) {
-					unlink("../images/member/members/".$new_name);
-				}
+				safe_delete_image($new_name, "../images/member/members/");
 			}
 		} else {
-			$msg = 'Could not save the uploaded photo.';
+			$msg = $uploadErr ?: 'Could not save the uploaded photo.';
 		}
 	}
 
@@ -74,14 +73,13 @@ include('navigation.php');
 		$info = addslashes($_POST['info']);
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 		
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/member/members/', $uploadErr);
 
-
-		if (move_uploaded_file($tmp_name, "../images/member/members/".$new_name)) {
-
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
 			if ($link=='' || $link == null) {
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, status) VALUES ('$new_name_esc', '$name', '$info', '$designation', '$phone', '$email', '$status')";
 
 				if ($db->query($sql) === TRUE) {
 
@@ -99,7 +97,7 @@ include('navigation.php');
 
 			}else {
 
-				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
+				$sql = "INSERT INTO members(image, name, info, designation, phone, email, link, status) VALUES ('$new_name_esc', '$name', '$info', '$designation', '$phone', '$email', '$link', '$status')";
 
 				if ($db->query($sql) === TRUE) {
 
@@ -117,8 +115,9 @@ include('navigation.php');
 
 			}
 
-				
-
+		} else {
+			$msg = $uploadErr ?: 'Failed to upload photo.';
+			$alert_failed = '';
 		}
 	
 	}
@@ -132,10 +131,7 @@ include('navigation.php');
 		$result = mysqli_query($db, "SELECT * FROM members WHERE id=$id");
 		if ($result && $row = mysqli_fetch_array($result)) {
 			$del_image = $row['image'];
-			$img_path = "../images/member/members/" . $del_image;
-			if ($del_image && is_file($img_path)) {
-				unlink($img_path);
-			}
+			safe_delete_image($del_image, "../images/member/members/");
 			mysqli_query($db, "DELETE FROM members WHERE id=$id");
 		}
 		// Redirect to clear the ?del= from URL and prevent double-delete on refresh
@@ -257,7 +253,7 @@ include('navigation.php');
 					$current_count++;
 				?>
 				<div class="member-card">
-					<img src="../images/member/members/<?php echo $row['image']; ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>">
+					<img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/member/members/')); ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>">
 					<div class="member-card__body">
 						<p class="member-card__name"><?php echo htmlspecialchars($row['name']); ?></p>
 						<span style="font-size:12px; color:#94a3b8;"><?php echo htmlspecialchars($row['designation']); ?></span>
@@ -284,7 +280,7 @@ include('navigation.php');
 					$alumni_count++;
 				?>
 				<div class="member-card" style="border-color:rgba(167,139,250,0.25);">
-					<img src="../images/member/members/<?php echo $row['image']; ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(25%);">
+					<img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/member/members/')); ?>" class="member-card__img" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(25%);">
 					<div class="member-card__body">
 						<p class="member-card__name"><?php echo htmlspecialchars($row['name']); ?></p>
 						<span style="font-size:12px; color:#94a3b8;"><?php echo htmlspecialchars($row['designation']); ?></span>

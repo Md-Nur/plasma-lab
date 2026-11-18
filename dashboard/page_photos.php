@@ -8,18 +8,20 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 	if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK || $_FILES['image']['size'] === 0) {
 		$msg = 'No file uploaded or upload error. Please try again.';
 	} else {
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
-		if (move_uploaded_file($tmp_name, "../images/gallary/photos/".$new_name)) {
-			$sql = "INSERT INTO photos(image) VALUES ('$new_name')";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/gallary/photos/', $uploadErr);
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql = "INSERT INTO photos(image) VALUES ('$new_name_esc')";
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Image uploaded successfully.';
 				$upload_ok = true;
 			} else {
 				$msg = 'Could not save to database. Please try again.';
+				safe_delete_image($new_name, "../images/gallary/photos/");
 			}
 		} else {
-			$msg = 'Could not upload file. Please try again.';
+			$msg = $uploadErr ?: 'Could not upload file. Please try again.';
 		}
 	}
 
@@ -42,13 +44,7 @@ $id = 0;
 
 // Helper: safely delete a photo file from the server
 function deletePhotoFile($imageName) {
-	if (empty($imageName) || $imageName === 'demo_image.png') {
-		return;
-	}
-	$imagePath = __DIR__ . '/../images/gallary/photos/' . basename($imageName);
-	if (is_file($imagePath)) {
-		unlink($imagePath);
-	}
+	safe_delete_image($imageName, __DIR__ . '/../images/gallary/photos/');
 }
 
 //if save btn is clicked
@@ -60,10 +56,11 @@ if(isset($_POST['insert'])){
 		$msg = 'No file uploaded or upload error. Please try again.';
 		$alert_failed = '';
 	} else {
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
-		if (move_uploaded_file($tmp_name, "../images/gallary/photos/".$new_name)) {
-			$sql = "INSERT INTO photos(image) VALUES ('$new_name')";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/gallary/photos/', $uploadErr);
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql = "INSERT INTO photos(image) VALUES ('$new_name_esc')";
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Image uploaded successfully.';
 				$alert_success = '';
@@ -71,9 +68,10 @@ if(isset($_POST['insert'])){
 			} else {
 				$msg = 'Could not save to database. Please try again.';
 				$alert_failed = '';
+				safe_delete_image($new_name, "../images/gallary/photos/");
 			}
 		} else {
-			$msg = 'Could not upload file. Please try again.';
+			$msg = $uploadErr ?: 'Could not upload file. Please try again.';
 			$alert_failed = '';
 		}
 	}
@@ -143,7 +141,7 @@ $result = mysqli_query($db, "SELECT * FROM photos");
              <div class="photos-grid">
              <?php while($row = mysqli_fetch_array($result)){ ?>
              <div class="photo-card">
-                  <img src="../images/gallary/photos/<?php echo htmlspecialchars($row['image']); ?>" alt="Gallery photo">
+                  <img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/gallary/photos/')); ?>" alt="Gallery photo">
                   <div class="card-actions">
                       <a class="label label-danger" href="page_photos.php?del=<?php echo $row['id']; ?>" onclick="return deleletconfig()" title="Delete">
                         <i class="fa fa-trash-o fa-lg"></i>

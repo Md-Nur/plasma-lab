@@ -14,28 +14,27 @@ if(isset($_POST['insert']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strto
 		$link = mysqli_real_escape_string($db, $_POST['link'] ?? '');
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/member/students/', $uploadErr);
 
-		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
-			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name', '$name', '$session', '$email', '$link', '$status')";
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name_esc', '$name', '$session', '$email', '$link', '$status')";
 			if ($db->query($sql) === TRUE) {
 				$msg = 'Student added successfully.';
 				$upload_ok = true;
 			} else {
-				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name_esc', '$name', '$session', '$email')";
 				if ($db->query($sql_fallback) === TRUE) {
 					$msg = 'Student added successfully.';
 					$upload_ok = true;
 				} else {
 					$msg = 'Failed to save to database. Try again.';
-					if (is_file("../images/member/students/".$new_name)) {
-						unlink("../images/member/students/".$new_name);
-					}
+					safe_delete_image($new_name, "../images/member/students/");
 				}
 			}
 		} else {
-			$msg = 'Could not save the uploaded photo.';
+			$msg = $uploadErr ?: 'Could not save the uploaded photo.';
 		}
 	}
 
@@ -68,12 +67,12 @@ include('navigation.php');
 		$link = $_POST['link'] ?? '';
 		$status = in_array($_POST['status'] ?? '', ['current','alumni']) ? $_POST['status'] : 'current';
 		
-		$tmp_name = $_FILES['image']['tmp_name'];
-		$new_name = time().".jpg";
+		$uploadErr = '';
+		$new_name = upload_dashboard_image($_FILES['image'], '../images/member/students/', $uploadErr);
 
-		if (move_uploaded_file($tmp_name, "../images/member/students/".$new_name)) {
-
-			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name', '$name', '$session', '$email', '$link', '$status')";
+		if ($new_name) {
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql = "INSERT INTO students(image, name, session, email, link, status) VALUES ('$new_name_esc', '$name', '$session', '$email', '$link', '$status')";
 
 			if ($db->query($sql) === TRUE) {
 
@@ -83,7 +82,7 @@ include('navigation.php');
 
 			} else {
 
-				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name', '$name', '$session', '$email')";
+				$sql_fallback = "INSERT INTO students(image, name, session, email) VALUES ('$new_name_esc', '$name', '$session', '$email')";
 
 				if ($db->query($sql_fallback) === TRUE) {
 
@@ -101,6 +100,9 @@ include('navigation.php');
 
 			}
 
+		} else {
+			$msg = $uploadErr ?: 'Failed to upload photo.';
+			$alert_failed = '';
 		}
 
 	}
@@ -116,8 +118,8 @@ include('navigation.php');
 	
 		$result = mysqli_query($db, "SELECT * FROM students WHERE id=$id");
 		$row = mysqli_fetch_array($result);
-		$image=$row['image'];
-		unlink("../images/member/students/".$image);
+		$image = $row['image'];
+		safe_delete_image($image, "../images/member/students/");
 		mysqli_query($db, "DELETE FROM students WHERE id=$id");
 		
 		$msg = 'Member Deleted..';
@@ -222,7 +224,7 @@ include('navigation.php');
 			 
 	<?php while($row = mysqli_fetch_array($result_current)){ ?>
 	<div class="student-card">
-		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>">
+		<img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/member/students/')); ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>">
 		<div class="card-name"><?php echo htmlspecialchars($row['name']); ?></div>
 		<div class="card-actions">
 			<a href="edit_student.php?id=<?php echo $row['id']; ?>" class="btn btn-success">Edit</a>
@@ -242,7 +244,7 @@ include('navigation.php');
 			  $alumni_count++;
 		  ?>
 	<div class="student-card" style="border-color:rgba(167,139,250,0.25);">
-		<img src="../images/member/students/<?php echo $row['image']; ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(30%);">
+		<img src="<?php echo htmlspecialchars(get_image_url($row['image'], '../images/member/students/')); ?>" class="img-responsive" alt="<?php echo htmlspecialchars($row['name']); ?>" style="filter:grayscale(30%);">
 		<div class="card-name"><?php echo htmlspecialchars($row['name']); ?></div>
 		<div class="card-actions">
 			<a href="edit_student.php?id=<?php echo $row['id']; ?>" class="btn btn-success">Edit</a>

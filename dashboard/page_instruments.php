@@ -25,83 +25,29 @@ function uploadInstrumentImage($fileInputName, &$errorMessage) {
 	}
 
 	if ($_FILES[$fileInputName]['error'] !== UPLOAD_ERR_OK) {
-		switch ($_FILES[$fileInputName]['error']) {
-			case UPLOAD_ERR_INI_SIZE:
-				$errorMessage = 'Photo upload failed: The file size exceeds the upload_max_filesize directive in php.ini.';
-				break;
-			case UPLOAD_ERR_FORM_SIZE:
-				$errorMessage = 'Photo upload failed: The file exceeds the MAX_FILE_SIZE limit in the HTML form.';
-				break;
-			case UPLOAD_ERR_PARTIAL:
-				$errorMessage = 'Photo upload failed: The file was only partially uploaded.';
-				break;
-			case UPLOAD_ERR_NO_TMP_DIR:
-				$errorMessage = 'Photo upload failed: Temporary directory is missing in PHP configuration.';
-				break;
-			case UPLOAD_ERR_CANT_WRITE:
-				$errorMessage = 'Photo upload failed: Failed to write file to disk. Check disk space or folder permissions.';
-				break;
-			case UPLOAD_ERR_EXTENSION:
-				$errorMessage = 'Photo upload failed: A PHP extension stopped the file upload.';
-				break;
-			default:
-				$errorMessage = 'Photo upload failed: Unknown PHP upload error (Code: ' . $_FILES[$fileInputName]['error'] . ').';
-				break;
-		}
+		$errorMessage = 'Photo upload failed. Please try again.';
 		return false;
 	}
 
 	$tmp_name = $_FILES[$fileInputName]['tmp_name'];
-	$imageInfo = getimagesize($tmp_name);
+	$imageInfo = @getimagesize($tmp_name);
 	if ($imageInfo === false) {
 		$errorMessage = 'Only image files are allowed.';
 		return false;
 	}
 
-	$allowedTypes = array(
-		IMAGETYPE_JPEG => 'jpg',
-		IMAGETYPE_PNG => 'png',
-		IMAGETYPE_GIF => 'gif'
-	);
-
-	if (defined('IMAGETYPE_WEBP')) {
-		$allowedTypes[IMAGETYPE_WEBP] = 'webp';
-	}
-
-	if (!isset($allowedTypes[$imageInfo[2]])) {
-		$errorMessage = 'Only JPG, PNG, GIF, and WEBP photos are supported.';
-		return false;
-	}
-
 	$uploadDir = __DIR__ . '/../images/instruments/';
-	if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
-		$errorMessage = 'Instrument photo folder is missing and could not be created.';
+	$uploaded = upload_dashboard_image($_FILES[$fileInputName], $uploadDir, $errorMessage);
+	if (!$uploaded) {
+		$errorMessage = $errorMessage ?: 'Could not save the uploaded photo.';
 		return false;
 	}
 
-	if (!is_writable($uploadDir)) {
-		$errorMessage = 'Instrument photo directory is not writeable. Current permissions: ' . substr(sprintf('%o', fileperms($uploadDir)), -4);
-		return false;
-	}
-
-	$new_name = time() . '_' . mt_rand(1000, 9999) . '.' . $allowedTypes[$imageInfo[2]];
-	if (!move_uploaded_file($tmp_name, $uploadDir . $new_name)) {
-		$errorMessage = 'Could not save the uploaded photo. Check destination directory permissions: ' . $uploadDir;
-		return false;
-	}
-
-	return $new_name;
+	return $uploaded;
 }
 
 function deleteInstrumentImage($imageName) {
-	if (empty($imageName) || $imageName === 'demo_image.png') {
-		return;
-	}
-
-	$imagePath = __DIR__ . '/../images/instruments/' . basename($imageName);
-	if (is_file($imagePath)) {
-		unlink($imagePath);
-	}
+	safe_delete_image($imageName, __DIR__ . '/../images/instruments/');
 }
 
 // If save btn is clicked
@@ -399,12 +345,12 @@ if(isset($_GET['edit'])) {
             <div class="col-md-4">
                 <h5 style="font-weight: 700; margin-bottom: 10px; color: #475569;">Instrument Image Preview</h5>
                 <?php
-                $preview_src = '../images/instruments/' . htmlspecialchars($image);
+                $preview_src = get_image_url($image, '../images/instruments/');
                 if (empty($image) || $image === 'demo_image.png') {
                     $preview_src = '../images/activities/demo_image.png'; // Fallback to activities demo image
                 }
                 ?>
-                <img id="output" class="img-responsive instrument-preview-image" src="<?php echo $preview_src; ?>" alt="Instrument photo preview" onerror="this.src='../images/activities/demo_image.png'">
+                <img id="output" class="img-responsive instrument-preview-image" src="<?php echo htmlspecialchars($preview_src); ?>" alt="Instrument photo preview" onerror="this.src='../images/activities/demo_image.png'">
             </div>
 
             <div class="col-md-8">
@@ -496,7 +442,7 @@ if(isset($_GET['edit'])) {
                     <div class="instrument-admin-card">
                         <div class="service-icon">
                             <span class="status-badge-overlay <?php echo $badge_class; ?>"><?php echo $badge_label; ?></span>
-                            <img src="../images/instruments/<?php echo htmlspecialchars($row_inst['image']); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" class="instrument-admin-image" onerror="this.src='../images/activities/demo_image.png'">
+                            <img src="<?php echo htmlspecialchars(get_image_url($row_inst['image'], '../images/instruments/')); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" class="instrument-admin-image" onerror="this.src='../images/activities/demo_image.png'">
                         </div>
                         <div class="card-details-wrapper">
                             <h3><?php echo htmlspecialchars($row_inst['name']); ?></h3>

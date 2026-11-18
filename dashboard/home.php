@@ -1,7 +1,7 @@
 <div class="fb-profile-block">
 
 		<div class="fb-profile-block-thumb"><img src="assets/images/home/aa.jpg" alt="" title=""></div>
-		<div class="profile-img"><a href="#"><img src="assets/images/admin/<?php echo $admin_image; ?>" alt="" title=""></a></div>
+		<div class="profile-img"><a href="#"><img src="<?php echo htmlspecialchars(get_image_url($admin_image, 'assets/images/admin/')); ?>" alt="" title=""></a></div>
 		<div class="profile-name">
 		<h2><?php echo $admin_fullname; ?> <span class=""><a href="profile.php" class="btn btn-info">Edit Profile</a></span></h2>
 		</div>

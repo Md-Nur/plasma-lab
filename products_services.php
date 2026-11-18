@@ -575,9 +575,9 @@ if ($products_res && mysqli_num_rows($products_res) > 0) {
 		<div class="services-grid">
 			<?php foreach ($services_data as $srv): ?>
 			<div class="service-card">
-				<?php if (!empty($srv['image']) && file_exists($srv['image'])): ?>
+				<?php if (!empty($srv['image']) && (preg_match('~^https?://~i', $srv['image']) || file_exists($srv['image']))): ?>
 					<div class="service-card-image-wrap" style="height: 180px; margin: -32px -28px 20px -28px; overflow: hidden; position: relative;">
-						<img src="<?php echo htmlspecialchars($srv['image']); ?>" alt="<?php echo htmlspecialchars($srv['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;">
+						<img src="<?php echo htmlspecialchars(get_image_url($srv['image'])); ?>" alt="<?php echo htmlspecialchars($srv['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;">
 						<div style="position: absolute; bottom: 12px; left: 16px; width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--lab-teal-dark);">
 							<i class="fa <?php echo htmlspecialchars($srv['icon'] ?: 'fa-cogs'); ?>"></i>
 						</div>
@@ -665,8 +665,8 @@ if ($products_res && mysqli_num_rows($products_res) > 0) {
 			?>
 			<div class="product-card">
 				<div class="product-card-banner <?php echo $b_theme; ?>-bg">
-					<?php if (!empty($prd['image']) && file_exists($prd['image'])): ?>
-						<img src="<?php echo htmlspecialchars($prd['image']); ?>" alt="<?php echo htmlspecialchars($prd['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+					<?php if (!empty($prd['image']) && (preg_match('~^https?://~i', $prd['image']) || file_exists($prd['image']))): ?>
+						<img src="<?php echo htmlspecialchars(get_image_url($prd['image'])); ?>" alt="<?php echo htmlspecialchars($prd['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
 					<?php else: ?>
 						<?php echo htmlspecialchars($prd['icon_emoji'] ?: '⚡'); ?>
 					<?php endif; ?>

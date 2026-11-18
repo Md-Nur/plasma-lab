@@ -26,51 +26,24 @@ $msg = '';
 		}
 
 		$tmp_name = $_FILES[$fileInputName]['tmp_name'];
-		$imageInfo = getimagesize($tmp_name);
+		$imageInfo = @getimagesize($tmp_name);
 		if ($imageInfo === false) {
 			$errorMessage = 'Only image files are allowed.';
 			return false;
 		}
 
-		$allowedTypes = array(
-			IMAGETYPE_JPEG => 'jpg',
-			IMAGETYPE_PNG => 'png',
-			IMAGETYPE_GIF => 'gif'
-		);
-
-		if (defined('IMAGETYPE_WEBP')) {
-			$allowedTypes[IMAGETYPE_WEBP] = 'webp';
-		}
-
-		if (!isset($allowedTypes[$imageInfo[2]])) {
-			$errorMessage = 'Only JPG, PNG, GIF, and WEBP photos are supported.';
-			return false;
-		}
-
 		$uploadDir = __DIR__ . '/../images/activities/';
-		if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
-			$errorMessage = 'Activity photo folder is missing and could not be created.';
+		$uploaded = upload_dashboard_image($_FILES[$fileInputName], $uploadDir, $errorMessage);
+		if (!$uploaded) {
+			$errorMessage = $errorMessage ?: 'Could not save the uploaded photo.';
 			return false;
 		}
 
-		$new_name = time() . '_' . mt_rand(1000, 9999) . '.' . $allowedTypes[$imageInfo[2]];
-		if (!move_uploaded_file($tmp_name, $uploadDir . $new_name)) {
-			$errorMessage = 'Could not save the uploaded photo.';
-			return false;
-		}
-
-		return $new_name;
+		return $uploaded;
 	}
 
 	function deleteActivityImage($imageName) {
-		if (empty($imageName) || $imageName === 'demo_image.png') {
-			return;
-		}
-
-		$imagePath = __DIR__ . '/../images/activities/' . basename($imageName);
-		if (is_file($imagePath)) {
-			unlink($imagePath);
-		}
+		safe_delete_image($imageName, __DIR__ . '/../images/activities/');
 	}
 	
 	
@@ -246,7 +219,7 @@ $msg = '';
 			</div>
 
 <div class="col-md-4">
-    <img id="output" class="img-responsive activity-preview-image" src="../images/activities/<?php echo htmlspecialchars($image); ?>" alt="Activity photo preview" onerror="this.style.display='none'">
+    <img id="output" class="img-responsive activity-preview-image" src="<?php echo htmlspecialchars(get_image_url($image, '../images/activities/')); ?>" alt="Activity photo preview" onerror="this.style.display='none'">
 </div>
 
 <div class="col-md-8">
@@ -309,7 +282,7 @@ $msg = '';
 	        <div class="col-md-4 col-lg-4 col-sm-6 ">
 	            <div class="service-box activity-admin-card">
 	                <div class="service-icon ">
-	                    <img src="../images/activities/<?php echo htmlspecialchars($row_activities['image']); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>" class="activity-admin-image">
+	                    <img src="<?php echo htmlspecialchars(get_image_url($row_activities['image'], '../images/activities/')); ?>" alt="<?php echo htmlspecialchars($row_activities['title']); ?>" class="activity-admin-image">
 	                </div>
 	                <div class="service-content" style="background-image:url(../images/back4.jpg);">
 	                    <h3><?php echo htmlspecialchars($row_activities['title']); ?></h3>

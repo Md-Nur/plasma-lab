@@ -36,7 +36,7 @@
 				<?php while($row_areas = mysqli_fetch_array($result_areas)){ ?>
 				<div class="service-box">
 					<div class="service-icon">
-						<img src="images/areas/<?php echo $row_areas['image']; ?>" alt="<?php echo htmlspecialchars($row_areas['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+						<img src="<?php echo htmlspecialchars(get_image_url($row_areas['image'], 'images/areas/')); ?>" alt="<?php echo htmlspecialchars($row_areas['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
 					</div>
 					<div class="service-content" style="background-color: #fff;">
 						<h3 style="color: var(--lab-plum);">
