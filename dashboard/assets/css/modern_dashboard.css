@@ -1159,8 +1159,10 @@ select:focus {
   color: #a5b4fc !important;
 }
 
-/* Accessible styling to hide default browser file input buttons */
-input[type="file"] {
+/* Accessible styling to hide default browser file input buttons inside custom upload components */
+.photo_post input[type="file"],
+input[type="file"].sr-only,
+input[type="file"].custom-file-hidden {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;

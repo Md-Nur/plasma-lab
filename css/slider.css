@@ -125,32 +125,12 @@
  ----------------------------------------*/
  @media only screen and (max-width: 825px) {
   .slider-wrapper {
-    height: 280px;
+    height: 320px;
   }
  }
 
  @media only screen and (max-width: 535px) {
   .slider-wrapper {
-    height: 220px;
-  }
-  
-  .slider-wrapper .caption {
-    padding: 10px 14px;
-  }
-
-  .slider-wrapper h2 {
-    font-size: 16px;
-    margin-bottom: 3px;
-  }
-
-  .slider-wrapper p {
-    font-size: 12px;
-    line-height: 1.3em;
-  }
- }
-
- @media only screen and (max-width: 410px) {
-  .slider-wrapper {
-    height: 190px;
+    height: clamp(230px, 60vw, 300px);
   }
  }

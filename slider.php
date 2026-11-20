@@ -5,8 +5,8 @@
 			<div class="tittle-style"></div>
 		</div>
 
-		<div class="welcome-container" style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 30px; align-items: stretch;">
-			<div id="slider" style="flex: 1 1 500px; min-width: 0;">
+		<div class="welcome-container">
+			<div id="slider">
 				<ul class="slider-wrapper">
 					<?php 
 					$resultt = mysqli_query($db, "SELECT * FROM slider ORDER BY id DESC");
@@ -26,13 +26,13 @@
 				<ul id="control-buttons" class="control-buttons"></ul>
 			</div>
 
-			<div class="welcome-info" style="flex: 1 1 400px; display: flex; flex-direction: column;">
-				<div class="info-content" style="background: var(--lab-card); border: 1px solid var(--lab-line); border-radius: 8px; box-shadow: var(--lab-shadow); padding: 30px; height: 100%; display: flex; align-items: center;">
+			<div class="welcome-info">
+				<div class="info-content">
 					<?php 
 					$result_about = mysqli_query($db, "SELECT * FROM about");
 					$row_about = mysqli_fetch_array($result_about);
 					?>
-					<p style="margin: 0; font-size: 16px; line-height: 1.8; color: var(--lab-muted); text-align: justify;">
+					<p>
 						<?php echo $row_about ? htmlspecialchars($row_about['about']) : ''; ?>
 					</p>
 				</div>

@@ -176,7 +176,7 @@ if (!function_exists('get_image_url')) {
      * If the value is a local relative filename, it prefixes the local folder.
      *
      * @param string $image Database image value (URL or filename)
-     * @param string $localFolder Optional folder prefix for local images (e.g. 'images/member/members/')
+     * @param string $localFolder Optional folder prefix for local images (e.g. 'images/member/members/' or '../images/member/members/')
      * @return string Valid image src URL
      */
     function get_image_url($image, $localFolder = '') {
@@ -191,16 +191,24 @@ if (!function_exists('get_image_url')) {
             return $image;
         }
 
-        if (!empty($localFolder)) {
-            $localFolder = rtrim($localFolder, '/') . '/';
-            // Avoid duplicate prefixing if already prefixed
-            if (strpos($image, $localFolder) === 0) {
-                return $image;
-            }
-            return $localFolder . ltrim($image, '/');
+        // Determine if context is within dashboard (starts with '../')
+        $isDashboard = (!empty($localFolder) && strpos($localFolder, '../') === 0);
+
+        // Normalize image path by removing any leading '../', './', or '/'
+        $cleanImage = preg_replace('~^(\.\./|\./|/)+~', '', $image);
+
+        // If image already has a relative path like 'images/...'
+        if (strpos($cleanImage, 'images/') === 0) {
+            return ($isDashboard ? '../' : '') . $cleanImage;
         }
 
-        return $image;
+        // Otherwise it's a bare filename like 'demo_image.png' or '1726478916.jpg'
+        if (!empty($localFolder)) {
+            $localFolder = rtrim($localFolder, '/') . '/';
+            return $localFolder . basename($cleanImage);
+        }
+
+        return ($isDashboard ? '../' : '') . $cleanImage;
     }
 }
 
@@ -219,11 +227,12 @@ if (!function_exists('safe_delete_image')) {
             // Hosted externally (e.g. ImgBB), no local file to unlink
             return;
         }
-        if ($image === 'demo_image.png' || $image === 'admin.jpg') {
+        $base = basename($image);
+        if ($base === 'demo_image.png' || $base === 'admin.jpg') {
             return;
         }
 
-        $fullPath = rtrim($localFolder, '/') . '/' . basename($image);
+        $fullPath = rtrim($localFolder, '/') . '/' . $base;
         if (is_file($fullPath)) {
             @unlink($fullPath);
         }

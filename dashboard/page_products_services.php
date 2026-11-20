@@ -356,13 +356,29 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                         <textarea name="description" rows="4" class="form-control" placeholder="Describe the scientific/analytical service offered..." required style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;"><?php echo htmlspecialchars($s_description); ?></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label style="color: #cbd5e1; font-size: 13px;">Service Image (Path or Upload)</label>
-                        <input type="text" name="image" class="form-control" placeholder="e.g. images/activities/Consulting.png" value="<?php echo htmlspecialchars($s_image); ?>" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff; margin-bottom: 6px;">
-                        <input type="file" name="image_file" class="form-control" accept="image/*" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
-                        <?php if (!empty($s_image)): ?>
-                            <small style="color: #2dd4bf;">Current: <?php echo htmlspecialchars($s_image); ?></small>
-                        <?php endif; ?>
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label style="color: #cbd5e1; font-size: 13px; font-weight: 600; display: block; margin-bottom: 8px;">Service Image</label>
+                        <input type="hidden" name="image" value="<?php echo htmlspecialchars($s_image); ?>">
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                            <!-- Preview Box -->
+                            <div style="position: relative; width: 72px; height: 72px; border-radius: 12px; overflow: hidden; border: 1px dashed rgba(255,255,255,0.2); background: rgba(0,0,0,0.25); flex-shrink: 0;">
+                                <img id="service_preview" src="<?php echo !empty($s_image) ? htmlspecialchars(get_image_url($s_image, '../')) : ''; ?>" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; <?php echo empty($s_image) ? 'display: none;' : ''; ?>">
+                                <div id="service_placeholder" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); <?php echo !empty($s_image) ? 'display: none;' : ''; ?>">
+                                    <i class="fa fa-image fa-lg"></i>
+                                </div>
+                            </div>
+                            <!-- Upload Button & File Name -->
+                            <div style="flex: 1; min-width: 0;">
+                                <div class="photo_post" style="margin-bottom: 6px;">
+                                    <input type="file" name="image_file" id="service_image_file" accept="image/jpeg,image/png,image/gif,image/webp" onchange="previewServiceImage(event)">
+                                    <label for="service_image_file"><i class="fa fa-upload" style="margin-right: 5px;"></i>Upload Image</label>
+                                </div>
+                                <span id="service_fileNameDisplay" style="display: block; color: #cbd5e1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <?php echo !empty($s_image) ? ('Current: ' . htmlspecialchars(basename($s_image))) : 'No file chosen'; ?>
+                                </span>
+                                <span style="display: block; color: var(--text-muted, #94a3b8); font-size: 11px; margin-top: 3px;">Supports JPG, PNG, GIF, WEBP</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -494,13 +510,29 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
                         <input type="text" name="name" class="form-control" placeholder="e.g. Atmospheric Pressure Plasma Jet (APPJ)" value="<?php echo htmlspecialchars($p_name); ?>" required style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
                     </div>
 
-                    <div class="form-group">
-                        <label style="color: #cbd5e1; font-size: 13px;">Product Image (Path or Upload)</label>
-                        <input type="text" name="image" class="form-control" placeholder="e.g. images/instruments/Film Deposition Using Plasma.png" value="<?php echo htmlspecialchars($p_image); ?>" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff; margin-bottom: 6px;">
-                        <input type="file" name="image_file" class="form-control" accept="image/*" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.12); color: #fff;">
-                        <?php if (!empty($p_image)): ?>
-                            <small style="color: #2dd4bf;">Current: <?php echo htmlspecialchars($p_image); ?></small>
-                        <?php endif; ?>
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label style="color: #cbd5e1; font-size: 13px; font-weight: 600; display: block; margin-bottom: 8px;">Product Image</label>
+                        <input type="hidden" name="image" value="<?php echo htmlspecialchars($p_image); ?>">
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                            <!-- Preview Box -->
+                            <div style="position: relative; width: 72px; height: 72px; border-radius: 12px; overflow: hidden; border: 1px dashed rgba(255,255,255,0.2); background: rgba(0,0,0,0.25); flex-shrink: 0;">
+                                <img id="product_preview" src="<?php echo !empty($p_image) ? htmlspecialchars(get_image_url($p_image, '../')) : ''; ?>" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; <?php echo empty($p_image) ? 'display: none;' : ''; ?>">
+                                <div id="product_placeholder" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); <?php echo !empty($p_image) ? 'display: none;' : ''; ?>">
+                                    <i class="fa fa-image fa-lg"></i>
+                                </div>
+                            </div>
+                            <!-- Upload Button & File Name -->
+                            <div style="flex: 1; min-width: 0;">
+                                <div class="photo_post" style="margin-bottom: 6px;">
+                                    <input type="file" name="image_file" id="product_image_file" accept="image/jpeg,image/png,image/gif,image/webp" onchange="previewProductImage(event)">
+                                    <label for="product_image_file"><i class="fa fa-upload" style="margin-right: 5px;"></i>Upload Image</label>
+                                </div>
+                                <span id="product_fileNameDisplay" style="display: block; color: #cbd5e1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <?php echo !empty($p_image) ? ('Current: ' . htmlspecialchars(basename($p_image))) : 'No file chosen'; ?>
+                                </span>
+                                <span style="display: block; color: var(--text-muted, #94a3b8); font-size: 11px; margin-top: 3px;">Supports JPG, PNG, GIF, WEBP</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -631,5 +663,53 @@ $products_count = $products_list ? mysqli_num_rows($products_list) : 0;
     <?php endif; ?>
 
 </div>
+
+<script>
+function previewServiceImage(event) {
+    var file = event.target.files && event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = document.getElementById('service_preview');
+            var ph = document.getElementById('service_placeholder');
+            if (img) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            if (ph) {
+                ph.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+        var fn = document.getElementById('service_fileNameDisplay');
+        if (fn) {
+            fn.textContent = file.name;
+        }
+    }
+}
+
+function previewProductImage(event) {
+    var file = event.target.files && event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = document.getElementById('product_preview');
+            var ph = document.getElementById('product_placeholder');
+            if (img) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            if (ph) {
+                ph.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+        var fn = document.getElementById('product_fileNameDisplay');
+        if (fn) {
+            fn.textContent = file.name;
+        }
+    }
+}
+</script>
 
 <?php include('bottom.php'); ?>

@@ -60,7 +60,8 @@ if(isset($_POST['submit'])){
 	$new_name = uploadInstrumentImage('image', $msg);
 	
 	if ($new_name !== false) {
-		$query = "INSERT INTO instruments (image, name, description, specifications, status) VALUES ('$new_name', '$name', '$description', '$specifications', '$status')";
+		$new_name_esc = mysqli_real_escape_string($db, $new_name);
+		$query = "INSERT INTO instruments (image, name, description, specifications, status) VALUES ('$new_name_esc', '$name', '$description', '$specifications', '$status')";
 
 		if ($db->query($query) === TRUE) {
 			$msg = 'Instrument Added successfully.';
@@ -121,7 +122,8 @@ if(isset($_POST['update'])){
 		$old_image = $row['image'];
 
 		if ($new_name !== false) {
-			$sql_update = mysqli_query($db, "UPDATE instruments SET image='$new_name', name='$name', description='$description', specifications='$specifications', status='$status' WHERE id = $id");
+			$new_name_esc = mysqli_real_escape_string($db, $new_name);
+			$sql_update = mysqli_query($db, "UPDATE instruments SET image='$new_name_esc', name='$name', description='$description', specifications='$specifications', status='$status' WHERE id = $id");
 
 			if ($sql_update === TRUE) {
 				deleteInstrumentImage($old_image);
@@ -188,10 +190,10 @@ if(isset($_GET['edit'])) {
 <style>
 .instrument-preview-image {
   aspect-ratio: 4 / 3 !important;
-  background: #f4f7fb !important;
-  border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12) !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25) !important;
   height: auto !important;
   max-height: 280px !important;
   object-fit: cover !important;
@@ -199,37 +201,44 @@ if(isset($_GET['edit'])) {
 }
 
 .instrument-admin-card {
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   overflow: hidden !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border: 1px solid var(--border-color, #e2e8f0);
-  background: #ffffff;
-  margin-bottom: 30px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08)) !important;
+  background: var(--card-bg, #1e293b) !important;
+  margin-bottom: 30px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .instrument-admin-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  transform: translateY(-4px) !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
 }
 
 .instrument-admin-card .service-icon {
+  width: 100% !important;
+  height: 200px !important;
   aspect-ratio: 16 / 10 !important;
-  height: auto !important;
   overflow: hidden !important;
-  position: relative;
+  position: relative !important;
+  border: none !important;
+  background: rgba(0, 0, 0, 0.3) !important;
 }
 
 .instrument-admin-image {
   display: block !important;
-  height: 100% !important;
-  object-fit: cover !important;
   width: 100% !important;
-  transition: transform 0.3s ease;
+  height: 100% !important;
+  min-height: 200px !important;
+  object-fit: cover !important;
+  transition: transform 0.3s ease !important;
 }
 
 .instrument-admin-card:hover .instrument-admin-image {
-  transform: scale(1.05);
+  transform: scale(1.05) !important;
 }
 
 .status-badge-overlay {
@@ -260,49 +269,49 @@ if(isset($_GET['edit'])) {
 }
 
 .card-details-wrapper {
-  padding: 16px 20px 20px;
+  padding: 18px 20px 20px !important;
 }
 
 .card-details-wrapper h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-  color: var(--text-color, #1e293b);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin: 0 0 10px 0 !important;
+  color: #fff !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .card-details-wrapper p {
-  font-size: 13px;
-  color: var(--text-muted, #64748b);
-  line-height: 1.6;
-  height: 60px;
-  overflow: hidden;
+  font-size: 13px !important;
+  color: var(--text-muted, #94a3b8) !important;
+  line-height: 1.6 !important;
+  height: 60px !important;
+  overflow: hidden !important;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  margin-bottom: 15px;
+  margin-bottom: 15px !important;
 }
 
 .card-details-wrapper .specs-block {
-  background: #f8fafc;
-  padding: 8px 12px;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25) !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
   font-family: monospace;
-  font-size: 11px;
-  color: #475569;
-  height: 60px;
-  overflow: hidden;
-  margin-bottom: 15px;
-  border: 1px dashed #e2e8f0;
+  font-size: 11px !important;
+  color: #cbd5e1 !important;
+  height: 70px !important;
+  overflow-y: auto !important;
+  margin-bottom: 15px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .instrument-card-actions {
-  display: flex;
-  gap: 10px;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 15px;
+  display: flex !important;
+  gap: 10px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-top: 15px !important;
 }
 
 .instrument-card-actions a {
@@ -343,14 +352,14 @@ if(isset($_GET['edit'])) {
 			</div>
 
             <div class="col-md-4">
-                <h5 style="font-weight: 700; margin-bottom: 10px; color: #475569;">Instrument Image Preview</h5>
+                <h5 style="font-weight: 700; margin-bottom: 10px; color: #cbd5e1;">Instrument Image Preview</h5>
                 <?php
                 $preview_src = get_image_url($image, '../images/instruments/');
                 if (empty($image) || $image === 'demo_image.png') {
-                    $preview_src = '../images/activities/demo_image.png'; // Fallback to activities demo image
+                    $preview_src = '../images/instruments/demo_image.png';
                 }
                 ?>
-                <img id="output" class="img-responsive instrument-preview-image" src="<?php echo htmlspecialchars($preview_src); ?>" alt="Instrument photo preview" onerror="this.src='../images/activities/demo_image.png'">
+                <img id="output" class="img-responsive instrument-preview-image" src="<?php echo htmlspecialchars($preview_src); ?>" alt="Instrument photo preview" onerror="this.onerror=null; this.src='../images/instruments/demo_image.png';">
             </div>
 
             <div class="col-md-8">
@@ -442,7 +451,7 @@ if(isset($_GET['edit'])) {
                     <div class="instrument-admin-card">
                         <div class="service-icon">
                             <span class="status-badge-overlay <?php echo $badge_class; ?>"><?php echo $badge_label; ?></span>
-                            <img src="<?php echo htmlspecialchars(get_image_url($row_inst['image'], '../images/instruments/')); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" class="instrument-admin-image" onerror="this.src='../images/activities/demo_image.png'">
+                            <img src="<?php echo htmlspecialchars(get_image_url($row_inst['image'], '../images/instruments/')); ?>" alt="<?php echo htmlspecialchars($row_inst['name']); ?>" class="instrument-admin-image" onerror="this.onerror=null; this.src='../images/instruments/demo_image.png';">
                         </div>
                         <div class="card-details-wrapper">
                             <h3><?php echo htmlspecialchars($row_inst['name']); ?></h3>
