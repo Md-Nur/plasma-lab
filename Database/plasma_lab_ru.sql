@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `admin_login` (
   `firstname` varchar(255) NOT NULL DEFAULT 'Admin',
   `lastname`  varchar(255) NOT NULL DEFAULT 'User',
   `phone`     varchar(20)  NOT NULL DEFAULT '',
-  `image`     varchar(255) NOT NULL DEFAULT '',
+  `image`     varchar(500) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `members` (
   `id`          int(11)      NOT NULL AUTO_INCREMENT,
   `name`        varchar(255) NOT NULL DEFAULT '',
   `designation` varchar(255) NOT NULL DEFAULT '',
-  `image`       varchar(255) NOT NULL DEFAULT 'demo_image.png',
+  `image`       varchar(500) NOT NULL DEFAULT 'https://i.ibb.co/7tskC0HV/demo-image.png',
   `phone`       varchar(50)  NOT NULL DEFAULT '',
   `email`       varchar(255) NOT NULL DEFAULT '',
   `info`        text,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `members` (
 -- ── students ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `students` (
   `id`       int(11)      NOT NULL AUTO_INCREMENT,
-  `image`    varchar(255) NOT NULL DEFAULT '',
+  `image`    varchar(500) NOT NULL DEFAULT '',
   `name`     varchar(255) NOT NULL DEFAULT '',
   `session`  varchar(100) NOT NULL DEFAULT '',
   `email`    varchar(255) NOT NULL DEFAULT '',
@@ -77,14 +77,14 @@ CREATE TABLE IF NOT EXISTS `videos` (
   `id`    int(11)      NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '',
   `info`  text,
-  `image` varchar(255) NOT NULL DEFAULT 'demo_image.png',
+  `image` varchar(500) NOT NULL DEFAULT 'https://i.ibb.co/7tskC0HV/demo-image.png',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── activities ───────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `activities` (
   `id`    int(11)      NOT NULL AUTO_INCREMENT,
-  `image` varchar(255) NOT NULL DEFAULT '',
+  `image` varchar(500) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL DEFAULT '',
   `info`  text,
   PRIMARY KEY (`id`)
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `activities` (
 -- ── areas ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `areas` (
   `id`    int(11)      NOT NULL AUTO_INCREMENT,
-  `image` varchar(255) NOT NULL DEFAULT '',
+  `image` varchar(500) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL DEFAULT '',
   `info`  text,
   PRIMARY KEY (`id`)
@@ -125,7 +125,7 @@ ON DUPLICATE KEY UPDATE `id` = `id`;
 -- ── slider ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `slider` (
   `id`        int(11)      NOT NULL AUTO_INCREMENT,
-  `image`     varchar(255) NOT NULL DEFAULT '',
+  `image`     varchar(500) NOT NULL DEFAULT '',
   `title`     varchar(255) NOT NULL DEFAULT '',
   `sub_title` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
@@ -182,14 +182,14 @@ CREATE TABLE IF NOT EXISTS `conference` (
 -- ── photos ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `photos` (
   `id`    int(11)      NOT NULL AUTO_INCREMENT,
-  `image` varchar(255) NOT NULL DEFAULT '',
+  `image` varchar(500) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── instruments ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `instruments` (
   `id`            int(11)      NOT NULL AUTO_INCREMENT,
-  `image`         varchar(255) NOT NULL DEFAULT '',
+  `image`         varchar(500) NOT NULL DEFAULT '',
   `name`          varchar(255) NOT NULL DEFAULT '',
   `description`   text         NOT NULL,
   `specifications` text        NOT NULL DEFAULT '',
@@ -264,36 +264,36 @@ WHERE NOT EXISTS (SELECT 1 FROM `products` WHERE `id` = 3);
 
 -- Seed default areas
 INSERT INTO `areas` (`id`, `image`, `title`, `info`)
-SELECT 1, 'demo_image.png', 'Atmospheric Non-Thermal Plasma', 'Generation, diagnostics, and characterization of cold atmospheric pressure plasmas (DBD, APPJ) and investigation of active reactive species for industrial and biological applications.'
+SELECT 1, 'https://i.ibb.co/rGdH5q13/1525859533.jpg', 'Atmospheric Non-Thermal Plasma', 'Generation, diagnostics, and characterization of cold atmospheric pressure plasmas (DBD, APPJ) and investigation of active reactive species for industrial and biological applications.'
 WHERE NOT EXISTS (SELECT 1 FROM `areas` WHERE `id` = 1);
 
 INSERT INTO `areas` (`id`, `image`, `title`, `info`)
-SELECT 2, 'demo_image.png', 'Plasma Agriculture & Food Science', 'Enhancing crop yield, seed germination acceleration, and microbial decontamination using direct cold plasma exposure and Plasma-Activated Water (PAW).'
+SELECT 2, 'https://i.ibb.co/0RZSMWCL/1526729574.jpg', 'Plasma Agriculture & Food Science', 'Enhancing crop yield, seed germination acceleration, and microbial decontamination using direct cold plasma exposure and Plasma-Activated Water (PAW).'
 WHERE NOT EXISTS (SELECT 1 FROM `areas` WHERE `id` = 2);
 
 INSERT INTO `areas` (`id`, `image`, `title`, `info`)
-SELECT 3, 'demo_image.png', 'Thin Film Deposition & Nanomaterials', 'Plasma-assisted chemical and physical vapor deposition of functional thin films, protective coatings, and nanostructured materials for electronic and optical devices.'
+SELECT 3, 'https://i.ibb.co/jxFqJfn/1532398637.png', 'Thin Film Deposition & Nanomaterials', 'Plasma-assisted chemical and physical vapor deposition of functional thin films, protective coatings, and nanostructured materials for electronic and optical devices.'
 WHERE NOT EXISTS (SELECT 1 FROM `areas` WHERE `id` = 3);
 
 INSERT INTO `areas` (`id`, `image`, `title`, `info`)
-SELECT 4, 'demo_image.png', 'Plasma Medicine & Sterilization', 'Harnessing Reactive Oxygen and Nitrogen Species (RONS) generated by cold plasma for wound healing, biomedical material surface activation, and pathogen eradication.'
+SELECT 4, 'https://i.ibb.co/SX85nrJn/1783381676.png', 'Plasma Medicine & Sterilization', 'Harnessing Reactive Oxygen and Nitrogen Species (RONS) generated by cold plasma for wound healing, biomedical material surface activation, and pathogen eradication.'
 WHERE NOT EXISTS (SELECT 1 FROM `areas` WHERE `id` = 4);
 
 -- Seed default instruments
 INSERT INTO `instruments` (`id`, `image`, `name`, `description`, `specifications`, `status`)
-SELECT 1, 'demo_image.png', 'Cold Atmospheric Pressure Plasma Jet (APPJ)', 'High-voltage AC/RF driven atmospheric plasma jet system with mass flow controllers for argon, helium, and reactive gas mixtures.', 'Frequency: 10 kHz – 50 kHz\nApplied Voltage: 0 – 20 kV peak-to-peak\nWorking Gas: He, Ar, O2, N2\nOperating Temp: Room temperature (25°C - 35°C)\nApplications: Biomedical, agriculture, polymer treatment', 'active'
+SELECT 1, 'https://i.ibb.co/WWr3F58t/Whats-App-Image-2026-11-12-at-10-34-23-AM.jpg', 'Cold Atmospheric Pressure Plasma Jet (APPJ)', 'High-voltage AC/RF driven atmospheric plasma jet system with mass flow controllers for argon, helium, and reactive gas mixtures.', 'Frequency: 10 kHz – 50 kHz\nApplied Voltage: 0 – 20 kV peak-to-peak\nWorking Gas: He, Ar, O2, N2\nOperating Temp: Room temperature (25°C - 35°C)\nApplications: Biomedical, agriculture, polymer treatment', 'active'
 WHERE NOT EXISTS (SELECT 1 FROM `instruments` WHERE `id` = 1);
 
 INSERT INTO `instruments` (`id`, `image`, `name`, `description`, `specifications`, `status`)
-SELECT 2, 'demo_image.png', 'Dielectric Barrier Discharge (DBD) Plasma Reactor', 'Planar DBD reactor with quartz dielectric barriers for large-area uniform surface modification, ozone synthesis, and seed treatment.', 'Electrode Configuration: Parallel planar, 100 x 100 mm\nDielectric: High-purity Quartz (1.5 mm thick)\nDischarge Gap: 1 mm – 10 mm adjustable\nPower Supply: 0-30 kV, 50 Hz - 20 kHz\nGas Flow: Ambient air, O2, N2, CO2', 'active'
+SELECT 2, 'https://i.ibb.co/DgVDZCy5/1525857843.jpg', 'Dielectric Barrier Discharge (DBD) Plasma Reactor', 'Planar DBD reactor with quartz dielectric barriers for large-area uniform surface modification, ozone synthesis, and seed treatment.', 'Electrode Configuration: Parallel planar, 100 x 100 mm\nDielectric: High-purity Quartz (1.5 mm thick)\nDischarge Gap: 1 mm – 10 mm adjustable\nPower Supply: 0-30 kV, 50 Hz - 20 kHz\nGas Flow: Ambient air, O2, N2, CO2', 'active'
 WHERE NOT EXISTS (SELECT 1 FROM `instruments` WHERE `id` = 2);
 
 INSERT INTO `instruments` (`id`, `image`, `name`, `description`, `specifications`, `status`)
-SELECT 3, 'demo_image.png', 'Optical Emission Spectrometer (OES)', 'High-resolution UV-Vis-NIR spectrometer configured for real-time plasma diagnostic measurements, emission spectrum analysis, and radical species identification.', 'Spectral Range: 200 nm – 900 nm\nOptical Resolution: < 0.5 nm FWHM\nDetector: 2048-pixel linear CCD array\nIntegration Time: 1 ms to 65 seconds\nFiber Optic: Solarization-resistant quartz fiber', 'active'
+SELECT 3, 'https://i.ibb.co/DTchqSr/1525857898.jpg', 'Optical Emission Spectrometer (OES)', 'High-resolution UV-Vis-NIR spectrometer configured for real-time plasma diagnostic measurements, emission spectrum analysis, and radical species identification.', 'Spectral Range: 200 nm – 900 nm\nOptical Resolution: < 0.5 nm FWHM\nDetector: 2048-pixel linear CCD array\nIntegration Time: 1 ms to 65 seconds\nFiber Optic: Solarization-resistant quartz fiber', 'active'
 WHERE NOT EXISTS (SELECT 1 FROM `instruments` WHERE `id` = 3);
 
 INSERT INTO `instruments` (`id`, `image`, `name`, `description`, `specifications`, `status`)
-SELECT 4, 'demo_image.png', 'High-Voltage Storage Oscilloscope & Probes', '4-channel high-bandwidth digital oscilloscope coupled with calibrated 1000:1 high-voltage probes and current monitors for electrical discharge characterization.', 'Bandwidth: 200 MHz, 4 Channels\nSample Rate: 2 GSa/s\nHV Probe: 1000:1 attenuation, up to 40 kV peak\nCurrent Monitor: Rogowski coil / Pearson current monitor\nDiagnostics: Lissajous Q-V charge-voltage analysis', 'active'
+SELECT 4, 'https://i.ibb.co/Sw5xP5Wr/1526478304.png', 'High-Voltage Storage Oscilloscope & Probes', '4-channel high-bandwidth digital oscilloscope coupled with calibrated 1000:1 high-voltage probes and current monitors for electrical discharge characterization.', 'Bandwidth: 200 MHz, 4 Channels\nSample Rate: 2 GSa/s\nHV Probe: 1000:1 attenuation, up to 40 kV peak\nCurrent Monitor: Rogowski coil / Pearson current monitor\nDiagnostics: Lissajous Q-V charge-voltage analysis', 'active'
 WHERE NOT EXISTS (SELECT 1 FROM `instruments` WHERE `id` = 4);
 
 

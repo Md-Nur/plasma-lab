@@ -4,7 +4,18 @@
  * 
  * Automatically uploads dashboard images to ImgBB if IMGBB_API_KEY is configured.
  * Safely falls back to local storage if API key is missing or upload fails.
+ * Automatically resolves both local and hosted images through get_image_url().
  */
+
+// Load static URL catalog if available
+if (!isset($GLOBALS['IMGBB_CATALOG'])) {
+    $catalogPath = __DIR__ . '/imgbb_catalog.php';
+    if (file_exists($catalogPath)) {
+        $GLOBALS['IMGBB_CATALOG'] = require $catalogPath;
+    } else {
+        $GLOBALS['IMGBB_CATALOG'] = [];
+    }
+}
 
 if (!function_exists('get_imgbb_api_key')) {
     function get_imgbb_api_key() {
@@ -57,7 +68,7 @@ if (!defined('IMGBB_API_KEY')) {
 
 if (!function_exists('upload_image_to_imgbb')) {
     /**
-     * Upload an image file to ImgBB API v1.
+     * Upload an image file to ImgBB API v1 with automatic retry.
      *
      * @param string $fileTmpPath Absolute path to the local/temporary image file
      * @param string $originalName Original filename
@@ -79,35 +90,66 @@ if (!function_exists('upload_image_to_imgbb')) {
         $mime = @mime_content_type($fileTmpPath) ?: 'image/jpeg';
         $filename = !empty($originalName) ? basename($originalName) : 'image.jpg';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.imgbb.com/1/upload?key=' . urlencode($apiKey));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, [
-            'image' => new CURLFile($fileTmpPath, $mime, $filename)
-        ]);
+        $maxAttempts = 3;
+        $attempt = 0;
+        $lastErr = '';
 
-        $response = curl_exec($ch);
-        $curlErr = curl_error($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        while ($attempt < $maxAttempts) {
+            $attempt++;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://api.imgbb.com/1/upload?key=' . urlencode($apiKey));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'image' => new CURLFile($fileTmpPath, $mime, $filename)
+            ]);
 
-        if ($curlErr) {
-            $errorMessage = 'ImgBB connection error: ' . $curlErr;
-            return false;
+            $response = curl_exec($ch);
+            $curlErr = curl_error($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($curlErr) {
+                $lastErr = 'ImgBB connection error: ' . $curlErr;
+                usleep(300000); // 0.3s before retry
+                continue;
+            }
+
+            $json = json_decode($response, true);
+            if ($httpCode === 200 && !empty($json['success']) && !empty($json['data']['url'])) {
+                $hostedUrl = $json['data']['url'];
+
+                // Dynamically update the runtime catalog and mapping file
+                if (!isset($GLOBALS['IMGBB_CATALOG'])) {
+                    $GLOBALS['IMGBB_CATALOG'] = [];
+                }
+                $GLOBALS['IMGBB_CATALOG'][$filename] = $hostedUrl;
+                if (!empty($originalName)) {
+                    $GLOBALS['IMGBB_CATALOG'][basename($originalName)] = $hostedUrl;
+                }
+
+                $mappingFile = __DIR__ . '/imgbb_mapping.json';
+                if (file_exists($mappingFile) && is_writable($mappingFile)) {
+                    $existing = json_decode(@file_get_contents($mappingFile), true) ?: [];
+                    $existing[$filename] = $hostedUrl;
+                    @file_put_contents($mappingFile, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                }
+
+                return $hostedUrl;
+            }
+
+            $apiMsg = $json['error']['message'] ?? ('HTTP ' . $httpCode);
+            $lastErr = 'ImgBB upload failed: ' . $apiMsg;
+            usleep(300000);
         }
 
-        $json = json_decode($response, true);
-        if ($httpCode === 200 && !empty($json['success']) && !empty($json['data']['url'])) {
-            return $json['data']['url'];
-        }
-
-        $apiMsg = $json['error']['message'] ?? ('HTTP ' . $httpCode);
-        $errorMessage = 'ImgBB upload failed: ' . $apiMsg;
+        $errorMessage = $lastErr ?: 'ImgBB upload failed after retries.';
         return false;
     }
 }
@@ -136,6 +178,7 @@ if (!function_exists('upload_dashboard_image')) {
         // 1. Try uploading to ImgBB
         $apiKey = get_imgbb_api_key();
         if (!empty($apiKey)) {
+            $imgbbError = '';
             $imgbbUrl = upload_image_to_imgbb($fileInput['tmp_name'], $fileInput['name'] ?? '', $imgbbError);
             if ($imgbbUrl) {
                 return $imgbbUrl;
@@ -173,6 +216,7 @@ if (!function_exists('get_image_url')) {
     /**
      * Resolves an image value to a full displayable URL.
      * If the value is an absolute HTTP/HTTPS URL, it returns it directly.
+     * If the value exists in the ImgBB catalog, it returns the hosted ImgBB URL.
      * If the value is a local relative filename, it prefixes the local folder.
      *
      * @param string $image Database image value (URL or filename)
@@ -186,7 +230,7 @@ if (!function_exists('get_image_url')) {
 
         $image = trim($image);
 
-        // Check if image is an external URL or data URI
+        // 1. Check if image is already an external URL or data URI
         if (preg_match('~^(https?://|//|data:)~i', $image)) {
             return $image;
         }
@@ -196,8 +240,29 @@ if (!function_exists('get_image_url')) {
 
         // Normalize image path by removing any leading '../', './', or '/'
         $cleanImage = preg_replace('~^(\.\./|\./|/)+~', '', $image);
+        $cleanFolder = !empty($localFolder) ? preg_replace('~^(\.\./|\./|/)+~', '', $localFolder) : '';
+        $cleanFolder = rtrim($cleanFolder, '/') . '/';
+        $baseName = basename($cleanImage);
 
-        // If image already has a relative path like 'images/...'
+        // 2. Check ImgBB catalog mapping
+        $catalog = $GLOBALS['IMGBB_CATALOG'] ?? [];
+        if (!empty($catalog)) {
+            $candidates = [
+                $cleanImage,
+                'images/' . $cleanImage,
+                $cleanFolder . $baseName,
+                'images/' . $cleanFolder . $baseName,
+                $baseName,
+            ];
+            foreach ($candidates as $cand) {
+                $cand = preg_replace('~/{2,}~', '/', $cand);
+                if (!empty($catalog[$cand])) {
+                    return $catalog[$cand];
+                }
+            }
+        }
+
+        // 3. Fallback to local file path
         if (strpos($cleanImage, 'images/') === 0) {
             return ($isDashboard ? '../' : '') . $cleanImage;
         }
@@ -205,7 +270,7 @@ if (!function_exists('get_image_url')) {
         // Otherwise it's a bare filename like 'demo_image.png' or '1726478916.jpg'
         if (!empty($localFolder)) {
             $localFolder = rtrim($localFolder, '/') . '/';
-            return $localFolder . basename($cleanImage);
+            return $localFolder . $baseName;
         }
 
         return ($isDashboard ? '../' : '') . $cleanImage;
